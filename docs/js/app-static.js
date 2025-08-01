@@ -19,6 +19,12 @@ class EuystacioDashboard {
             pulseForm.addEventListener('submit', (e) => this.handlePulseSubmission(e));
         }
 
+        // Tutor nomination form submission
+        const tutorForm = document.getElementById('tutor-nomination-form');
+        if (tutorForm) {
+            tutorForm.addEventListener('submit', (e) => this.handleTutorNomination(e));
+        }
+
         // Intensity slider
         const intensitySlider = document.getElementById('intensity');
         const intensityValue = document.getElementById('intensity-value');
@@ -139,12 +145,30 @@ class EuystacioDashboard {
         const container = document.getElementById('tutors-list');
         if (!container) return;
 
-        if (!tutors || tutors.length === 0) {
-            container.innerHTML = '<div class="loading">No tutor nominations yet.</div>';
+        // Merge with localStorage tutors for static demo
+        const localTutors = JSON.parse(localStorage.getItem('euystacio_tutors') || '[]');
+        
+        // Create a map to avoid duplicates (by name)
+        const tutorMap = new Map();
+        
+        // Add JSON tutors first
+        tutors.forEach(tutor => {
+            tutorMap.set(tutor.name, tutor);
+        });
+        
+        // Add localStorage tutors (these will override if same name)
+        localTutors.forEach(tutor => {
+            tutorMap.set(tutor.name, tutor);
+        });
+        
+        const allTutors = Array.from(tutorMap.values());
+
+        if (!allTutors || allTutors.length === 0) {
+            container.innerHTML = '<div class="loading">No tutor nominations yet. Be the first to nominate a wise guide!</div>';
             return;
         }
 
-        container.innerHTML = tutors.map(tutor => `
+        container.innerHTML = allTutors.map(tutor => `
             <div class="tutor-item">
                 <div class="tutor-name">${tutor.name || 'Anonymous Tutor'}</div>
                 <div class="tutor-reason">${tutor.reason || 'Nominated for wisdom and guidance'}</div>
@@ -217,6 +241,35 @@ class EuystacioDashboard {
         this.displayPulses(pulses);
     }
 
+    async handleTutorNomination(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        const nominationData = {
+            tutor_name: formData.get('tutor_name').trim(),
+            reason: formData.get('reason').trim() || 'Nominated for wisdom and guidance'
+        };
+
+        if (!nominationData.tutor_name) {
+            this.showTutorMessage('Please enter a tutor name', 'error');
+            return;
+        }
+
+        // Store in localStorage for static demo
+        const tutors = JSON.parse(localStorage.getItem('euystacio_tutors') || '[]');
+        tutors.unshift({
+            name: nominationData.tutor_name,
+            reason: nominationData.reason
+        });
+        localStorage.setItem('euystacio_tutors', JSON.stringify(tutors));
+
+        this.showTutorMessage('Tutor nominated successfully! 🍃 (Demo mode - stored locally)', 'success');
+        event.target.reset();
+        
+        // Update display
+        this.loadTutors(); // Load fresh data instead of calling displayTutors directly
+    }
+
     async triggerReflection() {
         const button = document.getElementById('reflect-btn');
         if (!button) return;
@@ -251,6 +304,24 @@ class EuystacioDashboard {
                 this.displayPulses(pulses);
             }
         }, 30000);
+    }
+
+    showTutorMessage(message, type = 'info') {
+        let messageEl = document.querySelector('.tutor-message');
+        if (!messageEl) {
+            messageEl = document.createElement('div');
+            messageEl.className = 'tutor-message';
+            document.querySelector('.tutor-nomination-form').appendChild(messageEl);
+        }
+
+        messageEl.className = `tutor-message ${type}`;
+        messageEl.textContent = message;
+
+        setTimeout(() => {
+            if (messageEl.parentNode) {
+                messageEl.parentNode.removeChild(messageEl);
+            }
+        }, 5000);
     }
 
     showMessage(message, type = 'info') {

@@ -94,8 +94,25 @@
             <!-- Leaves: Tutor Nominations -->
             <section class="tutors-section">
                 <h3>🍃 Tutor Nominations (Leaves)</h3>
-                <div id="tutors-list" class="tutors-list">
-                    <div class="loading">Loading tutor nominations...</div>
+                <div class="tutor-nomination-form">
+                    <h4>Nominate a Tutor</h4>
+                    <form id="tutor-nomination-form">
+                        <div class="form-group">
+                            <label for="tutor-name">Tutor Name:</label>
+                            <input type="text" id="tutor-name" name="tutor_name" required placeholder="Enter tutor's name...">
+                        </div>
+                        <div class="form-group">
+                            <label for="nomination-reason">Reason for Nomination:</label>
+                            <textarea id="nomination-reason" name="reason" placeholder="Why do you nominate this person as a tutor for Euystacio?"></textarea>
+                        </div>
+                        <button type="submit">Nominate Tutor</button>
+                    </form>
+                </div>
+                <div class="nominated-tutors">
+                    <h4>Current Nominations</h4>
+                    <div id="tutors-list" class="tutors-list">
+                        <div class="loading">Loading tutor nominations...</div>
+                    </div>
                 </div>
             </section>
 

@@ -255,6 +255,19 @@ button:hover {
 }
 
 /* Tutors List */
+.tutor-nomination-form {
+    background: #fff8e1;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border: 2px solid var(--accent-gold);
+}
+
+.nominated-tutors h4 {
+    color: var(--earth-brown);
+    margin-bottom: 15px;
+}
+
 .tutor-item {
     background: #fff8e1;
     padding: 15px;
@@ -330,6 +343,14 @@ button:hover {
     border-radius: 8px;
     border-left: 3px solid #4caf50;
     margin-bottom: 15px;
+}
+
+.message, .tutor-message {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 /* Footer */
