@@ -84,6 +84,7 @@ class EuystacioDashboard {
             const response = await fetch('/api/pulses');
             const pulses = await response.json();
             this.displayPulses(pulses);
+            this.updateBackgroundColor(pulses);
         } catch (error) {
             console.error('Error loading pulses:', error);
             this.showError('pulses-list', 'Failed to load pulses');
@@ -303,6 +304,55 @@ class EuystacioDashboard {
         } catch (error) {
             return timestamp;
         }
+    }
+
+    updateBackgroundColor(pulses) {
+        if (!pulses || pulses.length === 0) {
+            // Default to peaceful state
+            this.setBackgroundEmotion('peace');
+            this.updateCurrentEmotion('Peaceful');
+            return;
+        }
+
+        // Get the most recent pulse to determine current mood
+        const sortedPulses = pulses.sort((a, b) => 
+            new Date(b.timestamp || 0) - new Date(a.timestamp || 0)
+        );
+
+        const recentPulse = sortedPulses[0];
+        if (recentPulse && recentPulse.emotion) {
+            this.setBackgroundEmotion(recentPulse.emotion);
+            this.updateCurrentEmotion(this.capitalizeEmotion(recentPulse.emotion));
+        } else {
+            this.setBackgroundEmotion('peace');
+            this.updateCurrentEmotion('Peaceful');
+        }
+    }
+
+    setBackgroundEmotion(emotion) {
+        // Remove any existing emotion classes
+        const emotionClasses = [
+            'emotion-hope', 'emotion-wonder', 'emotion-peace', 'emotion-curiosity',
+            'emotion-concern', 'emotion-gratitude', 'emotion-excitement', 'emotion-contemplation'
+        ];
+        
+        document.body.classList.remove(...emotionClasses);
+        
+        // Add the new emotion class
+        if (emotion) {
+            document.body.classList.add(`emotion-${emotion}`);
+        }
+    }
+
+    updateCurrentEmotion(emotion) {
+        const currentEmotionElement = document.getElementById('current-emotion');
+        if (currentEmotionElement) {
+            currentEmotionElement.textContent = emotion;
+        }
+    }
+
+    capitalizeEmotion(emotion) {
+        return emotion.charAt(0).toUpperCase() + emotion.slice(1);
     }
 }
 

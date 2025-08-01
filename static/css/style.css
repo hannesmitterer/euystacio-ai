@@ -24,6 +24,40 @@ body {
     color: var(--text-dark);
     background: linear-gradient(135deg, var(--bg-light) 0%, #e8f5e8 100%);
     min-height: 100vh;
+    transition: background 2s ease-in-out;
+}
+
+/* Dynamic background colors based on emotions */
+body.emotion-hope {
+    background: linear-gradient(135deg, #fff4e6 0%, #ffeaa7 100%);
+}
+
+body.emotion-wonder {
+    background: linear-gradient(135deg, #e8f4fd 0%, #74b9ff 100%);
+}
+
+body.emotion-peace {
+    background: linear-gradient(135deg, #e8f5e8 0%, #00b894 100%);
+}
+
+body.emotion-curiosity {
+    background: linear-gradient(135deg, #f3e5f5 0%, #a29bfe 100%);
+}
+
+body.emotion-concern {
+    background: linear-gradient(135deg, #fff5f5 0%, #fab1a0 100%);
+}
+
+body.emotion-gratitude {
+    background: linear-gradient(135deg, #fef7e0 0%, #fdcb6e 100%);
+}
+
+body.emotion-excitement {
+    background: linear-gradient(135deg, #ffe8e8 0%, #ff7675 100%);
+}
+
+body.emotion-contemplation {
+    background: linear-gradient(135deg, #f0f3ff 0%, #6c5ce7 100%);
 }
 
 .container {
