@@ -1,0 +1,11 @@
+{
+  "created": "2025-08-01T16:53:53.523667+00:00",
+  "backup_system_version": "1.0",
+  "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer",
+  "immutable_commitment": true,
+  "backup_locations": [
+    "local_snapshots",
+    "fractal_chain_mirror",
+    "reflection_tree_backup"
+  ]
+}

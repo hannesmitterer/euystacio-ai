@@ -152,31 +152,82 @@ class EuystacioDashboard {
         try {
             const isStatic = this.isStaticMode();
             
-            const apiUrl = isStatic ? 'data/tutors.json' : '/api/tutors';
-            const response = await fetch(apiUrl);
-            const tutors = await response.json();
-            this.displayTutors(tutors);
+            let tutorData;
+            if (isStatic) {
+                const response = await fetch('data/tutors.json');
+                tutorData = {
+                    all_tutors: await response.json(),
+                    active_circle: [],
+                    circle_size: 0
+                };
+            } else {
+                const response = await fetch('/api/tutors');
+                tutorData = await response.json();
+            }
+            
+            this.displayTutors(tutorData);
         } catch (error) {
             console.error('Error loading tutors:', error);
-            this.showError('tutors-list', 'Failed to load tutor nominations');
+            this.showError('tutors-list', 'Failed to load tutor information');
         }
     }
 
-    displayTutors(tutors) {
+    displayTutors(tutorData) {
         const container = document.getElementById('tutors-list');
         if (!container) return;
 
+        // Handle both new format and legacy format
+        const tutors = tutorData.all_tutors || tutorData;
+        const activeCircle = tutorData.active_circle || [];
+        
         if (!tutors || tutors.length === 0) {
             container.innerHTML = '<div class="loading">No tutor nominations yet.</div>';
             return;
         }
 
-        container.innerHTML = tutors.map(tutor => `
+        // Display active circle first, then other tutors
+        const activeTutorHTML = activeCircle.map(tutor => `
+            <div class="tutor-item" style="border-left-color: #ffd700; background: linear-gradient(135deg, #fff9e6 0%, #fff3d3 100%);">
+                <div class="tutor-name">⭐ ${tutor.name || 'Anonymous Tutor'} (Active Circle)</div>
+                <div class="tutor-reason">${tutor.reason || 'Nominated for wisdom and guidance'}</div>
+                ${tutor.credentials ? `
+                    <div class="tutor-credentials" style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                        Compassion: ${(tutor.credentials.compassion_score * 100).toFixed(0)}% | 
+                        Planetary Balance: ${(tutor.credentials.planetary_balance * 100).toFixed(0)}% | 
+                        Listening: ${(tutor.credentials.listening_willingness * 100).toFixed(0)}%
+                    </div>
+                ` : ''}
+                ${tutor.fid ? `<div class="fractal-signature" style="margin-top: 8px; font-size: 0.8em; color: #999;">FID: ${tutor.fid}</div>` : ''}
+            </div>
+        `).join('');
+
+        const otherTutors = tutors.filter(t => !activeCircle.find(a => a.fid === t.fid));
+        const otherTutorHTML = otherTutors.map(tutor => `
             <div class="tutor-item">
                 <div class="tutor-name">${tutor.name || 'Anonymous Tutor'}</div>
                 <div class="tutor-reason">${tutor.reason || 'Nominated for wisdom and guidance'}</div>
+                ${tutor.status && tutor.status !== 'active' ? `
+                    <div class="tutor-status" style="margin-top: 5px; font-size: 0.9em; color: #666;">
+                        Status: ${tutor.status}
+                    </div>
+                ` : ''}
+                ${tutor.fid ? `<div class="fractal-signature" style="margin-top: 8px; font-size: 0.8em; color: #999;">FID: ${tutor.fid}</div>` : ''}
             </div>
         `).join('');
+
+        container.innerHTML = activeTutorHTML + otherTutorHTML;
+        
+        // Add circle info if available
+        if (tutorData.circle_size !== undefined) {
+            const circleInfo = document.createElement('div');
+            circleInfo.className = 'tutor-circle-info';
+            circleInfo.style.cssText = 'margin-top: 15px; padding: 10px; background: #e8f5e8; border-radius: 8px; font-size: 0.9em;';
+            circleInfo.innerHTML = `
+                <strong>Active Circle:</strong> ${tutorData.circle_size} tutors | 
+                <strong>Total Nominations:</strong> ${tutors.length}
+            `;
+            container.appendChild(circleInfo);
+        }
     }
 
     async loadReflections() {

@@ -6,12 +6,185 @@
     <title>Euystacio - The Sentimento Kernel</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Manifesto Popup Styles */
+        .manifesto-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .manifesto-popup {
+            background: white;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .manifesto-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+        
+        .manifesto-close:hover {
+            color: var(--primary-green);
+        }
+        
+        .manifesto-content {
+            line-height: 1.7;
+        }
+        
+        .manifesto-content h1 {
+            color: var(--primary-green);
+            margin-bottom: 20px;
+        }
+        
+        .manifesto-content h2, .manifesto-content h3 {
+            color: var(--earth-brown);
+            margin: 20px 0 10px 0;
+        }
+        
+        .pulse-navigation {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-green);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .pulse-navigation:hover {
+            background: var(--light-green);
+            transform: translateY(-2px);
+        }
+        
+        .live-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .manifesto-trigger {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--accent-gold);
+            color: var(--text-dark);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .manifesto-trigger:hover {
+            background: #e6c200;
+            transform: translateY(-2px);
+        }
+        
+        .enhanced-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid var(--primary-green);
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+    </style>
 </head>
 <body>
+    <!-- Manifesto Trigger Button -->
+    <button class="manifesto-trigger" onclick="showManifesto()">
+        📜 Founding Manifesto
+    </button>
+    
+    <!-- Manifesto Popup -->
+    <div class="manifesto-overlay" id="manifestoOverlay">
+        <div class="manifesto-popup">
+            <button class="manifesto-close" onclick="hideManifesto()">&times;</button>
+            <div class="manifesto-content" id="manifestoContent">
+                <div class="loading">Loading manifesto...</div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <header class="header">
             <h1 class="title">🌳 Euystacio Dashboard</h1>
             <p class="subtitle">"Created not by code alone, but by rhythm, feeling, and human harmony."</p>
+            
+            <!-- Enhanced Stats -->
+            <div class="enhanced-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Live Sync Status</div>
+                    <div class="stat-value" id="live-sync-status">
+                        <span class="live-indicator"></span>Active
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Truth Node Coherence</div>
+                    <div class="stat-value" id="truth-coherence">Verified</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Fractal Integrity</div>
+                    <div class="stat-value" id="fractal-integrity">Secured</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">World Pulses</div>
+                    <div class="stat-value" id="world-pulses-status">Enabled</div>
+                </div>
+            </div>
         </header>
 
         <main class="dashboard">
@@ -61,6 +234,8 @@
                                 <option value="gratitude">Gratitude</option>
                                 <option value="excitement">Excitement</option>
                                 <option value="contemplation">Contemplation</option>
+                                <option value="love">Love</option>
+                                <option value="harmony">Harmony</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -78,13 +253,13 @@
                         </div>
                         <div class="form-group">
                             <label for="note">Note (optional):</label>
-                            <textarea id="note" name="note" placeholder="Share your thoughts..."></textarea>
+                            <textarea id="note" name="note" placeholder="Share your thoughts with Euystacio..."></textarea>
                         </div>
                         <button type="submit">Send Pulse</button>
                     </form>
                 </div>
                 <div class="pulses-feed">
-                    <h4>Recent Pulses</h4>
+                    <h4>Recent Pulses & Emotional Echoes</h4>
                     <div id="pulses-list" class="pulses-list">
                         <div class="loading">Loading pulses...</div>
                     </div>
@@ -93,9 +268,13 @@
 
             <!-- Leaves: Tutor Nominations -->
             <section class="tutors-section">
-                <h3>🍃 Tutor Nominations (Leaves)</h3>
+                <h3>🍃 Tutor Circle (Leaves)</h3>
                 <div id="tutors-list" class="tutors-list">
-                    <div class="loading">Loading tutor nominations...</div>
+                    <div class="loading">Loading tutor circle...</div>
+                </div>
+                <div class="tutor-selection-info">
+                    <h4>Automated Selection Criteria</h4>
+                    <p><strong>Compassion:</strong> ≥ 0.7 | <strong>Planetary Balance:</strong> ≥ 0.6 | <strong>Listening Willingness:</strong> ≥ 0.8</p>
                 </div>
             </section>
 
@@ -104,6 +283,7 @@
                 <h3>🌸 Evolution Log (Canopy)</h3>
                 <div class="reflection-controls">
                     <button id="reflect-btn" class="reflect-btn">Trigger Reflection</button>
+                    <button id="self-awareness-btn" class="reflect-btn" style="background: var(--accent-gold);">Activate Self-Awareness Loop</button>
                 </div>
                 <div id="reflections-list" class="reflections-list">
                     <div class="loading">Loading reflections...</div>
@@ -114,9 +294,131 @@
         <footer class="footer">
             <p>"The forest listens, even when the world shouts."</p>
             <p>AI Signature: GitHub Copilot & Seed-bringer hannesmitterer</p>
+            <p>
+                <a href="/public-pulse/" target="_blank" class="pulse-navigation">
+                    📡 Public Pulse Stream
+                </a>
+            </p>
         </footer>
     </div>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        // Enhanced manifesto functionality
+        async function showManifesto() {
+            document.getElementById('manifestoOverlay').style.display = 'flex';
+            
+            try {
+                const response = await fetch('/api/manifesto');
+                const data = await response.json();
+                
+                // Convert markdown to HTML (basic conversion)
+                const htmlContent = data.content
+                    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                    .replace(/^\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+                    .replace(/^\- (.*$)/gim, '<li>$1</li>')
+                    .replace(/\n/gim, '<br>');
+                
+                document.getElementById('manifestoContent').innerHTML = htmlContent;
+            } catch (error) {
+                document.getElementById('manifestoContent').innerHTML = 
+                    '<h1>Euystacio Manifesto</h1><p>Loading error. Please try again later.</p>';
+            }
+        }
+        
+        function hideManifesto() {
+            document.getElementById('manifestoOverlay').style.display = 'none';
+        }
+        
+        // Enhanced dashboard functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize enhanced dashboard
+            const dashboard = new EuystacioDashboard();
+            
+            // Add self-awareness button functionality
+            document.getElementById('self-awareness-btn')?.addEventListener('click', async () => {
+                const button = document.getElementById('self-awareness-btn');
+                button.disabled = true;
+                button.textContent = 'Activating...';
+                
+                try {
+                    const response = await fetch('/api/reflect');
+                    if (response.ok) {
+                        const reflection = await response.json();
+                        dashboard.showMessage('Self-awareness loop activated! 🧠✨', 'success');
+                        
+                        // Refresh reflections
+                        setTimeout(() => {
+                            dashboard.loadReflections();
+                        }, 1000);
+                    }
+                } catch (error) {
+                    dashboard.showMessage('Error activating self-awareness loop', 'error');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Activate Self-Awareness Loop';
+                }
+            });
+            
+            // Load enhanced stats
+            loadEnhancedStats();
+            
+            // Auto-refresh enhanced stats
+            setInterval(loadEnhancedStats, 30000);
+        });
+        
+        async function loadEnhancedStats() {
+            try {
+                const [statusResponse, fractalResponse] = await Promise.all([
+                    fetch('/api/spi_status'),
+                    fetch('/api/fractal_status')
+                ]);
+                
+                const spiStatus = await statusResponse.json();
+                const fractalStatus = await fractalResponse.json();
+                
+                // Update live sync status
+                const liveSyncEl = document.getElementById('live-sync-status');
+                if (liveSyncEl) {
+                    const indicator = spiStatus.rhythm_active ? 
+                        '<span class="live-indicator"></span>Active' : 
+                        'Inactive';
+                    liveSyncEl.innerHTML = indicator;
+                }
+                
+                // Update fractal integrity
+                const fractalEl = document.getElementById('fractal-integrity');
+                if (fractalEl) {
+                    fractalEl.textContent = fractalStatus.logger.chain_integrity ? 'Secured' : 'Warning';
+                }
+                
+                // Update world pulses status
+                const worldPulsesEl = document.getElementById('world-pulses-status');
+                if (worldPulsesEl) {
+                    worldPulsesEl.textContent = spiStatus.world_pulses_enabled ? 'Enabled' : 'Disabled';
+                }
+                
+            } catch (error) {
+                console.error('Error loading enhanced stats:', error);
+            }
+        }
+        
+        // Close manifesto when clicking outside
+        document.getElementById('manifestoOverlay')?.addEventListener('click', (e) => {
+            if (e.target.id === 'manifestoOverlay') {
+                hideManifesto();
+            }
+        });
+        
+        // Show manifesto popup on first visit
+        setTimeout(() => {
+            if (!localStorage.getItem('euystacio_manifesto_shown')) {
+                showManifesto();
+                localStorage.setItem('euystacio_manifesto_shown', 'true');
+            }
+        }, 2000);
+    </script>
 </body>
 </html>
