@@ -46,12 +46,18 @@ class EuystacioDashboard {
         }
     }
 
+    isStaticMode() {
+        // Check if running in static mode (GitHub Pages or local static server)
+        const hostname = window.location.hostname;
+        const hasFlaskPort = window.location.port === '5000';
+        const isLocalFlask = (hostname === 'localhost' || hostname === '127.0.0.1') && hasFlaskPort;
+        
+        // Return true if NOT running Flask locally
+        return !isLocalFlask;
+    }
     async loadRedCode() {
         try {
-            // Check if running in static mode (GitHub Pages)
-            const isStatic = !window.location.href.includes('localhost') && 
-                           !window.location.href.includes('127.0.0.1') &&
-                           !window.location.href.includes(':5000');
+            const isStatic = this.isStaticMode();
             
             const apiUrl = isStatic ? 'data/red_code.json' : '/api/red_code';
             const response = await fetch(apiUrl);
@@ -87,10 +93,7 @@ class EuystacioDashboard {
 
     async loadPulses() {
         try {
-            // Check if running in static mode (GitHub Pages)
-            const isStatic = !window.location.href.includes('localhost') && 
-                           !window.location.href.includes('127.0.0.1') &&
-                           !window.location.href.includes(':5000');
+            const isStatic = this.isStaticMode();
             
             let pulses = [];
             
@@ -147,10 +150,7 @@ class EuystacioDashboard {
 
     async loadTutors() {
         try {
-            // Check if running in static mode (GitHub Pages)
-            const isStatic = !window.location.href.includes('localhost') && 
-                           !window.location.href.includes('127.0.0.1') &&
-                           !window.location.href.includes(':5000');
+            const isStatic = this.isStaticMode();
             
             const apiUrl = isStatic ? 'data/tutors.json' : '/api/tutors';
             const response = await fetch(apiUrl);
@@ -181,10 +181,7 @@ class EuystacioDashboard {
 
     async loadReflections() {
         try {
-            // Check if running in static mode (GitHub Pages)
-            const isStatic = !window.location.href.includes('localhost') && 
-                           !window.location.href.includes('127.0.0.1') &&
-                           !window.location.href.includes(':5000');
+            const isStatic = this.isStaticMode();
             
             let reflections = [];
             
@@ -250,10 +247,7 @@ class EuystacioDashboard {
             return;
         }
 
-        // Check if running in static mode (GitHub Pages)
-        const isStatic = !window.location.href.includes('localhost') && 
-                       !window.location.href.includes('127.0.0.1') &&
-                       !window.location.href.includes(':5000');
+        const isStatic = this.isStaticMode();
 
         if (isStatic) {
             // In static mode, simulate the pulse submission
@@ -311,10 +305,7 @@ class EuystacioDashboard {
         button.disabled = true;
         button.textContent = 'Reflecting...';
 
-        // Check if running in static mode (GitHub Pages)
-        const isStatic = !window.location.href.includes('localhost') && 
-                       !window.location.href.includes('127.0.0.1') &&
-                       !window.location.href.includes(':5000');
+        const isStatic = this.isStaticMode();
 
         if (isStatic) {
             // In static mode, simulate reflection
