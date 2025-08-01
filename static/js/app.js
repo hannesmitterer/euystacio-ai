@@ -1,13 +1,77 @@
 // Euystacio Dashboard JavaScript
 class EuystacioDashboard {
     constructor() {
+        this.websocketConnected = false;
+        this.socket = null;
+        this.fallbackToPolling = false;
         this.init();
     }
 
     init() {
         this.setupEventListeners();
+        this.setupWebSocket();
         this.loadInitialData();
         this.setupAutoRefresh();
+    }
+
+    setupWebSocket() {
+        // Only try WebSocket if not in static mode and io is available
+        if (this.isStaticMode() || typeof io === 'undefined') {
+            console.log('WebSocket not available - using polling fallback');
+            this.fallbackToPolling = true;
+            return;
+        }
+
+        try {
+            this.socket = io();
+            
+            this.socket.on('connect', () => {
+                console.log('WebSocket connected - real-time updates enabled');
+                this.websocketConnected = true;
+                this.showConnectionStatus('Real-time updates enabled', 'success');
+            });
+
+            this.socket.on('disconnect', () => {
+                console.log('WebSocket disconnected - falling back to polling');
+                this.websocketConnected = false;
+                this.showConnectionStatus('Connection lost - using polling', 'warning');
+            });
+
+            this.socket.on('connect_error', (error) => {
+                console.log('WebSocket connection failed - using polling fallback');
+                this.fallbackToPolling = true;
+                this.showConnectionStatus('Real-time updates unavailable', 'info');
+            });
+
+            // Listen for real-time updates
+            this.socket.on('pulse_update', (data) => {
+                console.log('Received real-time pulse update');
+                if (data.allPulses) {
+                    this.displayPulses(data.allPulses);
+                }
+            });
+
+            this.socket.on('reflection_update', (data) => {
+                console.log('Received real-time reflection update');
+                if (data.allReflections) {
+                    this.displayReflections(data.allReflections);
+                }
+            });
+
+            this.socket.on('red_code_update', (data) => {
+                console.log('Received real-time red code update');
+                this.displayRedCode(data);
+            });
+
+            this.socket.on('tutors_update', (data) => {
+                console.log('Received real-time tutors update');
+                this.displayTutors(data);
+            });
+
+        } catch (error) {
+            console.log('WebSocket setup failed - using polling fallback:', error);
+            this.fallbackToPolling = true;
+        }
     }
 
     setupEventListeners() {
@@ -356,17 +420,38 @@ class EuystacioDashboard {
     }
 
     setupAutoRefresh() {
-        // Refresh data every 30 seconds
-        setInterval(() => {
-            this.loadPulses();
-            this.loadRedCode();
-        }, 30000);
+        // Only use polling if WebSocket is not available
+        if (this.fallbackToPolling || !this.websocketConnected) {
+            console.log('Setting up polling-based refresh');
+            
+            // Refresh data every 30 seconds
+            setInterval(() => {
+                if (!this.websocketConnected) {
+                    this.loadPulses();
+                    this.loadRedCode();
+                }
+            }, 30000);
 
-        // Refresh reflections and tutors every 2 minutes
-        setInterval(() => {
-            this.loadReflections();
-            this.loadTutors();
-        }, 120000);
+            // Refresh reflections and tutors every 2 minutes
+            setInterval(() => {
+                if (!this.websocketConnected) {
+                    this.loadReflections();
+                    this.loadTutors();
+                }
+            }, 120000);
+        } else {
+            console.log('WebSocket enabled - reduced polling frequency');
+            
+            // Keep a minimal polling as backup, but much less frequent
+            setInterval(() => {
+                if (!this.websocketConnected) {
+                    this.loadPulses();
+                    this.loadRedCode();
+                    this.loadReflections();
+                    this.loadTutors();
+                }
+            }, 300000); // Every 5 minutes as backup
+        }
     }
 
     showMessage(message, type = 'info') {
