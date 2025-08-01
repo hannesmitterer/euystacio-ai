@@ -361,13 +361,246 @@
         "source": "symbolic_kernel"
       },
       "verified": true
+    },
+    "FID-2025-0801-0023": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:53:21.287466+00:00",
+      "integrity_hash": "b64d4015bc10b8a3",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0024": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:53:21.288062+00:00",
+      "integrity_hash": "36dcbfa19858be3a",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0025": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:53:28.365132+00:00",
+      "integrity_hash": "6c0e4f6852d94941",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0026": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:53:28.365799+00:00",
+      "integrity_hash": "cacbdd989dd10534",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0027": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:53:28.370778+00:00",
+      "integrity_hash": "f8ce56f1aacd6fbc",
+      "content": {
+        "event_type": "world_pulses_enabled",
+        "data": {
+          "timestamp": "2025-08-01T18:53:28.370770+00:00",
+          "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0028": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:53:28.580478+00:00",
+      "integrity_hash": "50c8333ff7794e79",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0029": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:53:28.581180+00:00",
+      "integrity_hash": "de4ef2e162737418",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0030": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:53:28.586242+00:00",
+      "integrity_hash": "6f7ba7778bc73792",
+      "content": {
+        "event_type": "world_pulses_enabled",
+        "data": {
+          "timestamp": "2025-08-01T18:53:28.586235+00:00",
+          "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0031": {
+      "type": "pulse",
+      "timestamp": "2025-08-01T18:55:18.757408+00:00",
+      "integrity_hash": "49771657e6b4c726",
+      "content": {
+        "emotion": "hope",
+        "intensity": 0.5,
+        "note": "Testing bidirectional dashboard functionality",
+        "source": "sentimento_pulse_interface"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0032": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:55:18.758640+00:00",
+      "integrity_hash": "dcf51b5e5f05ba8b",
+      "content": {
+        "event_type": "pulse",
+        "data": {
+          "emotion": "hope",
+          "intensity": 0.5,
+          "clarity": "medium",
+          "note": "Testing bidirectional dashboard functionality",
+          "source": "sentimento_pulse_interface"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0033": {
+      "type": "pulse",
+      "timestamp": "2025-08-01T18:55:18.761219+00:00",
+      "integrity_hash": "fa42cd73c9ac8b42",
+      "content": {
+        "emotion": "hope",
+        "intensity": 0.5,
+        "note": "Testing bidirectional dashboard functionality",
+        "source": "sentimento_pulse_interface"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0034": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:55:18.762424+00:00",
+      "integrity_hash": "1977e54e20293d04",
+      "content": {
+        "event_type": "pulse",
+        "data": {
+          "emotion": "hope",
+          "intensity": 0.5,
+          "clarity": "medium",
+          "note": "Testing bidirectional dashboard functionality",
+          "source": "sentimento_pulse_interface"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0035": {
+      "type": "reflection",
+      "timestamp": "2025-08-01T18:55:27.707928+00:00",
+      "integrity_hash": "8b4293dba484ae5e",
+      "content": {
+        "reflection": "Reflection at 2025-08-01T18:55:27.707919+00:00",
+        "insights": [
+          "Pulse analysis completed",
+          "Symbiosis growth assessed",
+          "Truth node coherence verified"
+        ],
+        "source": "reflector"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0036": {
+      "type": "reflection",
+      "timestamp": "2025-08-01T18:55:27.709228+00:00",
+      "integrity_hash": "36a1f563a03505fb",
+      "content": {
+        "reflection": "Reflection at 2025-08-01T18:55:27.709224+00:00",
+        "insights": [
+          "Pulse analysis completed",
+          "Symbiosis growth assessed",
+          "Truth node coherence verified"
+        ],
+        "source": "reflector"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0037": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:55:27.710677+00:00",
+      "integrity_hash": "cb38787e9c57f20f",
+      "content": {
+        "event_type": "reflection",
+        "data": {
+          "reflection_content": "Comprehensive reflection: Symbiosis 0.1, Pulses analyzed: 2, Truth nodes: 4",
+          "insights": [],
+          "source": "reflector"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
     }
   },
   "counters": {
-    "2025-0801-pulse": 2,
-    "2025-0801": 22,
-    "2025-0801-tutor": 9,
-    "2025-0801-reflection": 1,
-    "2025-0801-kernel_event": 10
+    "2025-0801-pulse": 4,
+    "2025-0801": 37,
+    "2025-0801-tutor": 15,
+    "2025-0801-reflection": 3,
+    "2025-0801-kernel_event": 15
   }
 }
