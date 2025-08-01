@@ -141,9 +141,229 @@
             font-weight: 600;
             color: var(--primary-green);
         }
+        
+        /* Admin Login Styles */
+        .admin-login-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-login-btn {
+            background: linear-gradient(135deg, var(--primary-green), #4a9a5a);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            box-shadow: 0 3px 10px rgba(0, 100, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .admin-login-btn:hover {
+            background: linear-gradient(135deg, #4a9a5a, var(--primary-green));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 100, 0, 0.4);
+        }
+        
+        .admin-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 12px;
+            border-radius: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-user-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .admin-user-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .admin-logout-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .admin-logout-btn:hover {
+            background: rgba(255, 0, 0, 0.1);
+            color: #d63384;
+        }
+        
+        /* Login Modal Styles */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+        }
+        
+        .login-form {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-form h3 {
+            margin: 0 0 20px 0;
+            color: var(--text-dark);
+            text-align: center;
+        }
+        
+        .login-form .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .login-form label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+        }
+        
+        .login-form .login-btn {
+            width: 100%;
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .login-form .login-btn:hover {
+            background: #4a9a5a;
+        }
+        
+        .login-form .login-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .login-cancel {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            padding: 8px;
+        }
+        
+        .login-cancel:hover {
+            color: var(--text-dark);
+        }
+        
+        .admin-only-section {
+            background: linear-gradient(135deg, #f0fff0, #e8f5e8);
+            border: 2px solid var(--primary-green);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .admin-only-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .admin-badge {
+            background: var(--primary-green);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+    <!-- Admin Login Container -->
+    <div class="admin-login-container" id="adminLoginContainer">
+        <button class="admin-login-btn" id="adminLoginBtn" onclick="showLoginModal()">
+            🔐 Admin Login
+        </button>
+        <div class="admin-user-info" id="adminUserInfo" style="display: none;">
+            <div class="admin-user-avatar" id="adminUserAvatar">A</div>
+            <span class="admin-user-name" id="adminUserName">Admin</span>
+            <button class="admin-logout-btn" onclick="adminLogout()">Logout</button>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-form">
+            <h3>🌳 Admin Access</h3>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Username:</label>
+                    <input type="text" id="loginUsername" name="username" required placeholder="seed_bringer or cofounder_*">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                </div>
+                <button type="submit" class="login-btn" id="loginSubmitBtn">Login</button>
+                <button type="button" class="login-cancel" onclick="hideLoginModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Manifesto Trigger Button -->
     <button class="manifesto-trigger" onclick="showManifesto()">
         📜 Founding Manifesto
@@ -276,6 +496,48 @@
                     <h4>Automated Selection Criteria</h4>
                     <p><strong>Compassion:</strong> ≥ 0.7 | <strong>Planetary Balance:</strong> ≥ 0.6 | <strong>Listening Willingness:</strong> ≥ 0.8</p>
                 </div>
+                
+                <!-- Admin-Only Tutor Nomination Section -->
+                <div class="admin-only-section" id="adminTutorSection" style="display: none;">
+                    <div class="admin-only-header">
+                        <span class="admin-badge">ADMIN ONLY</span>
+                        <h4>Nominate New Tutor</h4>
+                    </div>
+                    <form id="tutorNominationForm">
+                        <div class="form-group">
+                            <label for="tutorName">Tutor Name:</label>
+                            <input type="text" id="tutorName" name="name" required placeholder="Enter tutor name">
+                        </div>
+                        <div class="form-group">
+                            <label for="tutorReason">Reason for Nomination:</label>
+                            <textarea id="tutorReason" name="reason" required placeholder="Explain why this person should be a tutor..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Credentials (Optional):</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                                <div>
+                                    <label for="compassionScore">Compassion Score (0-1):</label>
+                                    <input type="number" id="compassionScore" min="0" max="1" step="0.1" placeholder="0.7">
+                                </div>
+                                <div>
+                                    <label for="planetaryScore">Planetary Balance (0-1):</label>
+                                    <input type="number" id="planetaryScore" min="0" max="1" step="0.1" placeholder="0.6">
+                                </div>
+                                <div>
+                                    <label for="listeningScore">Listening Willingness (0-1):</label>
+                                    <input type="number" id="listeningScore" min="0" max="1" step="0.1" placeholder="0.8">
+                                </div>
+                                <div>
+                                    <label for="aiAlignmentScore">AI Alignment (0-1):</label>
+                                    <input type="number" id="aiAlignmentScore" min="0" max="1" step="0.1" placeholder="0.7">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" style="background: var(--primary-green); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                            Nominate Tutor
+                        </button>
+                    </form>
+                </div>
             </section>
 
             <!-- Canopy: Evolution Log -->
@@ -337,6 +599,9 @@
             // Initialize enhanced dashboard
             const dashboard = new EuystacioDashboard();
             
+            // Check admin authentication status
+            checkAdminAuth();
+            
             // Add self-awareness button functionality
             document.getElementById('self-awareness-btn')?.addEventListener('click', async () => {
                 const button = document.getElementById('self-awareness-btn');
@@ -362,12 +627,201 @@
                 }
             });
             
+            // Add tutor nomination form handler
+            document.getElementById('tutorNominationForm')?.addEventListener('submit', handleTutorNomination);
+            
+            // Add login form handler
+            document.getElementById('loginForm')?.addEventListener('submit', handleAdminLogin);
+            
             // Load enhanced stats
             loadEnhancedStats();
             
             // Auto-refresh enhanced stats
             setInterval(loadEnhancedStats, 30000);
         });
+        
+        // Admin Authentication Functions
+        async function checkAdminAuth() {
+            try {
+                const response = await fetch('/api/auth/status');
+                const data = await response.json();
+                
+                if (data.authenticated) {
+                    showAdminInterface(data.user);
+                } else {
+                    showLoginButton();
+                }
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                showLoginButton();
+            }
+        }
+        
+        function showAdminInterface(user) {
+            document.getElementById('adminLoginBtn').style.display = 'none';
+            document.getElementById('adminUserInfo').style.display = 'flex';
+            document.getElementById('adminUserName').textContent = user.display_name;
+            document.getElementById('adminUserAvatar').textContent = user.role === 'seed_bringer' ? 'S' : 'C';
+            document.getElementById('adminTutorSection').style.display = 'block';
+        }
+        
+        function showLoginButton() {
+            document.getElementById('adminLoginBtn').style.display = 'block';
+            document.getElementById('adminUserInfo').style.display = 'none';
+            document.getElementById('adminTutorSection').style.display = 'none';
+        }
+        
+        function showLoginModal() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+        
+        function hideLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('loginForm').reset();
+        }
+        
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    hideLoginModal();
+                    showAdminInterface(data.user);
+                    showMessage(`Welcome, ${data.user.display_name}! 🌳`, 'success');
+                } else {
+                    showMessage(data.error || 'Login failed', 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('Network error during login', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login';
+            }
+        }
+        
+        async function adminLogout() {
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showLoginButton();
+                    showMessage('Logged out successfully', 'info');
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+        
+        async function handleTutorNomination(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            const credentials = {};
+            if (formData.get('compassionScore')) credentials.compassion_score = parseFloat(formData.get('compassionScore'));
+            if (formData.get('planetaryScore')) credentials.planetary_balance = parseFloat(formData.get('planetaryScore'));
+            if (formData.get('listeningScore')) credentials.listening_willingness = parseFloat(formData.get('listeningScore'));
+            if (formData.get('aiAlignmentScore')) credentials.ai_alignment_score = parseFloat(formData.get('aiAlignmentScore'));
+            
+            const nominationData = {
+                name: formData.get('name'),
+                reason: formData.get('reason'),
+                spi_data: Object.keys(credentials).length > 0 ? { credentials } : {}
+            };
+            
+            try {
+                const response = await fetch('/api/nominate_tutor', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(nominationData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage(`Tutor ${data.name} nominated successfully! 🍃`, 'success');
+                    form.reset();
+                    // Refresh tutor list
+                    setTimeout(() => {
+                        if (window.EuystacioDashboard && window.dashboard) {
+                            window.dashboard.loadTutors();
+                        }
+                    }, 1000);
+                } else {
+                    showMessage(data.error || 'Nomination failed', 'error');
+                }
+            } catch (error) {
+                console.error('Nomination error:', error);
+                showMessage('Network error during nomination', 'error');
+            }
+        }
+        
+        function showMessage(message, type = 'info') {
+            // Create a simple message display
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1003;
+                max-width: 300px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                transition: all 0.3s ease;
+            `;
+            
+            switch (type) {
+                case 'success':
+                    messageDiv.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+                    break;
+                case 'error':
+                    messageDiv.style.background = 'linear-gradient(135deg, #dc3545, #e83e8c)';
+                    break;
+                case 'info':
+                default:
+                    messageDiv.style.background = 'linear-gradient(135deg, #007bff, #6610f2)';
+                    break;
+            }
+            
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                messageDiv.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.parentNode.removeChild(messageDiv);
+                    }
+                }, 300);
+            }, 4000);
+        }
         
         async function loadEnhancedStats() {
             try {
@@ -409,6 +863,13 @@
         document.getElementById('manifestoOverlay')?.addEventListener('click', (e) => {
             if (e.target.id === 'manifestoOverlay') {
                 hideManifesto();
+            }
+        });
+        
+        // Close login modal when clicking outside
+        document.getElementById('loginModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'loginModal') {
+                hideLoginModal();
             }
         });
         

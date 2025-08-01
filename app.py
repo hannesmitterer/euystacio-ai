@@ -1,10 +1,11 @@
-from flask import Flask, render_template, jsonify, request, send_from_directory
+from flask import Flask, render_template, jsonify, request, send_from_directory, make_response
 from sentimento_pulse_interface import SentimentoPulseInterface
 from core.red_code import red_code_system, RED_CODE
 from core.reflector import reflect_and_suggest
 from tutor_nomination import TutorNomination
 from fractal_id import get_fractal_id_system
 from fractal_logger import get_fractal_logger
+from auth_system import auth_system, require_auth, require_admin
 import json
 import os
 from datetime import datetime, timezone
@@ -190,12 +191,13 @@ def api_pulse():
     return jsonify(event)
 
 @app.route("/api/nominate_tutor", methods=["POST"])
+@require_auth("tutor_nomination")
 def api_nominate_tutor():
-    """Enhanced tutor nomination with SPI analysis"""
+    """Enhanced tutor nomination with SPI analysis - requires admin authentication"""
     data = request.get_json()
     name = data.get("name", "")
     reason = data.get("reason", "")
-    nominator = data.get("nominator", "web_interface")
+    nominator = getattr(request, 'current_user', {}).get('display_name', 'web_interface')
     
     if not name or not reason:
         return jsonify({"error": "Name and reason required"}), 400
@@ -214,7 +216,93 @@ def api_nominate_tutor():
         "tutor_fid": tutor_fid,
         "name": name,
         "credentials": credentials,
-        "nomination_successful": True
+        "nomination_successful": True,
+        "nominated_by": nominator
+    })
+
+# Authentication routes
+@app.route("/api/auth/login", methods=["POST"])
+def api_login():
+    """Admin login endpoint"""
+    data = request.get_json()
+    username = data.get("username", "")
+    password = data.get("password", "")
+    
+    if not username or not password:
+        return jsonify({"error": "Username and password required"}), 400
+    
+    # Authenticate user
+    user = auth_system.authenticate(username, password)
+    if not user:
+        return jsonify({"error": "Invalid credentials"}), 401
+    
+    # Create session
+    session_token = auth_system.create_session(user)
+    
+    # Create response with session cookie
+    response = make_response(jsonify({
+        "success": True,
+        "user": {
+            "username": user["username"],
+            "display_name": user["display_name"],
+            "role": user["role"],
+            "permissions": user["permissions"]
+        },
+        "message": f"Welcome, {user['display_name']}!"
+    }))
+    
+    # Set secure session cookie
+    response.set_cookie(
+        "euystacio_session", 
+        session_token,
+        max_age=86400,  # 24 hours
+        httponly=True,
+        secure=False,  # Set to True in production with HTTPS
+        samesite='Lax'
+    )
+    
+    return response
+
+@app.route("/api/auth/logout", methods=["POST"])
+def api_logout():
+    """Admin logout endpoint"""
+    session_token = request.cookies.get("euystacio_session")
+    
+    if session_token:
+        auth_system.logout(session_token)
+    
+    response = make_response(jsonify({"success": True, "message": "Logged out successfully"}))
+    response.set_cookie("euystacio_session", "", expires=0)
+    
+    return response
+
+@app.route("/api/auth/status")
+def api_auth_status():
+    """Check authentication status"""
+    session_token = request.cookies.get("euystacio_session")
+    user = auth_system.validate_session(session_token) if session_token else None
+    
+    if user:
+        return jsonify({
+            "authenticated": True,
+            "user": {
+                "username": user["username"],
+                "display_name": user["display_name"],
+                "role": user["role"],
+                "permissions": user["permissions"]
+            }
+        })
+    else:
+        return jsonify({"authenticated": False})
+
+@app.route("/api/auth/sessions")
+@require_admin
+def api_admin_sessions():
+    """Get active sessions (admin only)"""
+    sessions = auth_system.get_active_sessions()
+    return jsonify({
+        "active_sessions": sessions,
+        "total_count": len(sessions)
     })
 
 @app.route("/api/fractal_status")

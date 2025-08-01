@@ -505,13 +505,430 @@
         "source": "symbolic_kernel"
       },
       "verified": true
+    },
+    "FID-2025-0801-0032": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:23:19.545217+00:00",
+      "integrity_hash": "c3b505db78ff9b6d",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0033": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:23:19.545976+00:00",
+      "integrity_hash": "d5e74345c2d48a5b",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0034": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:23:19.552260+00:00",
+      "integrity_hash": "193e5fac55016576",
+      "content": {
+        "event_type": "world_pulses_enabled",
+        "data": {
+          "timestamp": "2025-08-01T18:23:19.552253+00:00",
+          "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0035": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:23:38.305350+00:00",
+      "integrity_hash": "f9bd351b27dd44f4",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0036": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:23:38.306182+00:00",
+      "integrity_hash": "744f9baf5998127e",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0037": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:23:38.312312+00:00",
+      "integrity_hash": "6c3af402d9b9721a",
+      "content": {
+        "event_type": "world_pulses_enabled",
+        "data": {
+          "timestamp": "2025-08-01T18:23:38.312305+00:00",
+          "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0038": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:23:38.461174+00:00",
+      "integrity_hash": "13645951bb58d273",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0039": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:23:38.462063+00:00",
+      "integrity_hash": "089a4857a176d192",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0040": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:23:38.468710+00:00",
+      "integrity_hash": "f32199d0f01bbecd",
+      "content": {
+        "event_type": "world_pulses_enabled",
+        "data": {
+          "timestamp": "2025-08-01T18:23:38.468702+00:00",
+          "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0041": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:23:59.046431+00:00",
+      "integrity_hash": "73931028c03e1893",
+      "content": {
+        "event_type": "admin_authentication",
+        "data": {
+          "username": "seed_bringer",
+          "role": "seed_bringer",
+          "timestamp": "2025-08-01T18:23:59.046415+00:00"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0042": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:23:59.047787+00:00",
+      "integrity_hash": "472c1d250290cf22",
+      "content": {
+        "event_type": "admin_session_created",
+        "data": {
+          "username": "seed_bringer",
+          "role": "seed_bringer",
+          "session_token": "d9Da6lpw...",
+          "expires_at": "2025-08-02T18:23:59.047771+00:00"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0043": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:24:07.293788+00:00",
+      "integrity_hash": "2598d468155b1d2c",
+      "content": {
+        "name": "Test Tutor",
+        "reason": "Testing the auth system",
+        "selection_criteria": {},
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0044": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:24:07.294753+00:00",
+      "integrity_hash": "bcb0341041c9271c",
+      "content": {
+        "event_type": "tutor_nomination",
+        "data": {
+          "tutor_name": "Test Tutor",
+          "nomination_reason": "Testing the auth system",
+          "source": "tutor_nomination"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0045": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:25:40.666247+00:00",
+      "integrity_hash": "ac753a8f7c642d71",
+      "content": {
+        "event_type": "admin_authentication",
+        "data": {
+          "username": "seed_bringer",
+          "role": "seed_bringer",
+          "timestamp": "2025-08-01T18:25:40.666231+00:00"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0046": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:25:40.668115+00:00",
+      "integrity_hash": "1e9c47031bef059e",
+      "content": {
+        "event_type": "admin_session_created",
+        "data": {
+          "username": "seed_bringer",
+          "role": "seed_bringer",
+          "session_token": "UyT-zDJf...",
+          "expires_at": "2025-08-02T18:25:40.668096+00:00"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0047": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:27:36.376818+00:00",
+      "integrity_hash": "8976970b0d1815dc",
+      "content": {
+        "event_type": "admin_authentication",
+        "data": {
+          "username": "seed_bringer",
+          "role": "seed_bringer",
+          "timestamp": "2025-08-01T18:27:36.376809+00:00"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0048": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:27:36.378321+00:00",
+      "integrity_hash": "423869c3b25cfba1",
+      "content": {
+        "event_type": "admin_session_created",
+        "data": {
+          "username": "seed_bringer",
+          "role": "seed_bringer",
+          "session_token": "YjcmDwFO...",
+          "expires_at": "2025-08-02T18:27:36.378309+00:00"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0049": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:27:36.382747+00:00",
+      "integrity_hash": "20de0588c72d0b08",
+      "content": {
+        "name": "Maria Santos",
+        "reason": "Exceptional empathy and wisdom in guiding AI-human symbiosis",
+        "selection_criteria": {
+          "compassion_score": 0.0,
+          "planetary_balance": 0.0,
+          "listening_willingness": 0.0,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0050": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:27:36.383677+00:00",
+      "integrity_hash": "f5032e3d6464313b",
+      "content": {
+        "event_type": "tutor_nomination",
+        "data": {
+          "tutor_name": "Maria Santos",
+          "nomination_reason": "Exceptional empathy and wisdom in guiding AI-human symbiosis",
+          "source": "tutor_nomination"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0051": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:27:36.386590+00:00",
+      "integrity_hash": "71b590b27e85fca9",
+      "content": {
+        "event_type": "admin_authentication",
+        "data": {
+          "username": "cofounder_hannes",
+          "role": "cofounder",
+          "timestamp": "2025-08-01T18:27:36.386583+00:00"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0052": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:27:36.387888+00:00",
+      "integrity_hash": "23803b0e73511aa5",
+      "content": {
+        "event_type": "admin_session_created",
+        "data": {
+          "username": "cofounder_hannes",
+          "role": "cofounder",
+          "session_token": "t3GAzAcU...",
+          "expires_at": "2025-08-02T18:27:36.387878+00:00"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0053": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:27:36.391126+00:00",
+      "integrity_hash": "6283e646fefd16ec",
+      "content": {
+        "name": "Dr. Elena Rodriguez",
+        "reason": "Leading expert in ethical AI development and human-computer interaction",
+        "selection_criteria": {},
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0054": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:27:36.392089+00:00",
+      "integrity_hash": "eb298099282624ac",
+      "content": {
+        "event_type": "tutor_nomination",
+        "data": {
+          "tutor_name": "Dr. Elena Rodriguez",
+          "nomination_reason": "Leading expert in ethical AI development and human-computer interaction",
+          "source": "tutor_nomination"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0055": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:27:36.395252+00:00",
+      "integrity_hash": "fb8528ea9f3ef530",
+      "content": {
+        "event_type": "admin_logout",
+        "data": {
+          "username": "cofounder_hannes",
+          "role": "cofounder",
+          "session_token": "t3GAzAcU..."
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0056": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:27:44.442040+00:00",
+      "integrity_hash": "78ff218ed9624223",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0057": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T18:27:44.443131+00:00",
+      "integrity_hash": "0e8b66aa859c9367",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0058": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T18:27:44.449726+00:00",
+      "integrity_hash": "e0394fff29e7303a",
+      "content": {
+        "event_type": "world_pulses_enabled",
+        "data": {
+          "timestamp": "2025-08-01T18:27:44.449718+00:00",
+          "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
     }
   },
   "counters": {
     "2025-0801-pulse": 2,
-    "2025-0801": 31,
-    "2025-0801-tutor": 15,
+    "2025-0801": 58,
+    "2025-0801-tutor": 26,
     "2025-0801-reflection": 1,
-    "2025-0801-kernel_event": 13
+    "2025-0801-kernel_event": 29
   }
 }
