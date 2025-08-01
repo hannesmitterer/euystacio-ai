@@ -31,6 +31,9 @@ class EuystacioDashboard {
         if (reflectBtn) {
             reflectBtn.addEventListener('click', () => this.triggerReflection());
         }
+
+        // Contact modal functionality
+        this.setupContactModal();
     }
 
     async loadInitialData() {
@@ -265,6 +268,179 @@ class EuystacioDashboard {
             this.loadReflections();
             this.loadTutors();
         }, 120000);
+    }
+
+    setupContactModal() {
+        const contactBtn = document.getElementById('contact-admin-btn');
+        const contactModal = document.getElementById('contact-modal');
+        const closeModal = document.getElementById('close-contact-modal');
+        const cancelBtn = document.getElementById('cancel-contact');
+        const contactForm = document.getElementById('contact-form');
+
+        if (contactBtn && contactModal) {
+            // Open modal
+            contactBtn.addEventListener('click', () => {
+                contactModal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            });
+
+            // Close modal functions
+            const closeModalFunc = () => {
+                contactModal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+                if (contactForm) {
+                    contactForm.reset();
+                }
+                this.clearContactMessages();
+            };
+
+            // Close modal events
+            if (closeModal) {
+                closeModal.addEventListener('click', closeModalFunc);
+            }
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', closeModalFunc);
+            }
+
+            // Close on outside click
+            contactModal.addEventListener('click', (e) => {
+                if (e.target === contactModal) {
+                    closeModalFunc();
+                }
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && contactModal.classList.contains('show')) {
+                    closeModalFunc();
+                }
+            });
+
+            // Handle form submission
+            if (contactForm) {
+                contactForm.addEventListener('submit', (e) => this.handleContactSubmission(e));
+            }
+        }
+    }
+
+    async handleContactSubmission(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        const contactData = {
+            name: formData.get('name').trim(),
+            email: formData.get('email').trim(),
+            message: formData.get('message').trim()
+        };
+
+        // Validate fields
+        if (!contactData.name || !contactData.email || !contactData.message) {
+            this.showContactMessage('Please fill in all fields', 'error');
+            return;
+        }
+
+        if (!this.isValidEmail(contactData.email)) {
+            this.showContactMessage('Please enter a valid email address', 'error');
+            return;
+        }
+
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        
+        try {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            // Try to send via backend API first
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(contactData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                this.showContactMessage('Message sent successfully! Thank you for reaching out. 🌱', 'success');
+                setTimeout(() => {
+                    const modal = document.getElementById('contact-modal');
+                    if (modal) {
+                        modal.classList.remove('show');
+                        document.body.style.overflow = 'auto';
+                    }
+                    event.target.reset();
+                    this.clearContactMessages();
+                }, 2000);
+            } else {
+                throw new Error('Backend API failed');
+            }
+        } catch (error) {
+            console.log('Backend API failed, falling back to EmailJS');
+            // Fallback to EmailJS for static hosting compatibility
+            this.sendViaEmailJS(contactData, submitBtn, originalText, event.target);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    }
+
+    async sendViaEmailJS(contactData, submitBtn, originalText, form) {
+        try {
+            // EmailJS configuration for static hosting
+            const emailData = {
+                to_email: 'hannes.mitterer@gmail.com',
+                from_name: contactData.name,
+                from_email: contactData.email,
+                message: `From: ${contactData.name} (${contactData.email})\n\nMessage:\n${contactData.message}\n\nSent from Euystacio Dashboard`,
+                reply_to: contactData.email
+            };
+
+            // This would normally use EmailJS service
+            // For now, we'll show a message with instructions
+            this.showContactMessage(
+                `Thanks for your message! Please email hannes.mitterer@gmail.com directly with your message:\n\nFrom: ${contactData.name}\nEmail: ${contactData.email}\nMessage: ${contactData.message}`,
+                'info'
+            );
+
+            setTimeout(() => {
+                const modal = document.getElementById('contact-modal');
+                if (modal) {
+                    modal.classList.remove('show');
+                    document.body.style.overflow = 'auto';
+                }
+                form.reset();
+                this.clearContactMessages();
+            }, 5000);
+
+        } catch (error) {
+            console.error('EmailJS fallback failed:', error);
+            this.showContactMessage('Unable to send message. Please email hannes.mitterer@gmail.com directly.', 'error');
+        }
+    }
+
+    isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    showContactMessage(message, type = 'info') {
+        this.clearContactMessages();
+        
+        const modalBody = document.querySelector('.modal-body');
+        if (!modalBody) return;
+
+        const messageEl = document.createElement('div');
+        messageEl.className = `contact-message ${type}`;
+        messageEl.textContent = message;
+        
+        // Insert message at the top of modal body
+        modalBody.insertBefore(messageEl, modalBody.firstChild);
+    }
+
+    clearContactMessages() {
+        const messages = document.querySelectorAll('.contact-message');
+        messages.forEach(msg => msg.remove());
     }
 
     showMessage(message, type = 'info') {

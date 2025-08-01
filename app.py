@@ -5,6 +5,7 @@ from core.reflector import reflect_and_suggest
 from tutor_nomination import TutorNomination
 import json
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -74,6 +75,62 @@ def api_pulse():
     note = data.get("note", "")
     event = spi.receive_pulse(emotion, intensity, clarity, note)
     return jsonify(event)
+
+@app.route("/api/contact", methods=["POST"])
+def api_contact():
+    """Handle contact form submissions"""
+    try:
+        data = request.get_json()
+        name = data.get("name", "").strip()
+        email = data.get("email", "").strip()
+        message = data.get("message", "").strip()
+        
+        # Basic validation
+        if not name or not email or not message:
+            return jsonify({"error": "All fields are required"}), 400
+            
+        # Simple email validation
+        import re
+        email_pattern = r'^[^\s@]+@[^\s@]+\.[^\s@]+$'
+        if not re.match(email_pattern, email):
+            return jsonify({"error": "Invalid email address"}), 400
+            
+        # Log the contact attempt (in production, this would send an actual email)
+        contact_log = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "name": name,
+            "email": email,
+            "message": message,
+            "status": "received"
+        }
+        
+        # In a real implementation, you would send an email here
+        # For now, we'll just log it and return success
+        print(f"Contact form submission: {contact_log}")
+        
+        # Save to a contact log file for demonstration
+        try:
+            import json
+            contact_file = "contact_submissions.json"
+            contacts = []
+            if os.path.exists(contact_file):
+                with open(contact_file, 'r') as f:
+                    contacts = json.load(f)
+            contacts.append(contact_log)
+            with open(contact_file, 'w') as f:
+                json.dump(contacts, f, indent=2)
+        except Exception as e:
+            print(f"Error saving contact log: {e}")
+        
+        return jsonify({
+            "message": "Contact form submitted successfully", 
+            "status": "success",
+            "note": "This is a demo - in production, an email would be sent to hannes.mitterer@gmail.com"
+        })
+        
+    except Exception as e:
+        print(f"Error processing contact form: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == "__main__":
     os.makedirs("logs", exist_ok=True)
