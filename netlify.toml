@@ -1,5 +1,5 @@
 [build]
-  publish = "static"
+  publish = "static_build"
   command = "python build_static.py"
 
 [build.environment]
