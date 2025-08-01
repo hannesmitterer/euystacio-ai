@@ -51,6 +51,17 @@ def api_red_code():
 def api_pulses():
     return jsonify(get_pulses())
 
+@app.route("/api/pulse/echo_of_belonging")
+def api_pulse_echo_of_belonging():
+    """API endpoint for the echo_of_belonging pulse data"""
+    try:
+        with open('logs/spi_pulse_echo_of_belonging.json', 'r') as f:
+            pulse_data = json.load(f)
+        return jsonify(pulse_data)
+    except FileNotFoundError:
+        # Return the pulse data from red_code if log file doesn't exist yet
+        return jsonify(RED_CODE.get("ethos_branch", {}).get("🧬 conscious_co_presence", {}))
+
 @app.route("/api/reflect")
 def api_reflect():
     # Run reflection, return latest
@@ -64,6 +75,15 @@ def api_reflections():
 @app.route("/api/tutors")
 def api_tutors():
     return jsonify(tutors.list_tutors())
+
+@app.route("/pulse")
+def pulse():
+    # Serve the pulse transmission page
+    try:
+        with open('docs/pulse.html', 'r') as f:
+            return f.read()
+    except FileNotFoundError:
+        return "Pulse page not found", 404
 
 @app.route("/api/pulse", methods=["POST"])
 def api_pulse():
