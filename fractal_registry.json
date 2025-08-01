@@ -361,13 +361,109 @@
         "source": "symbolic_kernel"
       },
       "verified": true
+    },
+    "FID-2025-0801-0023": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T19:21:23.743639+00:00",
+      "integrity_hash": "dd4de9496fc6c7b7",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0024": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T19:21:23.744257+00:00",
+      "integrity_hash": "df2319e1f0f09327",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0025": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T19:21:23.749263+00:00",
+      "integrity_hash": "40118a9a22e0e4f4",
+      "content": {
+        "event_type": "world_pulses_enabled",
+        "data": {
+          "timestamp": "2025-08-01T19:21:23.749255+00:00",
+          "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0026": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T19:21:23.936304+00:00",
+      "integrity_hash": "5002d1188f420b67",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0027": {
+      "type": "tutor",
+      "timestamp": "2025-08-01T19:21:23.937033+00:00",
+      "integrity_hash": "84eedca1f0369690",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0801-0028": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-01T19:21:23.942056+00:00",
+      "integrity_hash": "743a495879cbeb27",
+      "content": {
+        "event_type": "world_pulses_enabled",
+        "data": {
+          "timestamp": "2025-08-01T19:21:23.942048+00:00",
+          "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
     }
   },
   "counters": {
     "2025-0801-pulse": 2,
-    "2025-0801": 22,
-    "2025-0801-tutor": 9,
+    "2025-0801": 28,
+    "2025-0801-tutor": 13,
     "2025-0801-reflection": 1,
-    "2025-0801-kernel_event": 10
+    "2025-0801-kernel_event": 12
   }
 }
