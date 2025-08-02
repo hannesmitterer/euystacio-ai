@@ -361,6 +361,35 @@
         "source": "symbolic_kernel"
       },
       "verified": true
+    },
+    "FID-2025-0802-0001": {
+      "type": "pulse",
+      "timestamp": "2025-08-02T19:15:48.837588+00:00",
+      "integrity_hash": "4a8c9a7ea746a3e8",
+      "content": {
+        "emotion": "hope",
+        "intensity": 0.7,
+        "note": "Test pulse",
+        "source": "sentimento_pulse_interface"
+      },
+      "verified": true
+    },
+    "FID-2025-0802-0002": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-02T19:15:48.838421+00:00",
+      "integrity_hash": "e4749f981f65a307",
+      "content": {
+        "event_type": "pulse",
+        "data": {
+          "emotion": "hope",
+          "intensity": 0.7,
+          "clarity": "high",
+          "note": "Test pulse",
+          "source": "sentimento_pulse_interface"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
     }
   },
   "counters": {
@@ -368,6 +397,9 @@
     "2025-0801": 22,
     "2025-0801-tutor": 9,
     "2025-0801-reflection": 1,
-    "2025-0801-kernel_event": 10
+    "2025-0801-kernel_event": 10,
+    "2025-0802-pulse": 1,
+    "2025-0802": 2,
+    "2025-0802-kernel_event": 1
   }
 }
