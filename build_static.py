@@ -19,6 +19,10 @@ def create_static_version():
     if os.path.exists("static"):
         shutil.copytree("static", os.path.join(static_dir, "static"))
     
+    # Copy docs directory for GitHub Pages access
+    if os.path.exists("docs"):
+        shutil.copytree("docs", os.path.join(static_dir, "docs"))
+    
     # Load template
     with open("templates/index.html", "r") as f:
         template_content = f.read()
