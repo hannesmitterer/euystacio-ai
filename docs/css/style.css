@@ -388,6 +388,119 @@ button:hover {
     animation: fadeIn 0.5s ease-out;
 }
 
+/* Tutor Initiation Styles */
+.tutor-initiation-section {
+    border-left-color: var(--accent-gold);
+}
+
+.tutor-content {
+    line-height: 1.7;
+}
+
+.tutor-content ul {
+    margin: 15px 0;
+    padding-left: 20px;
+}
+
+.tutor-content li {
+    margin-bottom: 8px;
+    color: var(--text-dark);
+}
+
+.qualities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.quality-item {
+    background: #f8fff8;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 3px solid var(--light-green);
+}
+
+.quality-item h4 {
+    color: var(--primary-green);
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.quality-item p {
+    color: var(--text-dark);
+    font-size: 0.9rem;
+}
+
+.initiation-form {
+    background: #fafbfc;
+    padding: 25px;
+    border-radius: 10px;
+    margin-top: 30px;
+}
+
+.navigation {
+    margin: 30px 0;
+    text-align: center;
+}
+
+.nav-button {
+    display: inline-block;
+    background: var(--light-green);
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background: var(--primary-green);
+    transform: translateY(-2px);
+}
+
+/* Prominent Tutor Button */
+.tutor-cta-section {
+    text-align: center;
+    margin: 40px 0;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, var(--white) 0%, #f0f8ff 100%);
+    border-radius: 20px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--accent-gold);
+}
+
+.tutor-cta-button {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent-gold), #e6c200);
+    color: var(--text-dark);
+    padding: 18px 40px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tutor-cta-button:hover {
+    background: linear-gradient(135deg, #e6c200, var(--accent-gold));
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+.tutor-cta-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 25px;
+    font-style: italic;
+}
+
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
     * {
