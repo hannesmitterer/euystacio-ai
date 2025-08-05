@@ -361,6 +361,40 @@
         "source": "symbolic_kernel"
       },
       "verified": true
+    },
+    "FID-2025-0805-0001": {
+      "type": "tutor",
+      "timestamp": "2025-08-05T01:31:19.014370+00:00",
+      "integrity_hash": "530ab14bb13d97ed",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0805-0002": {
+      "type": "tutor",
+      "timestamp": "2025-08-05T01:31:19.014980+00:00",
+      "integrity_hash": "27c023ecd28a3e39",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
     }
   },
   "counters": {
@@ -368,6 +402,8 @@
     "2025-0801": 22,
     "2025-0801-tutor": 9,
     "2025-0801-reflection": 1,
-    "2025-0801-kernel_event": 10
+    "2025-0801-kernel_event": 10,
+    "2025-0805-tutor": 2,
+    "2025-0805": 2
   }
 }
