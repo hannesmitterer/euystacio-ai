@@ -491,6 +491,124 @@
         "source": "symbolic_kernel"
       },
       "verified": true
+    },
+    "FID-2025-0820-0007": {
+      "type": "pulse",
+      "timestamp": "2025-08-20T08:16:53.816269+00:00",
+      "integrity_hash": "eb9232c4e9f9a906",
+      "content": {
+        "emotion": "hope",
+        "intensity": 0.5,
+        "note": "Testing the new enhanced 3D visualization!",
+        "source": "sentimento_pulse_interface"
+      },
+      "verified": true
+    },
+    "FID-2025-0820-0008": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-20T08:16:53.820560+00:00",
+      "integrity_hash": "02b250f13ad3137e",
+      "content": {
+        "event_type": "pulse",
+        "data": {
+          "emotion": "hope",
+          "intensity": 0.5,
+          "clarity": "medium",
+          "note": "Testing the new enhanced 3D visualization!",
+          "source": "sentimento_pulse_interface"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0820-0009": {
+      "type": "pulse",
+      "timestamp": "2025-08-20T08:16:53.821550+00:00",
+      "integrity_hash": "fbab5dcbcf4810f9",
+      "content": {
+        "emotion": "hope",
+        "intensity": 0.5,
+        "note": "Testing the new enhanced 3D visualization!",
+        "source": "sentimento_pulse_interface"
+      },
+      "verified": true
+    },
+    "FID-2025-0820-0010": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-20T08:16:53.822882+00:00",
+      "integrity_hash": "7c45c3bdc48ca83c",
+      "content": {
+        "event_type": "pulse",
+        "data": {
+          "emotion": "hope",
+          "intensity": 0.5,
+          "clarity": "medium",
+          "note": "Testing the new enhanced 3D visualization!",
+          "source": "sentimento_pulse_interface"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0820-0011": {
+      "type": "reflection",
+      "timestamp": "2025-08-20T08:17:03.087145+00:00",
+      "integrity_hash": "5e3ae9a4eee8fae4",
+      "content": {
+        "reflection": "Reflection at 2025-08-20T08:17:03.087136+00:00",
+        "insights": [
+          "Pulse analysis completed",
+          "Symbiosis growth assessed",
+          "Truth node coherence verified"
+        ],
+        "source": "reflector"
+      },
+      "verified": true
+    },
+    "FID-2025-0820-0012": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-20T08:17:03.089101+00:00",
+      "integrity_hash": "1422e388c3f32346",
+      "content": {
+        "event_type": "reflection",
+        "data": {
+          "reflection_content": "Comprehensive reflection: Symbiosis 0.1, Pulses analyzed: 2, Truth nodes: 4",
+          "insights": [],
+          "source": "reflector"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0820-0013": {
+      "type": "reflection",
+      "timestamp": "2025-08-20T08:17:03.089402+00:00",
+      "integrity_hash": "656e0c65a9ddef43",
+      "content": {
+        "reflection": "Reflection at 2025-08-20T08:17:03.089396+00:00",
+        "insights": [
+          "Pulse analysis completed",
+          "Symbiosis growth assessed",
+          "Truth node coherence verified"
+        ],
+        "source": "reflector"
+      },
+      "verified": true
+    },
+    "FID-2025-0820-0014": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-20T08:17:03.092977+00:00",
+      "integrity_hash": "62a36d127b39ea5d",
+      "content": {
+        "event_type": "reflection",
+        "data": {
+          "reflection_content": "Comprehensive reflection: Symbiosis 0.1, Pulses analyzed: 2, Truth nodes: 4",
+          "insights": [],
+          "source": "reflector"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
     }
   },
   "counters": {
@@ -502,7 +620,9 @@
     "2025-0805-tutor": 2,
     "2025-0805": 2,
     "2025-0820-tutor": 4,
-    "2025-0820": 6,
-    "2025-0820-kernel_event": 2
+    "2025-0820": 14,
+    "2025-0820-kernel_event": 6,
+    "2025-0820-pulse": 2,
+    "2025-0820-reflection": 2
   }
 }

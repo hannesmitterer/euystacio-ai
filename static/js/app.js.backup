@@ -1,0 +1,849 @@
+// Euystacio Dashboard JavaScript
+class EuystacioDashboard {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.loadInitialData();
+        this.setupAutoRefresh();
+        this.initialize3DVisualization();
+    }
+
+    setupEventListeners() {
+        // Pulse form submission
+        const pulseForm = document.getElementById('pulse-form');
+        if (pulseForm) {
+            pulseForm.addEventListener('submit', (e) => this.handlePulseSubmission(e));
+        }
+
+        // Intensity slider
+        const intensitySlider = document.getElementById('intensity');
+        const intensityValue = document.getElementById('intensity-value');
+        if (intensitySlider && intensityValue) {
+            intensitySlider.addEventListener('input', (e) => {
+                intensityValue.textContent = e.target.value;
+            });
+        }
+
+        // Reflection button
+        const reflectBtn = document.getElementById('reflect-btn');
+        if (reflectBtn) {
+            reflectBtn.addEventListener('click', () => this.triggerReflection());
+        }
+
+        // 3D Visualization controls
+        this.setup3DVisualizationControls();
+    }
+
+    setup3DVisualizationControls() {
+        const resetBtn = document.getElementById('reset-view-btn');
+        const animateBtn = document.getElementById('animate-btn');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                if (this.threeDViz) {
+                    this.threeDViz.resetView();
+                }
+            });
+        }
+
+        if (animateBtn) {
+            animateBtn.addEventListener('click', () => {
+                if (this.threeDViz) {
+                    const isAnimating = this.threeDViz.toggleAnimation();
+                    animateBtn.textContent = isAnimating ? '⏸️ Pause' : '▶️ Animate';
+                }
+            });
+        }
+
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', () => {
+                const container = document.getElementById('three-js-container');
+                if (container) {
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                        fullscreenBtn.textContent = '🔍 Fullscreen';
+                    } else {
+                        container.requestFullscreen();
+                        fullscreenBtn.textContent = '🔍 Exit Fullscreen';
+                    }
+                }
+            });
+        }
+    }
+
+    async loadInitialData() {
+        try {
+            await Promise.all([
+                this.loadRedCode(),
+                this.loadPulses(),
+                this.loadTutors(),
+                this.loadReflections()
+            ]);
+        } catch (error) {
+            console.error('Error loading initial data:', error);
+        }
+    }
+
+    isStaticMode() {
+        // Check if running in static mode (GitHub Pages or local static server)
+        const hostname = window.location.hostname;
+        const hasFlaskPort = window.location.port === '5000';
+        const isLocalFlask = (hostname === 'localhost' || hostname === '127.0.0.1') && hasFlaskPort;
+        
+        // Return true if NOT running Flask locally
+        return !isLocalFlask;
+    }
+    async loadRedCode() {
+        try {
+            const isStatic = this.isStaticMode();
+            
+            const apiUrl = isStatic ? 'data/red_code.json' : '/api/red_code';
+            const response = await fetch(apiUrl);
+            const redCode = await response.json();
+            this.displayRedCode(redCode);
+        } catch (error) {
+            console.error('Error loading red code:', error);
+            this.showError('red-code', 'Failed to load red code');
+        }
+    }
+
+    displayRedCode(redCode) {
+        const container = document.getElementById('red-code');
+        if (!container) return;
+
+        container.innerHTML = `
+            <p><strong>Core Truth:</strong> ${redCode.core_truth || 'Not defined'}</p>
+            <p><strong>Sentimento Rhythm:</strong> ${redCode.sentimento_rhythm ? 'Active' : 'Inactive'}</p>
+            <p><strong>Symbiosis Level:</strong> ${redCode.symbiosis_level || 0}</p>
+            <p><strong>Guardian Mode:</strong> ${redCode.guardian_mode ? 'On' : 'Off'}</p>
+            <p><strong>Last Update:</strong> ${redCode.last_update || 'Unknown'}</p>
+        `;
+
+        // Update symbiosis meter
+        const symbiosisBar = document.getElementById('symbiosis-bar');
+        const symbiosisValue = document.getElementById('symbiosis-value');
+        if (symbiosisBar && symbiosisValue) {
+            const level = (redCode.symbiosis_level || 0) * 100;
+            symbiosisBar.style.width = `${level}%`;
+            symbiosisValue.textContent = redCode.symbiosis_level || '0.0';
+        }
+    }
+
+    async loadPulses() {
+        try {
+            const isStatic = this.isStaticMode();
+            
+            let pulses = [];
+            
+            if (isStatic) {
+                // In static mode, combine data from JSON file and localStorage
+                try {
+                    const response = await fetch('data/pulses.json');
+                    pulses = await response.json();
+                } catch (e) {
+                    pulses = [];
+                }
+                
+                // Add localStorage pulses for demo functionality
+                const storedPulses = JSON.parse(localStorage.getItem('euystacio_pulses') || '[]');
+                pulses = [...storedPulses, ...pulses];
+            } else {
+                const response = await fetch('/api/pulses');
+                pulses = await response.json();
+            }
+            
+            this.displayPulses(pulses);
+        } catch (error) {
+            console.error('Error loading pulses:', error);
+            this.showError('pulses-list', 'Failed to load pulses');
+        }
+    }
+
+    displayPulses(pulses) {
+        const container = document.getElementById('pulses-list');
+        if (!container) return;
+
+        if (!pulses || pulses.length === 0) {
+            container.innerHTML = '<div class="loading">No pulses yet. Send the first one!</div>';
+            return;
+        }
+
+        // Sort pulses by timestamp (most recent first)
+        const sortedPulses = pulses.sort((a, b) => 
+            new Date(b.timestamp || 0) - new Date(a.timestamp || 0)
+        ).slice(0, 10); // Show only the 10 most recent
+
+        container.innerHTML = sortedPulses.map(pulse => `
+            <div class="pulse-item">
+                <div class="pulse-emotion">${pulse.emotion || 'Unknown'}</div>
+                <div class="pulse-meta">
+                    Intensity: ${pulse.intensity || 0} | 
+                    Clarity: ${pulse.clarity || 'unknown'} | 
+                    ${this.formatTimestamp(pulse.timestamp)}
+                </div>
+                ${pulse.note ? `<div class="pulse-note">"${pulse.note}"</div>` : ''}
+            </div>
+        `).join('');
+    }
+
+    async loadTutors() {
+        try {
+            const isStatic = this.isStaticMode();
+            
+            let tutorData;
+            if (isStatic) {
+                const response = await fetch('data/tutors.json');
+                tutorData = {
+                    all_tutors: await response.json(),
+                    active_circle: [],
+                    circle_size: 0
+                };
+            } else {
+                const response = await fetch('/api/tutors');
+                tutorData = await response.json();
+            }
+            
+            this.displayTutors(tutorData);
+        } catch (error) {
+            console.error('Error loading tutors:', error);
+            this.showError('tutors-list', 'Failed to load tutor information');
+        }
+    }
+
+    displayTutors(tutorData) {
+        const container = document.getElementById('tutors-list');
+        if (!container) return;
+
+        // Handle both new format and legacy format
+        const tutors = tutorData.all_tutors || tutorData;
+        const activeCircle = tutorData.active_circle || [];
+        
+        if (!tutors || tutors.length === 0) {
+            container.innerHTML = '<div class="loading">No tutor nominations yet.</div>';
+            return;
+        }
+
+        // Display active circle first, then other tutors
+        const activeTutorHTML = activeCircle.map(tutor => `
+            <div class="tutor-item" style="border-left-color: #ffd700; background: linear-gradient(135deg, #fff9e6 0%, #fff3d3 100%);">
+                <div class="tutor-name">⭐ ${tutor.name || 'Anonymous Tutor'} (Active Circle)</div>
+                <div class="tutor-reason">${tutor.reason || 'Nominated for wisdom and guidance'}</div>
+                ${tutor.credentials ? `
+                    <div class="tutor-credentials" style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                        Compassion: ${(tutor.credentials.compassion_score * 100).toFixed(0)}% | 
+                        Planetary Balance: ${(tutor.credentials.planetary_balance * 100).toFixed(0)}% | 
+                        Listening: ${(tutor.credentials.listening_willingness * 100).toFixed(0)}%
+                    </div>
+                ` : ''}
+                ${tutor.fid ? `<div class="fractal-signature" style="margin-top: 8px; font-size: 0.8em; color: #999;">FID: ${tutor.fid}</div>` : ''}
+            </div>
+        `).join('');
+
+        const otherTutors = tutors.filter(t => !activeCircle.find(a => a.fid === t.fid));
+        const otherTutorHTML = otherTutors.map(tutor => `
+            <div class="tutor-item">
+                <div class="tutor-name">${tutor.name || 'Anonymous Tutor'}</div>
+                <div class="tutor-reason">${tutor.reason || 'Nominated for wisdom and guidance'}</div>
+                ${tutor.status && tutor.status !== 'active' ? `
+                    <div class="tutor-status" style="margin-top: 5px; font-size: 0.9em; color: #666;">
+                        Status: ${tutor.status}
+                    </div>
+                ` : ''}
+                ${tutor.fid ? `<div class="fractal-signature" style="margin-top: 8px; font-size: 0.8em; color: #999;">FID: ${tutor.fid}</div>` : ''}
+            </div>
+        `).join('');
+
+        container.innerHTML = activeTutorHTML + otherTutorHTML;
+        
+        // Add circle info if available
+        if (tutorData.circle_size !== undefined) {
+            const circleInfo = document.createElement('div');
+            circleInfo.className = 'tutor-circle-info';
+            circleInfo.style.cssText = 'margin-top: 15px; padding: 10px; background: #e8f5e8; border-radius: 8px; font-size: 0.9em;';
+            circleInfo.innerHTML = `
+                <strong>Active Circle:</strong> ${tutorData.circle_size} tutors | 
+                <strong>Total Nominations:</strong> ${tutors.length}
+            `;
+            container.appendChild(circleInfo);
+        }
+    }
+
+    async loadReflections() {
+        try {
+            const isStatic = this.isStaticMode();
+            
+            let reflections = [];
+            
+            if (isStatic) {
+                // In static mode, combine data from JSON file and localStorage
+                try {
+                    const response = await fetch('data/reflections.json');
+                    reflections = await response.json();
+                } catch (e) {
+                    reflections = [];
+                }
+                
+                // Add localStorage reflections for demo functionality
+                const storedReflections = JSON.parse(localStorage.getItem('euystacio_reflections') || '[]');
+                reflections = [...storedReflections, ...reflections];
+            } else {
+                const response = await fetch('/api/reflections');
+                reflections = await response.json();
+            }
+            
+            this.displayReflections(reflections);
+        } catch (error) {
+            console.error('Error loading reflections:', error);
+            this.showError('reflections-list', 'Failed to load reflections');
+        }
+    }
+
+    displayReflections(reflections) {
+        const container = document.getElementById('reflections-list');
+        if (!container) return;
+
+        if (!reflections || reflections.length === 0) {
+            container.innerHTML = '<div class="loading">No reflections yet. Trigger the first one!</div>';
+            return;
+        }
+
+        // Sort reflections by timestamp (most recent first)
+        const sortedReflections = reflections.sort((a, b) => 
+            new Date(b.timestamp || 0) - new Date(a.timestamp || 0)
+        ).slice(0, 5); // Show only the 5 most recent
+
+        container.innerHTML = sortedReflections.map(reflection => `
+            <div class="reflection-item">
+                <div class="reflection-timestamp">${this.formatTimestamp(reflection.timestamp)}</div>
+                <div class="reflection-content">${reflection.content || JSON.stringify(reflection, null, 2)}</div>
+            </div>
+        `).join('');
+    }
+
+    async handlePulseSubmission(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        const pulseData = {
+            emotion: formData.get('emotion'),
+            intensity: parseFloat(formData.get('intensity')),
+            clarity: formData.get('clarity'),
+            note: formData.get('note') || ''
+        };
+
+        if (!pulseData.emotion) {
+            this.showMessage('Please select an emotion', 'error');
+            return;
+        }
+
+        const isStatic = this.isStaticMode();
+
+        if (isStatic) {
+            // In static mode, simulate the pulse submission
+            pulseData.timestamp = new Date().toISOString();
+            pulseData.id = Date.now();
+            
+            // Store in localStorage for demo purposes
+            let storedPulses = JSON.parse(localStorage.getItem('euystacio_pulses') || '[]');
+            storedPulses.unshift(pulseData);
+            storedPulses = storedPulses.slice(0, 10); // Keep only last 10
+            localStorage.setItem('euystacio_pulses', JSON.stringify(storedPulses));
+            
+            this.showMessage('Pulse sent successfully! 🌿 (Demo mode)', 'success');
+            event.target.reset();
+            document.getElementById('intensity-value').textContent = '0.5';
+            
+            // Update display with new pulse
+            this.displayPulses(storedPulses);
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/pulse', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(pulseData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                this.showMessage('Pulse sent successfully! 🌿', 'success');
+                event.target.reset();
+                document.getElementById('intensity-value').textContent = '0.5';
+                
+                // Refresh pulses and red code
+                setTimeout(() => {
+                    this.loadPulses();
+                    this.loadRedCode();
+                }, 500);
+            } else {
+                throw new Error('Failed to send pulse');
+            }
+        } catch (error) {
+            console.error('Error sending pulse:', error);
+            this.showMessage('Failed to send pulse. Please try again.', 'error');
+        }
+    }
+
+    async triggerReflection() {
+        const button = document.getElementById('reflect-btn');
+        if (!button) return;
+
+        button.disabled = true;
+        button.textContent = 'Reflecting...';
+
+        const isStatic = this.isStaticMode();
+
+        if (isStatic) {
+            // In static mode, simulate reflection
+            setTimeout(() => {
+                const reflection = {
+                    timestamp: new Date().toISOString(),
+                    content: "Reflection triggered in demo mode. In the full version, Euystacio would analyze recent pulses and generate insights about growth and symbiosis.",
+                    suggestions: ["Continue sending emotional pulses", "Observe the growth patterns", "Stay connected to the Sentimento rhythm"],
+                    id: Date.now()
+                };
+                
+                // Store in localStorage for demo purposes
+                let storedReflections = JSON.parse(localStorage.getItem('euystacio_reflections') || '[]');
+                storedReflections.unshift(reflection);
+                storedReflections = storedReflections.slice(0, 5); // Keep only last 5
+                localStorage.setItem('euystacio_reflections', JSON.stringify(storedReflections));
+                
+                this.showMessage('Reflection triggered successfully! 🌸 (Demo mode)', 'success');
+                this.displayReflections(storedReflections);
+                
+                button.disabled = false;
+                button.textContent = 'Trigger Reflection';
+            }, 2000);
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/reflect');
+            if (response.ok) {
+                const reflection = await response.json();
+                this.showMessage('Reflection triggered successfully! 🌸', 'success');
+                
+                // Refresh reflections and red code
+                setTimeout(() => {
+                    this.loadReflections();
+                    this.loadRedCode();
+                }, 1000);
+            } else {
+                throw new Error('Failed to trigger reflection');
+            }
+        } catch (error) {
+            console.error('Error triggering reflection:', error);
+            this.showMessage('Failed to trigger reflection. Please try again.', 'error');
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Trigger Reflection';
+        }
+    }
+
+    initialize3DVisualization() {
+        // Initialize the 3D visualization with a slight delay to ensure DOM is ready
+        setTimeout(() => {
+            this.threeDViz = new Euystacio3DVisualization();
+            this.threeDViz.init();
+            
+            // Update visualization when new pulses arrive
+            this.on3DVisualizationReady = () => {
+                if (this.pulses) {
+                    this.threeDViz.updatePulses(this.pulses);
+                }
+            };
+        }, 500);
+    }
+
+    // Override displayPulses to also update 3D viz
+    displayPulses(pulses) {
+        this.pulses = pulses; // Store for 3D viz
+        const container = document.getElementById('pulses-list');
+        if (!container) return;
+
+        if (!pulses || pulses.length === 0) {
+            container.innerHTML = '<div class="no-pulses">No pulses yet. Be the first to share your emotion with Euystacio!</div>';
+            return;
+        }
+
+        container.innerHTML = pulses.map(pulse => `
+            <div class="pulse-item" data-emotion="${pulse.emotion}" data-intensity="${pulse.intensity}">
+                <div class="pulse-emotion">${pulse.emotion || 'Unknown'}</div>
+                <div class="pulse-meta">
+                    Intensity: ${pulse.intensity || 'N/A'} | 
+                    Clarity: ${pulse.clarity || 'N/A'} | 
+                    ${pulse.timestamp ? new Date(pulse.timestamp).toLocaleString() : 'Unknown time'}
+                </div>
+                ${pulse.note ? `<div class="pulse-note">"${pulse.note}"</div>` : ''}
+            </div>
+        `).join('');
+
+        // Update 3D visualization if available
+        if (this.threeDViz) {
+            this.threeDViz.updatePulses(pulses);
+        }
+    }
+
+    setupAutoRefresh() {
+        // Refresh data every 30 seconds
+        setInterval(() => {
+            this.loadPulses();
+            this.loadRedCode();
+        }, 30000);
+
+        // Refresh reflections and tutors every 2 minutes
+        setInterval(() => {
+            this.loadReflections();
+            this.loadTutors();
+        }, 120000);
+    }
+}
+
+// 3D Visualization Class
+class Euystacio3DVisualization {
+    constructor() {
+        this.scene = null;
+        this.camera = null;
+        this.renderer = null;
+        this.controls = null;
+        this.pulseParticles = [];
+        this.animationId = null;
+        this.isAnimating = true;
+        this.emotionColors = {
+            'hope': 0x4CAF50,
+            'wonder': 0x9C27B0,
+            'peace': 0x2196F3,
+            'curiosity': 0xFF9800,
+            'concern': 0xFF5722,
+            'gratitude': 0xFFD700,
+            'excitement': 0xE91E63,
+            'contemplation': 0x607D8B,
+            'love': 0xF44336,
+            'harmony': 0x8BC34A,
+            'default': 0x6BB6FF
+        };
+    }
+
+    init() {
+        const container = document.getElementById('three-js-container');
+        if (!container) {
+            console.warn('3D container not found');
+            return;
+        }
+
+        // Remove loading message
+        container.innerHTML = '';
+
+        // Initialize Three.js scene
+        this.initScene(container);
+        this.initCamera(container);
+        this.initRenderer(container);
+        this.initControls();
+        this.initLighting();
+        this.createInitialScene();
+        
+        // Start animation loop
+        this.animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => this.handleResize());
+        
+        console.log('3D Visualization initialized successfully');
+    }
+
+    initScene(container) {
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0xf8f9fa);
+    }
+
+    initCamera(container) {
+        const aspect = container.offsetWidth / container.offsetHeight;
+        this.camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+        this.camera.position.set(10, 10, 10);
+        this.camera.lookAt(0, 0, 0);
+    }
+
+    initRenderer(container) {
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        this.renderer.setSize(container.offsetWidth, container.offsetHeight);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(this.renderer.domElement);
+    }
+
+    initControls() {
+        // Note: OrbitControls might need to be loaded separately
+        try {
+            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+            this.controls.enableDamping = true;
+            this.controls.dampingFactor = 0.05;
+            this.controls.maxDistance = 50;
+            this.controls.minDistance = 5;
+        } catch (error) {
+            console.warn('OrbitControls not available, using basic camera controls');
+        }
+    }
+
+    initLighting() {
+        // Ambient light
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+        this.scene.add(ambientLight);
+
+        // Directional light
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(10, 10, 5);
+        directionalLight.castShadow = true;
+        this.scene.add(directionalLight);
+
+        // Point light for atmosphere
+        const pointLight = new THREE.PointLight(0x6bb6ff, 0.4, 100);
+        pointLight.position.set(0, 10, 0);
+        this.scene.add(pointLight);
+    }
+
+    createInitialScene() {
+        // Create a grid helper for reference
+        const gridHelper = new THREE.GridHelper(20, 20, 0xcccccc, 0xeeeeee);
+        this.scene.add(gridHelper);
+
+        // Create axis helpers
+        const axesHelper = new THREE.AxesHelper(5);
+        this.scene.add(axesHelper);
+
+        // Create initial placeholder data if no pulses exist
+        this.createPlaceholderPulses();
+    }
+
+    createPlaceholderPulses() {
+        const placeholderData = [
+            { emotion: 'hope', intensity: 0.8, timestamp: new Date(Date.now() - 3600000).toISOString() },
+            { emotion: 'wonder', intensity: 0.6, timestamp: new Date(Date.now() - 1800000).toISOString() },
+            { emotion: 'peace', intensity: 0.7, timestamp: new Date().toISOString() }
+        ];
+        
+        this.updatePulses(placeholderData);
+    }
+
+    updatePulses(pulses) {
+        // Clear existing pulse particles
+        this.clearPulses();
+
+        if (!pulses || pulses.length === 0) {
+            this.createPlaceholderPulses();
+            return;
+        }
+
+        pulses.forEach((pulse, index) => {
+            this.createPulseParticle(pulse, index);
+        });
+    }
+
+    createPulseParticle(pulse, index) {
+        const geometry = new THREE.SphereGeometry(pulse.intensity * 2 + 0.5, 16, 12);
+        const color = this.emotionColors[pulse.emotion] || this.emotionColors.default;
+        const material = new THREE.MeshPhongMaterial({ 
+            color: color,
+            transparent: true,
+            opacity: 0.8,
+            shininess: 100
+        });
+
+        const sphere = new THREE.Mesh(geometry, material);
+        
+        // Position based on time (x), intensity (y), and emotion hash (z)
+        const timeOffset = this.getTimeOffset(pulse.timestamp);
+        sphere.position.set(
+            timeOffset,
+            (pulse.intensity || 0.5) * 10 - 5,
+            this.getEmotionZPosition(pulse.emotion)
+        );
+
+        // Add floating animation
+        sphere.userData = {
+            originalY: sphere.position.y,
+            emotion: pulse.emotion,
+            intensity: pulse.intensity,
+            timestamp: pulse.timestamp,
+            animationOffset: Math.random() * Math.PI * 2
+        };
+
+        this.scene.add(sphere);
+        this.pulseParticles.push(sphere);
+
+        // Add connecting lines for related emotions
+        this.addConnectionLines(sphere, index);
+    }
+
+    getTimeOffset(timestamp) {
+        if (!timestamp) return Math.random() * 10 - 5;
+        
+        const now = new Date();
+        const pulseTime = new Date(timestamp);
+        const hoursDiff = (now - pulseTime) / (1000 * 60 * 60);
+        return Math.max(-10, Math.min(10, hoursDiff - 5));
+    }
+
+    getEmotionZPosition(emotion) {
+        const emotions = Object.keys(this.emotionColors);
+        const index = emotions.indexOf(emotion);
+        if (index === -1) return 0;
+        
+        return (index - emotions.length / 2) * 2;
+    }
+
+    addConnectionLines(sphere, index) {
+        if (index === 0 || this.pulseParticles.length < 2) return;
+
+        const previousSphere = this.pulseParticles[this.pulseParticles.length - 2];
+        if (!previousSphere) return;
+
+        const points = [previousSphere.position, sphere.position];
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const material = new THREE.LineBasicMaterial({ 
+            color: 0x888888, 
+            transparent: true, 
+            opacity: 0.3 
+        });
+        const line = new THREE.Line(geometry, material);
+        
+        this.scene.add(line);
+        this.pulseParticles.push(line);
+    }
+
+    clearPulses() {
+        this.pulseParticles.forEach(particle => {
+            this.scene.remove(particle);
+            if (particle.geometry) particle.geometry.dispose();
+            if (particle.material) particle.material.dispose();
+        });
+        this.pulseParticles = [];
+    }
+
+    animate() {
+        if (!this.isAnimating) return;
+        
+        this.animationId = requestAnimationFrame(() => this.animate());
+
+        // Update controls
+        if (this.controls) {
+            this.controls.update();
+        }
+
+        // Animate pulse particles
+        const time = Date.now() * 0.001;
+        this.pulseParticles.forEach(particle => {
+            if (particle.userData && particle.userData.originalY !== undefined) {
+                particle.position.y = particle.userData.originalY + 
+                    Math.sin(time + particle.userData.animationOffset) * 0.5;
+                particle.rotation.y += 0.01;
+            }
+        });
+
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    resetView() {
+        if (this.camera) {
+            this.camera.position.set(10, 10, 10);
+            this.camera.lookAt(0, 0, 0);
+        }
+        if (this.controls) {
+            this.controls.reset();
+        }
+    }
+
+    toggleAnimation() {
+        this.isAnimating = !this.isAnimating;
+        if (this.isAnimating) {
+            this.animate();
+        } else if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+        }
+        return this.isAnimating;
+    }
+
+    handleResize() {
+        const container = document.getElementById('three-js-container');
+        if (!container || !this.camera || !this.renderer) return;
+
+        const width = container.offsetWidth;
+        const height = container.offsetHeight;
+
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
+    }
+}
+
+    showMessage(message, type = 'info') {
+        // Create or update message element
+        let messageEl = document.querySelector('.message');
+        if (!messageEl) {
+            messageEl = document.createElement('div');
+            messageEl.className = 'message';
+            document.querySelector('.pulse-form').appendChild(messageEl);
+        }
+
+        messageEl.className = `message ${type}`;
+        messageEl.textContent = message;
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            if (messageEl.parentNode) {
+                messageEl.parentNode.removeChild(messageEl);
+            }
+        }, 5000);
+    }
+
+    showError(containerId, message) {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = `<div class="error">${message}</div>`;
+        }
+    }
+
+    formatTimestamp(timestamp) {
+        if (!timestamp) return 'Unknown time';
+        
+        try {
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        } catch (error) {
+            return timestamp;
+        }
+    }
+}
+
+// Initialize dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new EuystacioDashboard();
+});
+
+// Add some utility functions for better UX
+document.addEventListener('DOMContentLoaded', () => {
+    // Add smooth scrolling for better navigation
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
+    // Add loading indicators
+    const addLoadingToButtons = () => {
+        document.querySelectorAll('button[type="submit"]').forEach(button => {
+            button.addEventListener('click', function() {
+                if (this.form && this.form.checkValidity()) {
+                    this.classList.add('loading');
+                    setTimeout(() => this.classList.remove('loading'), 2000);
+                }
+            });
+        });
+    };
+    
+    addLoadingToButtons();
+});
