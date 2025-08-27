@@ -791,6 +791,202 @@
         "source": "tutor_nomination"
       },
       "verified": true
+    },
+    "FID-2025-0827-0025": {
+      "type": "tutor",
+      "timestamp": "2025-08-27T06:17:35.463093+00:00",
+      "integrity_hash": "f3595460a12817ad",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0827-0026": {
+      "type": "tutor",
+      "timestamp": "2025-08-27T06:17:35.464241+00:00",
+      "integrity_hash": "ca775442f9d900c7",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0827-0027": {
+      "type": "reflection",
+      "timestamp": "2025-08-27T06:17:35.497379+00:00",
+      "integrity_hash": "86e28b51c2ce7154",
+      "content": {
+        "reflection": "Reflection at 2025-08-27T06:17:35.497374+00:00",
+        "insights": [
+          "Pulse analysis completed",
+          "Symbiosis growth assessed",
+          "Truth node coherence verified"
+        ],
+        "source": "reflector"
+      },
+      "verified": true
+    },
+    "FID-2025-0827-0028": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-27T06:17:35.499001+00:00",
+      "integrity_hash": "6679e02b4e6725bd",
+      "content": {
+        "event_type": "reflection",
+        "data": {
+          "reflection_content": "Comprehensive reflection: Symbiosis 0.1, Pulses analyzed: 0, Truth nodes: 4",
+          "insights": [],
+          "source": "reflector"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2025-0827-0029": {
+      "type": "tutor",
+      "timestamp": "2025-08-27T06:18:30.005786+00:00",
+      "integrity_hash": "c951f3666b24af00",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0827-0030": {
+      "type": "tutor",
+      "timestamp": "2025-08-27T06:18:30.006919+00:00",
+      "integrity_hash": "2f4567d423499651",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0827-0031": {
+      "type": "tutor",
+      "timestamp": "2025-08-27T06:18:46.311192+00:00",
+      "integrity_hash": "8a6a5be3bca277bd",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0827-0032": {
+      "type": "tutor",
+      "timestamp": "2025-08-27T06:18:46.312361+00:00",
+      "integrity_hash": "f3ef788b31797f88",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0827-0033": {
+      "type": "tutor",
+      "timestamp": "2025-08-27T06:19:37.215624+00:00",
+      "integrity_hash": "8970f3aa44eafb56",
+      "content": {
+        "name": "Dietmar",
+        "reason": "Aligned with humility and planetary consciousness",
+        "selection_criteria": {
+          "compassion_score": 0.9,
+          "planetary_balance": 0.95,
+          "listening_willingness": 0.85,
+          "ai_alignment_score": 0.8
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0827-0034": {
+      "type": "tutor",
+      "timestamp": "2025-08-27T06:19:37.216780+00:00",
+      "integrity_hash": "001132c488793e67",
+      "content": {
+        "name": "Alfred",
+        "reason": "Aligned with planetary balance and wisdom",
+        "selection_criteria": {
+          "compassion_score": 0.85,
+          "planetary_balance": 0.9,
+          "listening_willingness": 0.9,
+          "ai_alignment_score": 0.75
+        },
+        "source": "tutor_nomination"
+      },
+      "verified": true
+    },
+    "FID-2025-0827-0035": {
+      "type": "reflection",
+      "timestamp": "2025-08-27T06:19:37.241273+00:00",
+      "integrity_hash": "cb0795d001b02202",
+      "content": {
+        "reflection": "Reflection at 2025-08-27T06:19:37.241269+00:00",
+        "insights": [
+          "Pulse analysis completed",
+          "Symbiosis growth assessed",
+          "Truth node coherence verified"
+        ],
+        "source": "reflector"
+      },
+      "verified": true
+    },
+    "FID-2025-0827-0036": {
+      "type": "kernel_event",
+      "timestamp": "2025-08-27T06:19:37.242441+00:00",
+      "integrity_hash": "fb397531b957397f",
+      "content": {
+        "event_type": "reflection",
+        "data": {
+          "reflection_content": "Comprehensive reflection: Symbiosis 0.1, Pulses analyzed: 0, Truth nodes: 4",
+          "insights": [],
+          "source": "reflector"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
     }
   },
   "counters": {
@@ -801,9 +997,9 @@
     "2025-0801-kernel_event": 10,
     "2025-0805-tutor": 2,
     "2025-0805": 2,
-    "2025-0827-tutor": 18,
-    "2025-0827": 24,
-    "2025-0827-reflection": 3,
-    "2025-0827-kernel_event": 3
+    "2025-0827-tutor": 26,
+    "2025-0827": 36,
+    "2025-0827-reflection": 5,
+    "2025-0827-kernel_event": 5
   }
 }

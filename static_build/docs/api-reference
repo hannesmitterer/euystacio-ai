@@ -1,0 +1,90 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>API Reference</title>
+        <style>
+            body { 
+                font-family: Arial, sans-serif; 
+                margin: 40px; 
+                line-height: 1.6; 
+            }
+            .header { 
+                border-bottom: 1px solid #eee; 
+                padding-bottom: 20px; 
+                margin-bottom: 30px; 
+            }
+            .source-badge { 
+                background: #f0f0f0; 
+                padding: 3px 8px; 
+                border-radius: 3px; 
+                font-size: 12px; 
+                margin-left: 10px; 
+            }
+            .content {
+                max-width: 800px;
+            }
+            .back-link {
+                display: inline-block;
+                margin-top: 30px;
+                color: #0066cc;
+                text-decoration: none;
+            }
+            .back-link:hover {
+                text-decoration: underline;
+            }
+            pre {
+                background: #f5f5f5;
+                padding: 15px;
+                border-radius: 5px;
+                overflow-x: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>API Reference</h1>
+            <p>
+                Slug: <code>api-reference</code>
+                <span class="source-badge">local_markdown</span>
+            </p>
+        </div>
+        
+        <div class="content">
+            
+                <pre># API Reference
+
+## REST API Endpoints
+
+### Core Endpoints
+
+- `GET /api/red_code` - Get current Red Code state
+- `GET /api/pulses` - Get recent emotional pulses
+- `POST /api/pulse` - Submit new emotional pulse
+- `GET /api/reflections` - Get AI reflections
+
+### Documentation Endpoints
+
+- `GET /docs/` - Documentation index
+- `GET /docs/&lt;slug&gt;` - Get documentation page
+- `GET /docs/api/&lt;slug&gt;` - Get documentation as JSON
+
+### Authentication
+
+For Hygraph integration, set these environment variables:
+- `HYGRAPH_ENDPOINT` - Your Hygraph GraphQL endpoint
+- `HYGRAPH_TOKEN` - Authentication token
+
+## GraphQL Schema
+
+The Hygraph integration expects a `Doc` content type with:
+- `title` (String)
+- `slug` (String, unique)
+- `content` (RichText or String)</pre>
+            
+        </div>
+        
+        <a href="/docs/" class="back-link">← Back to documentation index</a>
+    </body>
+    </html>
+    
