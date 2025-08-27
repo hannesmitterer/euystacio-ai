@@ -37,13 +37,52 @@
         },
         "children": [],
         "integrity_verified": true
+      },
+      {
+        "fid": "FID-2025-0827-0003",
+        "type": "reflection",
+        "timestamp": "2025-08-27T06:12:08.908715+00:00",
+        "parent": "FID-2025-0131-0001",
+        "content": {
+          "reflection_type": "comprehensive_analysis",
+          "symbiosis_level": 0.1,
+          "timestamp": "2025-08-27T06:12:08.909320+00:00"
+        },
+        "children": [],
+        "integrity_verified": true
+      },
+      {
+        "fid": "FID-2025-0827-0007",
+        "type": "reflection",
+        "timestamp": "2025-08-27T06:12:26.704212+00:00",
+        "parent": "FID-2025-0131-0001",
+        "content": {
+          "reflection_type": "comprehensive_analysis",
+          "symbiosis_level": 0.1,
+          "timestamp": "2025-08-27T06:12:26.704901+00:00"
+        },
+        "children": [],
+        "integrity_verified": true
+      },
+      {
+        "fid": "FID-2025-0827-0013",
+        "type": "reflection",
+        "timestamp": "2025-08-27T06:14:42.814540+00:00",
+        "parent": "FID-2025-0131-0001",
+        "content": {
+          "reflection_type": "comprehensive_analysis",
+          "symbiosis_level": 0.1,
+          "timestamp": "2025-08-27T06:14:42.815313+00:00"
+        },
+        "children": [],
+        "integrity_verified": true
       }
     ]
   },
   "metadata": {
     "created": "2025-08-01T16:43:28.525097+00:00",
-    "total_nodes": 4,
+    "total_nodes": 7,
     "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer",
-    "last_update": "2025-08-01T16:43:28.526655+00:00"
+    "last_update": "2025-08-27T06:14:42.816478+00:00"
   }
 }
