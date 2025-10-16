@@ -1,0 +1,62 @@
+/* Unique: The Paradoxical Aesthetic */
+body {
+    font-family: monospace;
+    color: #00FF90; /* Quantum Green */
+    background: #0D101A; /* Deep Space/Red Code backdrop */
+    margin: 0;
+    padding: 20px;
+    transition: background-color 0.5s;
+}
+
+/* Paradoxical: Tension represented by contrasting layers */
+#Header-Module, #Covenant-Module {
+    border: 1px solid #00FF90;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 15px #00FF90;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* Evolutionary/Modular: Flexible layout */
+#Anchors-Module {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+/* Quantum: Visual feedback on kernel state */
+body[data-dignity="WARNING"] {
+    color: #FF6B6B; /* Red Code Alert */
+    box-shadow: 0 0 20px #FF6B6B;
+}
+
+/* Auditable: Clear display of non-simulated data */
+#sovereignty-proof p {
+    font-size: 0.9em;
+    margin: 5px 0;
+}
+
+/* Control Panel Buttons */
+#command-interface {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+}
+#command-interface button {
+    background: #00FF90;
+    color: #0D101A;
+    border: none;
+    padding: 8px 16px;
+    font-family: monospace;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 0 8px #00FF90;
+    transition: background 0.2s, color 0.2s;
+}
+#command-interface button:hover {
+    background: #FF6B6B;
+    color: #fff;
+    box-shadow: 0 0 16px #FF6B6B;
+}
