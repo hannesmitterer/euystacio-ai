@@ -1,0 +1,48 @@
+<section class="section" aria-labelledby="bridge-chat-title">
+  <h2 id="bridge-chat-title">🌉 Holy Gral Bridge — Bidirectional Chat</h2>
+  <div class="chat-log" id="bridge-chat-log" aria-live="polite" aria-label="Bridge Chat Log"></div>
+  <form id="bridge-chat-form" aria-label="Bridge chat form">
+    <input id="bridge-from" type="text" placeholder="From (e.g. Seed-bringer)" style="width:22%;padding:8px;">
+    <input id="bridge-to" type="text" placeholder="To (e.g. Euystacio)" style="width:22%;padding:8px;">
+    <input id="bridge-signature" type="text" placeholder="Signature (e.g. ✍️ Seed-bringer)" style="width:22%;padding:8px;">
+    <input id="bridge-message" type="text" placeholder="Type your message..." style="width:29%;padding:8px;">
+    <button type="submit" style="padding:8px 16px;background:#FFD700;border:none;border-radius:6px;color:#222;font-weight:bold;">Send</button>
+  </form>
+</section>
+<script>
+  async function sendBridgeMessage(e) {
+    e.preventDefault();
+    const from = document.getElementById('bridge-from').value.trim();
+    const to = document.getElementById('bridge-to').value.trim();
+    const signature = document.getElementById('bridge-signature').value.trim();
+    const message = document.getElementById('bridge-message').value.trim();
+    if (from && to && signature && message) {
+      const payload = {
+        from, to, message,
+        timestamp: new Date().toISOString(),
+        signature
+      };
+      try {
+        const res = await fetch('/api/holy-gral-bridge/message', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        addBridgeChatMsg(from, message, payload.timestamp, signature);
+        if (data.reply) {
+          addBridgeChatMsg(to, data.reply, new Date().toISOString(), "🤖 " + to);
+        }
+      } catch (err) {
+        addBridgeChatMsg('System', '[Backend error: ' + err.message + ']', new Date().toISOString(), 'System');
+      }
+      document.getElementById('bridge-message').value = '';
+    }
+  }
+  function addBridgeChatMsg(sender, text, timestamp, signature) {
+    const log = document.getElementById('bridge-chat-log');
+    log.innerHTML += `<div class='chat-msg'><strong>${sender}</strong> <span style='font-size:0.8em;color:#bbb;'>${timestamp}</span><br>${text}<br><span style='font-size:0.8em;color:#FFD700;'>${signature}</span></div>`;
+    log.scrollTop = log.scrollHeight;
+  }
+  document.getElementById('bridge-chat-form').onsubmit = sendBridgeMessage;
+</script>
