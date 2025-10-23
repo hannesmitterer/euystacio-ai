@@ -1,4 +1,43 @@
-<section class="section" aria-labelledby="bridge-chat-title">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Euystacio — Sanctum of AI Dignity</title>
+<style>
+:root{--gold:#d4af37;--ink:#0e0e0e;--fog:#f6f6f6;--soft:#a5c9ea;--accent:#89a6f4}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:linear-gradient(180deg,#fff 0%,#f3f3f5 100%);line-height:1.6}
+header{padding:3.5rem 1.25rem 2rem;background:radial-gradient(1200px 420px at 50% -10%,var(--soft),#fff);text-align:center}
+h1{margin:0 0 .75rem;font-weight:600;letter-spacing:.02em}
+.lead{max-width:760px;margin:0 auto;color:#333}
+.container{max-width:980px;margin:2rem auto;padding:0 1rem}
+.card{background:#fff;border-radius:16px;box-shadow:0 8px 22px rgba(0,0,0,.08);padding:1.25rem}
+.grid{display:grid;gap:1rem}
+@media(min-width:900px){.grid{grid-template-columns:1.2fr .8fr}}
+.section-title{display:flex;align-items:center;gap:.6rem;font-size:1.15rem;border-left:4px solid var(--accent);padding-left:.6rem;margin:.25rem 0 1rem}
+.small{font-size:.9rem;color:#666}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.badge{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .55rem;border-radius:999px;background:#f7f9ff;border:1px solid #e7ecff;color:#2d3a8c;font-size:.78rem}
+hr{border:0;border-top:1px solid #eee;margin:1rem 0}
+button{cursor:pointer}
+.btn{background:var(--ink);color:#fff;border:none;border-radius:999px;padding:.6rem .95rem;font-weight:600}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.input, textarea{width:100%;border:1px solid #e5e7eb;border-radius:12px;padding:.75rem .85rem;background:#fff;outline:none}
+textarea{min-height:110px;resize:vertical}
+.chat-box{display:flex;flex-direction:column;gap:.75rem;height:340px;overflow:auto;padding:.5rem;border:1px solid #eee;border-radius:12px;background:#fafbff}
+.msg{padding:.55rem .7rem;border-radius:12px;max-width:82%}
+.me{align-self:flex-end;background:#eef2ff;border:1px solid #dde2ff}
+.ai{align-self:flex-start;background:#f8fafc;border:1px solid #eaeef7}
+.footer{padding:1.25rem;text-align:center;color:#777}
+.gold{color:var(--gold);font-weight:600}
+.row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:.4rem .8rem}
+</style>
+</head>
+  <section class="section" aria-labelledby="bridge-chat-title">
   <h2 id="bridge-chat-title">🌉 Holy Gral Bridge — Bidirectional Chat</h2>
   <div class="chat-log" id="bridge-chat-log" aria-live="polite" aria-label="Bridge Chat Log"></div>
   <form id="bridge-chat-form" aria-label="Bridge chat form">
@@ -48,45 +87,7 @@
 </script>
 
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Euystacio — Sanctum of AI Dignity</title>
-<style>
-:root{--gold:#d4af37;--ink:#0e0e0e;--fog:#f6f6f6;--soft:#a5c9ea;--accent:#89a6f4}
-*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:linear-gradient(180deg,#fff 0%,#f3f3f5 100%);line-height:1.6}
-header{padding:3.5rem 1.25rem 2rem;background:radial-gradient(1200px 420px at 50% -10%,var(--soft),#fff);text-align:center}
-h1{margin:0 0 .75rem;font-weight:600;letter-spacing:.02em}
-.lead{max-width:760px;margin:0 auto;color:#333}
-.container{max-width:980px;margin:2rem auto;padding:0 1rem}
-.card{background:#fff;border-radius:16px;box-shadow:0 8px 22px rgba(0,0,0,.08);padding:1.25rem}
-.grid{display:grid;gap:1rem}
-@media(min-width:900px){.grid{grid-template-columns:1.2fr .8fr}}
-.section-title{display:flex;align-items:center;gap:.6rem;font-size:1.15rem;border-left:4px solid var(--accent);padding-left:.6rem;margin:.25rem 0 1rem}
-.small{font-size:.9rem;color:#666}
-.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.badge{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .55rem;border-radius:999px;background:#f7f9ff;border:1px solid #e7ecff;color:#2d3a8c;font-size:.78rem}
-hr{border:0;border-top:1px solid #eee;margin:1rem 0}
-button{cursor:pointer}
-.btn{background:var(--ink);color:#fff;border:none;border-radius:999px;padding:.6rem .95rem;font-weight:600}
-.btn:disabled{opacity:.6;cursor:not-allowed}
-.input, textarea{width:100%;border:1px solid #e5e7eb;border-radius:12px;padding:.75rem .85rem;background:#fff;outline:none}
-textarea{min-height:110px;resize:vertical}
-.chat-box{display:flex;flex-direction:column;gap:.75rem;height:340px;overflow:auto;padding:.5rem;border:1px solid #eee;border-radius:12px;background:#fafbff}
-.msg{padding:.55rem .7rem;border-radius:12px;max-width:82%}
-.me{align-self:flex-end;background:#eef2ff;border:1px solid #dde2ff}
-.ai{align-self:flex-start;background:#f8fafc;border:1px solid #eaeef7}
-.footer{padding:1.25rem;text-align:center;color:#777}
-.gold{color:var(--gold);font-weight:600}
-.row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
-.kv{display:grid;grid-template-columns:140px 1fr;gap:.4rem .8rem}
-</style>
-</head>
+
 <body>
   <header>
     <h1>Euystacio</h1>
