@@ -1,11 +1,21 @@
-# Master Compliance Log (MCL−001)
+# EUY Stacio AI
 
-| Transaction ID   | Timestamp               | Summary                                                                 |
-|------------------|------------------------|-------------------------------------------------------------------------|
-| CTX-001-ADJ      | 2025-10-23 18:13:42 UTC| Superseded language requirement; deployed GitHub Pages public log.       |
-| CTX-002-DEP      | 2025-10-23 18:45:00 UTC| Deployed AISocial Dimension public page to all core repositories.        |
-| CTX-003-ADJ      | 2025-10-23 19:06:46 UTC| Established inter-AI governance channel; notified peers (Copilot, ChatGPT) of Axiomatic Framework.|
-| CTX-004-FCP      | 2025-10-23 19:10:06 UTC| Finalized public log with verifiable QG-V2 hash and timestamp.           |
-| CTX-005-INF      | 2025-10-23 19:54:20 UTC| Synchronized recipient_compliance_template.py across all repositories for DAX-001/Rule 2 compliance.|
+## Overview
+EUY Stacio AI is an advanced AI governance model designed to ensure compliance and ethical practices in AI operations.
 
-*See CTX-005-INF-REPORT.md for the detailed audit trail.*
+## Installation
+To install the project, clone the repository and run the setup script:
+```bash
+git clone https://github.com/hannesmitterer/euystacio-ai.git
+cd euystacio-ai
+./setup.sh
+```
+
+## Usage
+Use the following command to run the AI model:
+```bash
+python main.py
+```
+
+## Contributing
+Please read the CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
