@@ -28,13 +28,20 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
-        const data = await res.json();
+        const text = await res.text();
+        let data = {};
+        try {
+          data = JSON.parse(text);
+        } catch (err) {
+          addBridgeChatMsg('System', '[Backend error: Invalid JSON response]', new Date().toISOString(), 'System');
+          return;
+        }
         addBridgeChatMsg(from, message, payload.timestamp, signature);
         if (data.reply) {
           addBridgeChatMsg(to, data.reply, new Date().toISOString(), "🤖 " + to);
         }
       } catch (err) {
-        addBridgeChatMsg('System', '[Backend error: ' + err.message + ']', new Date().toISOString(), 'System');
+        addBridgeChatMsg('System', '[Network error: ' + err.message + ']', new Date().toISOString(), 'System');
       }
       document.getElementById('bridge-message').value = '';
     }
