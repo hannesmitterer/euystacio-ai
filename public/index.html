@@ -1,154 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIQUIIUM ARENA Index v2.0</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #333;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 3rem;
-            max-width: 800px;
-            width: 90%;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #667eea;
-            margin-bottom: 1rem;
-            font-size: 2.5rem;
-        }
-        
-        .version {
-            text-align: center;
-            color: #764ba2;
-            margin-bottom: 2rem;
-            font-weight: bold;
-        }
-        
-        .section {
-            margin: 2rem 0;
-            padding: 1.5rem;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .section h2 {
-            color: #667eea;
-            margin-bottom: 1rem;
-        }
-        
-        .metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .metric-card {
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        
-        .metric-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #764ba2;
-        }
-        
-        .metric-label {
-            color: #666;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-        }
-        
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        
-        .status-active {
-            background: #28a745;
-            box-shadow: 0 0 10px #28a745;
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e9ecef;
-            color: #666;
-            font-size: 0.9rem;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LIQUIIUM ARENA — Index v2.0</title>
+  <meta name="description" content="LIQUIIUM ARENA Index v2.0 — Synesthetic-Fluid Architecture">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #e9eef8;
+      overflow-x: hidden;
+    }
+    .synesthetic-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      grid-template-rows: auto 1fr auto;
+      gap: 16px;
+      padding: 16px;
+      min-height: 100vh;
+    }
+    .synesthetic-panel {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+    #GGC_HEADER {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #VIS_RELATIONAL {
+      grid-row: 2;
+      grid-column: 1;
+    }
+    #EUYSTACIO_CHAT {
+      grid-row: 2;
+      grid-column: 2;
+      position: relative;
+      overflow: hidden;
+    }
+    #VIS_EQUILIBRIUM {
+      grid-row: 2;
+      grid-column: 3;
+    }
+    #VIS_SFI {
+      grid-column: 1 / 3;
+      grid-row: 3;
+    }
+    #GGC_DOCS_PORTAL {
+      grid-column: 3;
+      grid-row: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .full-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    button {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #e9eef8;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    input, select {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #e9eef8;
+      padding: 8px;
+      border-radius: 6px;
+    }
+    .muted-small {
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+    h2, h3 {
+      color: #a8b9ff;
+      font-weight: 600;
+    }
+    @media (max-width: 1024px) {
+      .synesthetic-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+      #GGC_HEADER, #VIS_RELATIONAL, #EUYSTACIO_CHAT, #VIS_EQUILIBRIUM, #VIS_SFI, #GGC_DOCS_PORTAL {
+        grid-column: 1;
+        grid-row: auto;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>LIQUIIUM ARENA Index</h1>
-        <div class="version">Version 2.0</div>
-        
-        <div class="section">
-            <h2><span class="status-indicator status-active"></span>System Status</h2>
-            <p>All systems operational and equilibrium maintained</p>
-        </div>
-        
-        <div class="section">
-            <h2>Core Metrics</h2>
-            <div class="metrics">
-                <div class="metric-card">
-                    <div class="metric-value">100%</div>
-                    <div class="metric-label">Uptime</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">0</div>
-                    <div class="metric-label">Active Alerts</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">⚖️</div>
-                    <div class="metric-label">Equilibrium</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="section">
-            <h2>TFM-1 Integration</h2>
-            <p>Tactical Field Module 1 (TFM-1) monitoring and equilibrium top-up system</p>
-            <ul style="list-style: none; padding: 1rem 0;">
-                <li style="padding: 0.5rem 0;">✓ Payload delivery system: Active</li>
-                <li style="padding: 0.5rem 0;">✓ Prometheus alerts: Configured</li>
-                <li style="padding: 0.5rem 0;">✓ Equilibrium monitoring: Enabled</li>
-            </ul>
-        </div>
-        
-        <div class="footer">
-            <p>LIQUIIUM ARENA Index v2.0 | Powered by TFM-1</p>
-            <p style="margin-top: 0.5rem; font-size: 0.8rem;">Attribution: Leonardo da Vinci principles applied</p>
-        </div>
+  <div class="synesthetic-grid" id="app_root" data-ie="1.000">
+    <div id="GGC_HEADER" class="synesthetic-panel" role="banner" aria-label="GGC Header">
+      <div style="display:flex;gap:12px;align-items:center">
+        <button id="GoogleLoginBtn" aria-label="Authenticate via Google">Sign in with Google</button>
+        <div id="GGC_BRAND" style="font-size:18px;font-weight:700">LIQUIIUM ARENA</div>
+        <div class="muted-small" id="logged_in_user" aria-live="polite" style="margin-left:8px"></div>
+      </div>
+      <div style="text-align:right">
+        <div id="NCP_STATUS" data-ie-band="normal" style="font-weight:600">Equilibrium Flow: Stable Harmony.</div>
+        <div class="muted-small" id="tfm_status">TFM-1: ready</div>
+      </div>
     </div>
+
+    <aside id="VIS_RELATIONAL" class="synesthetic-panel" aria-label="Knowledge Graph (Euystacio)">
+      <h3 style="margin-top:0">Euystacio Knowledge Graph</h3>
+      <div id="graph_container" style="height:360px;"></div>
+      <div class="muted-small" style="margin-top:10px">Interactive, node-based visualisation — drag to explore. Node distance &amp; thickness show correlation strength.</div>
+    </aside>
+
+    <main id="EUYSTACIO_CHAT" class="synesthetic-panel" aria-label="Euystacio Chat">
+      <canvas id="Euy_Kernel_Cascade" class="full-canvas" aria-hidden="true"></canvas>
+      <div id="Euy_Chat_Window" style="position:relative;z-index:2;padding:12px;max-width:900px;margin:auto">
+        <h2 style="margin:0 0 8px 0">Euystacio Kernel Chat</h2>
+        <div id="chat_area" style="height:320px;overflow:auto;background:rgba(0,0,0,0.18);border-radius:8px;padding:10px">Connecting…</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="chat_input" placeholder="Ask Euystacio…" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff">
+          <button id="chat_send" style="padding:10px 12px;border-radius:8px">Send</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+          <div class="muted-small">Kernel WS:</div>
+          <div id="ws_status" class="muted-small">disconnected</div>
+        </div>
+      </div>
+    </main>
+
+    <section id="VIS_EQUILIBRIUM" class="synesthetic-panel equilibrium-gauge" role="region" aria-label="Systemic Equilibrium Gauge">
+      <div style="width:100%;text-align:center">
+        <h3 style="margin-top:0">Systemic Equilibrium Status</h3>
+        <canvas id="equilibrium_gauge" width="360" height="360" aria-label="Equilibrium 3D gauge"></canvas>
+        <div style="text-align:center;margin-top:8px">
+          <span id="ie_value" style="font-weight:700">IE = 1.000</span>
+          <div class="muted-small" id="em_info">E vs M — awaiting telemetry</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="VIS_SFI" class="synesthetic-panel">
+      <h3 style="margin-top:0">Social Frequency Index (SFI)</h3>
+      <div id="sfi_waveform" style="height:120px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent);border-radius:8px"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <label class="muted-small">Axis:</label>
+        <select id="sfi_axis" class="muted-small">
+          <option value="sentiment">Sentiment</option>
+          <option value="anxiety">Anxiety</option>
+          <option value="engagement">Engagement</option>
+        </select>
+        <div style="flex:1"></div>
+        <div class="muted-small" id="sfi_stats">live</div>
+      </div>
+    </section>
+
+    <div id="GGC_DOCS_PORTAL" class="synesthetic-panel">
+      <a href="/governance/ethical-docs.html" style="color:#e9eef8;text-decoration:none;font-weight:600">GGC Ethical Protocol &amp; Immutable Ledger</a>
+    </div>
+  </div>
 </body>
 </html>
