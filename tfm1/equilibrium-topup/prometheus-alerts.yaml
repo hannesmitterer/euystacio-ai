@@ -84,8 +84,8 @@ groups:
           component: tfm1
           subsystem: operations
         annotations:
-          summary: "TFM-1 top-up operations failing"
-          description: "TFM-1 top-up operation failure rate is above 10% over the last 5 minutes"
+          summary: "TFM-1 topup operations failing"
+          description: "TFM-1 topup operation failure rate is above 10% over the last 5 minutes"
           runbook_url: "https://docs.liquiium-arena.internal/runbooks/topup-failures"
 
       - alert: HealthCheckFailing
