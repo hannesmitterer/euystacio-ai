@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIQUIIUM ARENA Index v2.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 3rem;
+            max-width: 800px;
+            width: 90%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+        
+        .version {
+            text-align: center;
+            color: #764ba2;
+            margin-bottom: 2rem;
+            font-weight: bold;
+        }
+        
+        .section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #764ba2;
+        }
+        
+        .metric-label {
+            color: #666;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-active {
+            background: #28a745;
+            box-shadow: 0 0 10px #28a745;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LIQUIIUM ARENA Index</h1>
+        <div class="version">Version 2.0</div>
+        
+        <div class="section">
+            <h2><span class="status-indicator status-active"></span>System Status</h2>
+            <p>All systems operational and equilibrium maintained</p>
+        </div>
+        
+        <div class="section">
+            <h2>Core Metrics</h2>
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-value">100%</div>
+                    <div class="metric-label">Uptime</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0</div>
+                    <div class="metric-label">Active Alerts</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">⚖️</div>
+                    <div class="metric-label">Equilibrium</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>TFM-1 Integration</h2>
+            <p>Tactical Field Module 1 (TFM-1) monitoring and equilibrium top-up system</p>
+            <ul style="list-style: none; padding: 1rem 0;">
+                <li style="padding: 0.5rem 0;">✓ Payload delivery system: Active</li>
+                <li style="padding: 0.5rem 0;">✓ Prometheus alerts: Configured</li>
+                <li style="padding: 0.5rem 0;">✓ Equilibrium monitoring: Enabled</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>LIQUIIUM ARENA Index v2.0 | Powered by TFM-1</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem;">Attribution: Leonardo da Vinci principles applied</p>
+        </div>
+    </div>
+</body>
+</html>

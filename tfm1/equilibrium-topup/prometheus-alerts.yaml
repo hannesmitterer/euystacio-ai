@@ -1,0 +1,152 @@
+groups:
+  - name: tfm1_equilibrium_alerts
+    interval: 30s
+    rules:
+      # High-level system health alerts
+      - alert: EquilibriumThresholdBreach
+        expr: equilibrium_balance < 0.95
+        for: 5m
+        labels:
+          severity: critical
+          component: tfm1
+          subsystem: equilibrium
+        annotations:
+          summary: "Equilibrium threshold breached"
+          description: "System equilibrium has fallen below 95% threshold for more than 5 minutes. Current value: {{ $value }}"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/equilibrium-breach"
+
+      - alert: HighCPUUsage
+        expr: cpu_usage_percent > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: tfm1
+          subsystem: resources
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for more than 10 minutes. Current value: {{ $value }}%"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/high-cpu"
+
+      - alert: HighMemoryUsage
+        expr: memory_usage_percent > 85
+        for: 10m
+        labels:
+          severity: warning
+          component: tfm1
+          subsystem: resources
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% for more than 10 minutes. Current value: {{ $value }}%"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/high-memory"
+
+      - alert: HighDiskUsage
+        expr: disk_usage_percent > 90
+        for: 5m
+        labels:
+          severity: critical
+          component: tfm1
+          subsystem: storage
+        annotations:
+          summary: "Critical disk usage detected"
+          description: "Disk usage is above 90% for more than 5 minutes. Current value: {{ $value }}%"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/high-disk"
+
+      - alert: HighNetworkLatency
+        expr: network_latency_ms > 100
+        for: 5m
+        labels:
+          severity: warning
+          component: tfm1
+          subsystem: network
+        annotations:
+          summary: "High network latency detected"
+          description: "Network latency exceeds 100ms for more than 5 minutes. Current value: {{ $value }}ms"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/high-latency"
+
+      # TFM-1 specific alerts
+      - alert: TFM1ServiceDown
+        expr: up{job="tfm1"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: tfm1
+          subsystem: service
+        annotations:
+          summary: "TFM-1 service is down"
+          description: "TFM-1 service has been down for more than 2 minutes"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/tfm1-service-down"
+
+      - alert: TopupOperationFailed
+        expr: rate(tfm1_topup_failures_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          component: tfm1
+          subsystem: operations
+        annotations:
+          summary: "TFM-1 top-up operations failing"
+          description: "TFM-1 top-up operation failure rate is above 10% over the last 5 minutes"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/topup-failures"
+
+      - alert: HealthCheckFailing
+        expr: tfm1_health_check_success == 0
+        for: 3m
+        labels:
+          severity: critical
+          component: tfm1
+          subsystem: health
+        annotations:
+          summary: "TFM-1 health check failing"
+          description: "TFM-1 health check has been failing for more than 3 minutes"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/health-check-failure"
+
+      # LIQUIIUM ARENA Index alerts
+      - alert: LiquiiumArenaIndexUnresponsive
+        expr: up{job="liquiium-arena-index"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: liquiium-arena
+          subsystem: index
+        annotations:
+          summary: "LIQUIIUM ARENA Index is unresponsive"
+          description: "LIQUIIUM ARENA Index v2.0 has been unresponsive for more than 2 minutes"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/index-unresponsive"
+
+      - alert: LowUptimePercentage
+        expr: tfm1_uptime_percentage < 99.9
+        for: 1h
+        labels:
+          severity: warning
+          component: tfm1
+          subsystem: availability
+        annotations:
+          summary: "System uptime below target"
+          description: "System uptime has fallen below 99.9% over the last hour. Current value: {{ $value }}%"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/low-uptime"
+
+      # Auto-scaling alerts
+      - alert: AutoScalingDisabled
+        expr: tfm1_autoscaling_enabled == 0
+        for: 5m
+        labels:
+          severity: warning
+          component: tfm1
+          subsystem: autoscaling
+        annotations:
+          summary: "Auto-scaling is disabled"
+          description: "TFM-1 auto-scaling has been disabled for more than 5 minutes"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/autoscaling-disabled"
+
+      # Security alerts
+      - alert: AuthenticationFailureSpike
+        expr: rate(tfm1_auth_failures_total[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: tfm1
+          subsystem: security
+        annotations:
+          summary: "High authentication failure rate"
+          description: "Authentication failure rate exceeds 5 per minute over the last 5 minutes"
+          runbook_url: "https://docs.liquiium-arena.internal/runbooks/auth-failures"
