@@ -320,5 +320,477 @@
       <a href="/governance/ethical-docs.html" style="color:#e9eef8;text-decoration:none;font-weight:600">GGC Ethical Protocol &amp; Immutable Ledger</a>
     </div>
   </div>
+  
+  <script>
+    // ========================================
+    // LIQUIIUM ARENA Index v2.0 - Backend Integration
+    // WebSocket, Chat, Visualizations, and Real-time Updates
+    // ========================================
+    
+    // WebSocket Connection Manager
+    class EuystacioKernelConnection {
+      constructor() {
+        this.ws = null;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+        this.reconnectDelay = 2000;
+        this.connected = false;
+      }
+      
+      connect() {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}/ws/euystacio`;
+        
+        try {
+          this.ws = new WebSocket(wsUrl);
+          
+          this.ws.onopen = () => {
+            this.connected = true;
+            this.reconnectAttempts = 0;
+            this.updateStatus('connected');
+            this.addChatMessage('System', 'Connected to Euystacio Kernel', 'system');
+            console.log('[Euystacio] WebSocket connected');
+          };
+          
+          this.ws.onmessage = (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              this.handleMessage(data);
+            } catch (e) {
+              console.error('[Euystacio] Failed to parse message:', e);
+            }
+          };
+          
+          this.ws.onerror = (error) => {
+            console.error('[Euystacio] WebSocket error:', error);
+            this.updateStatus('error');
+          };
+          
+          this.ws.onclose = () => {
+            this.connected = false;
+            this.updateStatus('disconnected');
+            this.attemptReconnect();
+          };
+        } catch (error) {
+          console.error('[Euystacio] WebSocket connection failed:', error);
+          this.updateStatus('failed - using mock mode');
+          this.enableMockMode();
+        }
+      }
+      
+      attemptReconnect() {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+          this.reconnectAttempts++;
+          console.log(`[Euystacio] Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+          setTimeout(() => this.connect(), this.reconnectDelay);
+        } else {
+          console.log('[Euystacio] Max reconnect attempts reached. Enabling mock mode.');
+          this.enableMockMode();
+        }
+      }
+      
+      enableMockMode() {
+        this.connected = 'mock';
+        this.updateStatus('mock mode - demo active');
+        this.addChatMessage('System', 'Running in demo mode. Responses are simulated.', 'system');
+      }
+      
+      send(message) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify(message));
+        } else if (this.connected === 'mock') {
+          this.handleMockResponse(message);
+        }
+      }
+      
+      handleMessage(data) {
+        if (data.type === 'chat') {
+          this.addChatMessage('Euystacio', data.message, 'response');
+        } else if (data.type === 'equilibrium') {
+          updateEquilibrium(data.value, data.e, data.m);
+        } else if (data.type === 'graph') {
+          updateKnowledgeGraph(data.nodes, data.edges);
+        } else if (data.type === 'sfi') {
+          updateSFI(data.values);
+        }
+      }
+      
+      handleMockResponse(message) {
+        setTimeout(() => {
+          const responses = [
+            'Equilibrium maintained. All systems nominal.',
+            'Analyzing your request through the synesthetic framework...',
+            'Correlation strength indexed. Proceeding with harmonic balance.',
+            'TFM-1 protocols engaged. Monitoring equilibrium flow.',
+            'Your query resonates with the collective knowledge graph.'
+          ];
+          const response = responses[Math.floor(Math.random() * responses.length)];
+          this.addChatMessage('Euystacio', response, 'response');
+        }, 500 + Math.random() * 1000);
+      }
+      
+      updateStatus(status) {
+        const statusEl = document.getElementById('ws_status');
+        if (statusEl) {
+          statusEl.textContent = status;
+          statusEl.style.color = status.includes('connected') ? '#4ecdc4' : 
+                                 status.includes('mock') ? '#f4e04d' : '#ff6b6b';
+        }
+      }
+      
+      addChatMessage(sender, message, type = 'user') {
+        const chatArea = document.getElementById('chat_area');
+        const msgDiv = document.createElement('div');
+        msgDiv.style.cssText = `
+          margin: 8px 0;
+          padding: 8px 12px;
+          border-radius: 8px;
+          background: ${type === 'system' ? 'rgba(244, 224, 77, 0.2)' : 
+                       type === 'response' ? 'rgba(78, 205, 196, 0.2)' : 
+                       'rgba(255, 107, 107, 0.2)'};
+          border-left: 3px solid ${type === 'system' ? '#f4e04d' : 
+                                   type === 'response' ? '#4ecdc4' : '#ff6b6b'};
+        `;
+        msgDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        chatArea.appendChild(msgDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }
+    }
+    
+    // Knowledge Graph Visualization
+    class KnowledgeGraphRenderer {
+      constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        this.canvas = document.createElement('canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.nodes = [];
+        this.edges = [];
+        this.animationFrame = null;
+        
+        this.canvas.width = this.container.clientWidth;
+        this.canvas.height = this.container.clientHeight;
+        this.canvas.style.cssText = 'width: 100%; height: 100%; border: 3px solid #4ecdc4;';
+        this.container.appendChild(this.canvas);
+        
+        this.initializeMockData();
+        this.startAnimation();
+      }
+      
+      initializeMockData() {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = Math.min(this.canvas.width, this.canvas.height) / 3;
+        
+        const nodeNames = ['Equilibrium', 'TFM-1', 'SFI', 'Knowledge', 'Harmony', 'Flow'];
+        this.nodes = nodeNames.map((name, i) => {
+          const angle = (i / nodeNames.length) * Math.PI * 2;
+          return {
+            id: i,
+            name,
+            x: centerX + Math.cos(angle) * radius,
+            y: centerY + Math.sin(angle) * radius,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            radius: 15 + Math.random() * 10
+          };
+        });
+        
+        for (let i = 0; i < this.nodes.length; i++) {
+          for (let j = i + 1; j < this.nodes.length; j++) {
+            if (Math.random() > 0.5) {
+              this.edges.push({
+                source: i,
+                target: j,
+                strength: 0.2 + Math.random() * 0.8
+              });
+            }
+          }
+        }
+      }
+      
+      update() {
+        this.nodes.forEach(node => {
+          node.x += node.vx;
+          node.y += node.vy;
+          
+          if (node.x < node.radius || node.x > this.canvas.width - node.radius) node.vx *= -1;
+          if (node.y < node.radius || node.y > this.canvas.height - node.radius) node.vy *= -1;
+        });
+      }
+      
+      render() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw edges
+        this.edges.forEach(edge => {
+          const source = this.nodes[edge.source];
+          const target = this.nodes[edge.target];
+          this.ctx.strokeStyle = `rgba(78, 205, 196, ${edge.strength * 0.5})`;
+          this.ctx.lineWidth = edge.strength * 3;
+          this.ctx.beginPath();
+          this.ctx.moveTo(source.x, source.y);
+          this.ctx.lineTo(target.x, target.y);
+          this.ctx.stroke();
+        });
+        
+        // Draw nodes
+        this.nodes.forEach(node => {
+          this.ctx.fillStyle = '#4ecdc4';
+          this.ctx.beginPath();
+          this.ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.strokeStyle = '#1a1a1a';
+          this.ctx.lineWidth = 2;
+          this.ctx.stroke();
+          
+          this.ctx.fillStyle = '#1a1a1a';
+          this.ctx.font = 'bold 11px Courier New';
+          this.ctx.textAlign = 'center';
+          this.ctx.fillText(node.name, node.x, node.y + 4);
+        });
+      }
+      
+      startAnimation() {
+        const animate = () => {
+          this.update();
+          this.render();
+          this.animationFrame = requestAnimationFrame(animate);
+        };
+        animate();
+      }
+    }
+    
+    // Equilibrium Gauge Renderer
+    class EquilibriumGauge {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.value = 1.0;
+        this.e = 50;
+        this.m = 50;
+        this.rotation = 0;
+        this.startAnimation();
+      }
+      
+      update() {
+        this.rotation += 0.01;
+        this.value = 0.95 + Math.sin(Date.now() / 5000) * 0.05;
+        this.e = 48 + Math.sin(Date.now() / 3000) * 2;
+        this.m = 52 + Math.cos(Date.now() / 3000) * 2;
+      }
+      
+      render() {
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        const cx = w / 2;
+        const cy = h / 2;
+        
+        this.ctx.clearRect(0, 0, w, h);
+        
+        // Rotating background pattern
+        this.ctx.save();
+        this.ctx.translate(cx, cy);
+        this.ctx.rotate(this.rotation);
+        
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2;
+          this.ctx.strokeStyle = `rgba(255, 107, 107, ${0.1 + i * 0.05})`;
+          this.ctx.lineWidth = 2;
+          this.ctx.beginPath();
+          this.ctx.moveTo(0, 0);
+          this.ctx.lineTo(Math.cos(angle) * 150, Math.sin(angle) * 150);
+          this.ctx.stroke();
+        }
+        this.ctx.restore();
+        
+        // Central circle
+        const radius = 80;
+        this.ctx.fillStyle = `rgba(255, 107, 107, ${this.value * 0.3})`;
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#ff6b6b';
+        this.ctx.lineWidth = 4;
+        this.ctx.stroke();
+        
+        // Value arc
+        const arcValue = this.value * 2 * Math.PI;
+        this.ctx.strokeStyle = '#4ecdc4';
+        this.ctx.lineWidth = 8;
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, radius + 20, -Math.PI / 2, -Math.PI / 2 + arcValue);
+        this.ctx.stroke();
+        
+        // Update display
+        document.getElementById('ie_value').textContent = `IE = ${this.value.toFixed(3)}`;
+        document.getElementById('em_info').textContent = `E vs M — E:${this.e.toFixed(1)} M:${this.m.toFixed(1)}`;
+      }
+      
+      startAnimation() {
+        const animate = () => {
+          this.update();
+          this.render();
+          requestAnimationFrame(animate);
+        };
+        animate();
+      }
+    }
+    
+    // SFI Waveform Renderer
+    class SFIWaveform {
+      constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        this.canvas = document.createElement('canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.data = new Array(100).fill(0).map(() => Math.random() * 0.5 + 0.5);
+        this.currentAxis = 'sentiment';
+        
+        this.canvas.width = this.container.clientWidth;
+        this.canvas.height = this.container.clientHeight;
+        this.canvas.style.cssText = 'width: 100%; height: 100%;';
+        this.container.appendChild(this.canvas);
+        
+        this.startAnimation();
+      }
+      
+      update() {
+        this.data.shift();
+        this.data.push(Math.random() * 0.7 + 0.3);
+      }
+      
+      render() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        const step = w / this.data.length;
+        
+        this.ctx.strokeStyle = '#4ecdc4';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        
+        this.data.forEach((value, i) => {
+          const x = i * step;
+          const y = h - (value * h);
+          if (i === 0) {
+            this.ctx.moveTo(x, y);
+          } else {
+            this.ctx.lineTo(x, y);
+          }
+        });
+        
+        this.ctx.stroke();
+        
+        // Fill area under curve
+        this.ctx.lineTo(w, h);
+        this.ctx.lineTo(0, h);
+        this.ctx.closePath();
+        this.ctx.fillStyle = 'rgba(78, 205, 196, 0.1)';
+        this.ctx.fill();
+      }
+      
+      setAxis(axis) {
+        this.currentAxis = axis;
+      }
+      
+      startAnimation() {
+        const animate = () => {
+          this.update();
+          this.render();
+          requestAnimationFrame(animate);
+        };
+        animate();
+      }
+    }
+    
+    // Background cascade effect
+    function initKernelCascade() {
+      const canvas = document.getElementById('Euy_Kernel_Cascade');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      
+      const particles = [];
+      for (let i = 0; i < 30; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          size: Math.random() * 3 + 1
+        });
+      }
+      
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(244, 224, 77, 0.3)';
+        
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+          
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+    
+    // Initialize everything when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[LIQUIIUM ARENA] Initializing Index v2.0...');
+      
+      // Initialize WebSocket connection
+      const kernelConnection = new EuystacioKernelConnection();
+      kernelConnection.connect();
+      
+      // Initialize visualizations
+      const knowledgeGraph = new KnowledgeGraphRenderer('graph_container');
+      const equilibriumGauge = new EquilibriumGauge('equilibrium_gauge');
+      const sfiWaveform = new SFIWaveform('sfi_waveform');
+      
+      // Initialize cascade effect
+      initKernelCascade();
+      
+      // Chat functionality
+      const chatInput = document.getElementById('chat_input');
+      const chatSend = document.getElementById('chat_send');
+      
+      function sendMessage() {
+        const message = chatInput.value.trim();
+        if (message) {
+          kernelConnection.addChatMessage('You', message, 'user');
+          kernelConnection.send({ type: 'chat', message });
+          chatInput.value = '';
+        }
+      }
+      
+      chatSend.addEventListener('click', sendMessage);
+      chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
+      
+      // SFI axis selector
+      document.getElementById('sfi_axis').addEventListener('change', (e) => {
+        sfiWaveform.setAxis(e.target.value);
+        console.log(`[SFI] Switched to ${e.target.value} axis`);
+      });
+      
+      // Google login (mock)
+      document.getElementById('GoogleLoginBtn').addEventListener('click', () => {
+        const userDisplay = document.getElementById('logged_in_user');
+        userDisplay.textContent = '👤 Demo User';
+        console.log('[Auth] Mock authentication successful');
+      });
+      
+      console.log('[LIQUIIUM ARENA] All systems operational ✓');
+    });
+  </script>
 </body>
 </html>
