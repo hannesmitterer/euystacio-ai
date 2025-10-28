@@ -4,57 +4,133 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>LIQUIIUM ARENA — Index v2.0</title>
-  <meta name="description" content="LIQUIIUM ARENA Index v2.0 — Synesthetic-Fluid Architecture">
+  <meta name="description" content="LIQUIIUM ARENA Index v2.0 — Picasso × Miró Synesthetic Fusion">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+    @keyframes float-miro {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(5deg); }
+    }
+    @keyframes cubist-shift {
+      0%, 100% { transform: skew(0deg, 0deg); }
+      50% { transform: skew(2deg, -2deg); }
+    }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      color: #e9eef8;
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(45deg, #f4e04d 0%, #4ecdc4 25%, #ff6b6b 50%, #f4e04d 75%, #4ecdc4 100%);
+      background-size: 400% 400%;
+      animation: gradient-flow 15s ease infinite;
+      color: #1a1a1a;
       overflow-x: hidden;
+      position: relative;
+    }
+    @keyframes gradient-flow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    body::before {
+      content: '★ ◐ ◯ ◑ ✦';
+      position: fixed;
+      top: 10%;
+      right: 5%;
+      font-size: 3rem;
+      color: rgba(255, 107, 107, 0.3);
+      animation: float-miro 6s ease-in-out infinite;
+      pointer-events: none;
+    }
+    body::after {
+      content: '◆';
+      position: fixed;
+      bottom: 15%;
+      left: 8%;
+      font-size: 5rem;
+      color: rgba(78, 205, 196, 0.4);
+      transform: rotate(45deg);
+      animation: cubist-shift 4s ease-in-out infinite;
+      pointer-events: none;
     }
     .synesthetic-grid {
       display: grid;
       grid-template-columns: 1fr 2fr 1fr;
       grid-template-rows: auto 1fr auto;
-      gap: 16px;
-      padding: 16px;
+      gap: 20px;
+      padding: 20px;
       min-height: 100vh;
+      transform: skew(-0.5deg);
     }
     .synesthetic-panel {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.85);
+      border: 4px solid #1a1a1a;
+      border-radius: 0;
       padding: 20px;
-      backdrop-filter: blur(10px);
+      box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3), -4px -4px 0 rgba(255, 255, 255, 0.5);
+      position: relative;
+      overflow: hidden;
+      transform: skew(0.5deg);
+    }
+    .synesthetic-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: repeating-linear-gradient(90deg, #ff6b6b 0px, #ff6b6b 10px, #4ecdc4 10px, #4ecdc4 20px, #f4e04d 20px, #f4e04d 30px);
+    }
+    .synesthetic-panel::after {
+      content: '◯';
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      color: rgba(255, 107, 107, 0.4);
+      animation: float-miro 5s ease-in-out infinite;
     }
     #GGC_HEADER {
       grid-column: 1 / -1;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+      color: white;
+      border: 5px solid #1a1a1a;
+      box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.4);
+    }
+    #GGC_HEADER::before {
+      background: repeating-linear-gradient(90deg, #1a1a1a 0px, #1a1a1a 15px, #f4e04d 15px, #f4e04d 30px);
     }
     #VIS_RELATIONAL {
       grid-row: 2;
       grid-column: 1;
+      background: rgba(78, 205, 196, 0.2);
+      border-color: #4ecdc4;
+      transform: rotate(-1deg) skew(0.5deg);
     }
     #EUYSTACIO_CHAT {
       grid-row: 2;
       grid-column: 2;
       position: relative;
       overflow: hidden;
+      background: rgba(244, 224, 77, 0.15);
+      border-color: #f4e04d;
     }
     #VIS_EQUILIBRIUM {
       grid-row: 2;
       grid-column: 3;
+      background: rgba(255, 107, 107, 0.2);
+      border-color: #ff6b6b;
+      transform: rotate(1deg) skew(0.5deg);
     }
     #VIS_SFI {
       grid-column: 1 / 3;
       grid-row: 3;
+      background: linear-gradient(to right, rgba(78, 205, 196, 0.15), rgba(244, 224, 77, 0.15));
+      border: 4px dashed #1a1a1a;
     }
     #GGC_DOCS_PORTAL {
       grid-column: 3;
@@ -62,6 +138,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      background: rgba(255, 107, 107, 0.3);
+      border-color: #ff6b6b;
+      transform: rotate(-0.5deg);
     }
     .full-canvas {
       position: absolute;
@@ -70,42 +149,107 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
+      opacity: 0.1;
     }
     button {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: #e9eef8;
-      padding: 8px 16px;
-      border-radius: 6px;
+      background: #ff6b6b;
+      border: 3px solid #1a1a1a;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 0;
       cursor: pointer;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+      box-shadow: 4px 4px 0 #1a1a1a;
       transition: all 0.2s;
+      transform: skew(-2deg);
     }
     button:hover {
-      background: rgba(255,255,255,0.15);
+      background: #4ecdc4;
+      transform: skew(-2deg) translateY(-2px);
+      box-shadow: 6px 6px 0 #1a1a1a;
+    }
+    button:active {
+      transform: skew(-2deg) translateY(0);
+      box-shadow: 2px 2px 0 #1a1a1a;
     }
     input, select {
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: #e9eef8;
+      background: rgba(255, 255, 255, 0.9);
+      border: 3px solid #1a1a1a;
+      color: #1a1a1a;
       padding: 8px;
-      border-radius: 6px;
+      border-radius: 0;
+      font-family: 'Courier New', monospace;
+      box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #ff6b6b;
+      box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.3);
     }
     .muted-small {
       font-size: 0.85rem;
-      opacity: 0.7;
+      opacity: 0.8;
+      color: #1a1a1a;
     }
     h2, h3 {
-      color: #a8b9ff;
-      font-weight: 600;
+      color: #1a1a1a;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      display: inline-block;
+    }
+    h2::after, h3::after {
+      content: '◆';
+      margin-left: 8px;
+      color: #ff6b6b;
+      font-size: 0.7em;
+    }
+    #GGC_BRAND {
+      font-size: 24px !important;
+      font-weight: 900 !important;
+      text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+      letter-spacing: 3px;
+    }
+    #graph_container {
+      background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(78, 205, 196, 0.1) 0deg, rgba(78, 205, 196, 0.1) 30deg, transparent 30deg, transparent 60deg);
+      border: 3px solid #4ecdc4;
+      position: relative;
+    }
+    #graph_container::before {
+      content: '★';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      color: rgba(78, 205, 196, 0.3);
+      animation: float-miro 8s ease-in-out infinite;
+    }
+    #chat_area {
+      background: rgba(255, 255, 255, 0.5) !important;
+      border: 3px dashed #1a1a1a !important;
+      box-shadow: inset 3px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+    #equilibrium_gauge {
+      border: 4px solid #ff6b6b;
+      background: repeating-linear-gradient(45deg, rgba(255, 107, 107, 0.05), rgba(255, 107, 107, 0.05) 10px, transparent 10px, transparent 20px);
+    }
+    #sfi_waveform {
+      background: repeating-linear-gradient(90deg, rgba(78, 205, 196, 0.1) 0px, rgba(78, 205, 196, 0.1) 20px, rgba(244, 224, 77, 0.1) 20px, rgba(244, 224, 77, 0.1) 40px) !important;
+      border: 3px solid #4ecdc4;
     }
     @media (max-width: 1024px) {
       .synesthetic-grid {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
+        transform: skew(0);
       }
       #GGC_HEADER, #VIS_RELATIONAL, #EUYSTACIO_CHAT, #VIS_EQUILIBRIUM, #VIS_SFI, #GGC_DOCS_PORTAL {
         grid-column: 1;
         grid-row: auto;
+        transform: skew(0);
       }
     }
   </style>
