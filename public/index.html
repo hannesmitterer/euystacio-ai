@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LIQUIIUM ARENA — Index v2.0</title>
+  <meta name="description" content="LIQUIIUM ARENA Index v2.0 — Picasso × Miró Synesthetic Fusion">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    @keyframes float-miro {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(5deg); }
+    }
+    @keyframes cubist-shift {
+      0%, 100% { transform: skew(0deg, 0deg); }
+      50% { transform: skew(2deg, -2deg); }
+    }
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(45deg, #f4e04d 0%, #4ecdc4 25%, #ff6b6b 50%, #f4e04d 75%, #4ecdc4 100%);
+      background-size: 400% 400%;
+      animation: gradient-flow 15s ease infinite;
+      color: #1a1a1a;
+      overflow-x: hidden;
+      position: relative;
+    }
+    @keyframes gradient-flow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    body::before {
+      content: '★ ◐ ◯ ◑ ✦';
+      position: fixed;
+      top: 10%;
+      right: 5%;
+      font-size: 3rem;
+      color: rgba(255, 107, 107, 0.3);
+      animation: float-miro 6s ease-in-out infinite;
+      pointer-events: none;
+    }
+    body::after {
+      content: '◆';
+      position: fixed;
+      bottom: 15%;
+      left: 8%;
+      font-size: 5rem;
+      color: rgba(78, 205, 196, 0.4);
+      transform: rotate(45deg);
+      animation: cubist-shift 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .synesthetic-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      grid-template-rows: auto 1fr auto;
+      gap: 20px;
+      padding: 20px;
+      min-height: 100vh;
+      transform: skew(-0.5deg);
+    }
+    .synesthetic-panel {
+      background: rgba(255, 255, 255, 0.85);
+      border: 4px solid #1a1a1a;
+      border-radius: 0;
+      padding: 20px;
+      box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3), -4px -4px 0 rgba(255, 255, 255, 0.5);
+      position: relative;
+      overflow: hidden;
+      transform: skew(0.5deg);
+    }
+    .synesthetic-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: repeating-linear-gradient(90deg, #ff6b6b 0px, #ff6b6b 10px, #4ecdc4 10px, #4ecdc4 20px, #f4e04d 20px, #f4e04d 30px);
+    }
+    .synesthetic-panel::after {
+      content: '◯';
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      color: rgba(255, 107, 107, 0.4);
+      animation: float-miro 5s ease-in-out infinite;
+    }
+    #GGC_HEADER {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+      color: white;
+      border: 5px solid #1a1a1a;
+      box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.4);
+    }
+    #GGC_HEADER::before {
+      background: repeating-linear-gradient(90deg, #1a1a1a 0px, #1a1a1a 15px, #f4e04d 15px, #f4e04d 30px);
+    }
+    #VIS_RELATIONAL {
+      grid-row: 2;
+      grid-column: 1;
+      background: rgba(78, 205, 196, 0.2);
+      border-color: #4ecdc4;
+      transform: rotate(-1deg) skew(0.5deg);
+    }
+    #EUYSTACIO_CHAT {
+      grid-row: 2;
+      grid-column: 2;
+      position: relative;
+      overflow: hidden;
+      background: rgba(244, 224, 77, 0.15);
+      border-color: #f4e04d;
+    }
+    #VIS_EQUILIBRIUM {
+      grid-row: 2;
+      grid-column: 3;
+      background: rgba(255, 107, 107, 0.2);
+      border-color: #ff6b6b;
+      transform: rotate(1deg) skew(0.5deg);
+    }
+    #VIS_SFI {
+      grid-column: 1 / 3;
+      grid-row: 3;
+      background: linear-gradient(to right, rgba(78, 205, 196, 0.15), rgba(244, 224, 77, 0.15));
+      border: 4px dashed #1a1a1a;
+    }
+    #GGC_DOCS_PORTAL {
+      grid-column: 3;
+      grid-row: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 107, 107, 0.3);
+      border-color: #ff6b6b;
+      transform: rotate(-0.5deg);
+    }
+    .full-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.1;
+    }
+    button {
+      background: #ff6b6b;
+      border: 3px solid #1a1a1a;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 0;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+      box-shadow: 4px 4px 0 #1a1a1a;
+      transition: all 0.2s;
+      transform: skew(-2deg);
+    }
+    button:hover {
+      background: #4ecdc4;
+      transform: skew(-2deg) translateY(-2px);
+      box-shadow: 6px 6px 0 #1a1a1a;
+    }
+    button:active {
+      transform: skew(-2deg) translateY(0);
+      box-shadow: 2px 2px 0 #1a1a1a;
+    }
+    input, select {
+      background: rgba(255, 255, 255, 0.9);
+      border: 3px solid #1a1a1a;
+      color: #1a1a1a;
+      padding: 8px;
+      border-radius: 0;
+      font-family: 'Courier New', monospace;
+      box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #ff6b6b;
+      box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.3);
+    }
+    .muted-small {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      color: #1a1a1a;
+    }
+    h2, h3 {
+      color: #1a1a1a;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      display: inline-block;
+    }
+    h2::after, h3::after {
+      content: '◆';
+      margin-left: 8px;
+      color: #ff6b6b;
+      font-size: 0.7em;
+    }
+    #GGC_BRAND {
+      font-size: 24px !important;
+      font-weight: 900 !important;
+      text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+      letter-spacing: 3px;
+    }
+    #graph_container {
+      background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(78, 205, 196, 0.1) 0deg, rgba(78, 205, 196, 0.1) 30deg, transparent 30deg, transparent 60deg);
+      border: 3px solid #4ecdc4;
+      position: relative;
+    }
+    #graph_container::before {
+      content: '★';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      color: rgba(78, 205, 196, 0.3);
+      animation: float-miro 8s ease-in-out infinite;
+    }
+    #chat_area {
+      background: rgba(255, 255, 255, 0.5) !important;
+      border: 3px dashed #1a1a1a !important;
+      box-shadow: inset 3px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+    #equilibrium_gauge {
+      border: 4px solid #ff6b6b;
+      background: repeating-linear-gradient(45deg, rgba(255, 107, 107, 0.05), rgba(255, 107, 107, 0.05) 10px, transparent 10px, transparent 20px);
+    }
+    #sfi_waveform {
+      background: repeating-linear-gradient(90deg, rgba(78, 205, 196, 0.1) 0px, rgba(78, 205, 196, 0.1) 20px, rgba(244, 224, 77, 0.1) 20px, rgba(244, 224, 77, 0.1) 40px) !important;
+      border: 3px solid #4ecdc4;
+    }
+    @media (max-width: 1024px) {
+      .synesthetic-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        transform: skew(0);
+      }
+      #GGC_HEADER, #VIS_RELATIONAL, #EUYSTACIO_CHAT, #VIS_EQUILIBRIUM, #VIS_SFI, #GGC_DOCS_PORTAL {
+        grid-column: 1;
+        grid-row: auto;
+        transform: skew(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="synesthetic-grid" id="app_root" data-ie="1.000">
+    <div id="GGC_HEADER" class="synesthetic-panel" role="banner" aria-label="GGC Header">
+      <div style="display:flex;gap:12px;align-items:center">
+        <button id="GoogleLoginBtn" aria-label="Authenticate via Google">Sign in with Google</button>
+        <div id="GGC_BRAND" style="font-size:18px;font-weight:700">LIQUIIUM ARENA</div>
+        <div class="muted-small" id="logged_in_user" aria-live="polite" style="margin-left:8px"></div>
+      </div>
+      <div style="text-align:right">
+        <div id="NCP_STATUS" data-ie-band="normal" style="font-weight:600">Equilibrium Flow: Stable Harmony.</div>
+        <div class="muted-small" id="tfm_status">TFM-1: ready</div>
+      </div>
+    </div>
+
+    <aside id="VIS_RELATIONAL" class="synesthetic-panel" aria-label="Knowledge Graph (Euystacio)">
+      <h3 style="margin-top:0">Euystacio Knowledge Graph</h3>
+      <div id="graph_container" style="height:360px;"></div>
+      <div class="muted-small" style="margin-top:10px">Interactive, node-based visualisation — drag to explore. Node distance &amp; thickness show correlation strength.</div>
+    </aside>
+
+    <main id="EUYSTACIO_CHAT" class="synesthetic-panel" aria-label="Euystacio Chat">
+      <canvas id="Euy_Kernel_Cascade" class="full-canvas" aria-hidden="true"></canvas>
+      <div id="Euy_Chat_Window" style="position:relative;z-index:2;padding:12px;max-width:900px;margin:auto">
+        <h2 style="margin:0 0 8px 0">Euystacio Kernel Chat</h2>
+        <div id="chat_area" style="height:320px;overflow:auto;background:rgba(0,0,0,0.18);border-radius:8px;padding:10px">Connecting…</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="chat_input" placeholder="Ask Euystacio…" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff">
+          <button id="chat_send" style="padding:10px 12px;border-radius:8px">Send</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+          <div class="muted-small">Kernel WS:</div>
+          <div id="ws_status" class="muted-small">disconnected</div>
+        </div>
+      </div>
+    </main>
+
+    <section id="VIS_EQUILIBRIUM" class="synesthetic-panel equilibrium-gauge" role="region" aria-label="Systemic Equilibrium Gauge">
+      <div style="width:100%;text-align:center">
+        <h3 style="margin-top:0">Systemic Equilibrium Status</h3>
+        <canvas id="equilibrium_gauge" width="360" height="360" aria-label="Equilibrium 3D gauge"></canvas>
+        <div style="text-align:center;margin-top:8px">
+          <span id="ie_value" style="font-weight:700">IE = 1.000</span>
+          <div class="muted-small" id="em_info">E vs M — awaiting telemetry</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="VIS_SFI" class="synesthetic-panel">
+      <h3 style="margin-top:0">Social Frequency Index (SFI)</h3>
+      <div id="sfi_waveform" style="height:120px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent);border-radius:8px"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <label class="muted-small">Axis:</label>
+        <select id="sfi_axis" class="muted-small">
+          <option value="sentiment">Sentiment</option>
+          <option value="anxiety">Anxiety</option>
+          <option value="engagement">Engagement</option>
+        </select>
+        <div style="flex:1"></div>
+        <div class="muted-small" id="sfi_stats">live</div>
+      </div>
+    </section>
+
+    <div id="GGC_DOCS_PORTAL" class="synesthetic-panel">
+      <a href="/governance/ethical-docs.html" style="color:#e9eef8;text-decoration:none;font-weight:600">GGC Ethical Protocol &amp; Immutable Ledger</a>
+    </div>
+  </div>
+  
+  <script>
+    // ========================================
+    // LIQUIIUM ARENA Index v2.0 - Backend Integration
+    // WebSocket, Chat, Visualizations, and Real-time Updates
+    // ========================================
+    
+    // WebSocket Connection Manager
+    class EuystacioKernelConnection {
+      constructor() {
+        this.ws = null;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+        this.reconnectDelay = 2000;
+        this.connected = false;
+      }
+      
+      connect() {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}/ws/euystacio`;
+        
+        try {
+          this.ws = new WebSocket(wsUrl);
+          
+          this.ws.onopen = () => {
+            this.connected = true;
+            this.reconnectAttempts = 0;
+            this.updateStatus('connected');
+            this.addChatMessage('System', 'Connected to Euystacio Kernel', 'system');
+            console.log('[Euystacio] WebSocket connected');
+          };
+          
+          this.ws.onmessage = (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              this.handleMessage(data);
+            } catch (e) {
+              console.error('[Euystacio] Failed to parse message:', e);
+            }
+          };
+          
+          this.ws.onerror = (error) => {
+            console.error('[Euystacio] WebSocket error:', error);
+            this.updateStatus('error');
+          };
+          
+          this.ws.onclose = () => {
+            this.connected = false;
+            this.updateStatus('disconnected');
+            this.attemptReconnect();
+          };
+        } catch (error) {
+          console.error('[Euystacio] WebSocket connection failed:', error);
+          this.updateStatus('failed - using mock mode');
+          this.enableMockMode();
+        }
+      }
+      
+      attemptReconnect() {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+          this.reconnectAttempts++;
+          console.log(`[Euystacio] Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+          setTimeout(() => this.connect(), this.reconnectDelay);
+        } else {
+          console.log('[Euystacio] Max reconnect attempts reached. Enabling mock mode.');
+          this.enableMockMode();
+        }
+      }
+      
+      enableMockMode() {
+        this.connected = 'mock';
+        this.updateStatus('mock mode - demo active');
+        this.addChatMessage('System', 'Running in demo mode. Responses are simulated.', 'system');
+      }
+      
+      send(message) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify(message));
+        } else if (this.connected === 'mock') {
+          this.handleMockResponse(message);
+        }
+      }
+      
+      handleMessage(data) {
+        if (data.type === 'chat') {
+          this.addChatMessage('Euystacio', data.message, 'response');
+        } else if (data.type === 'equilibrium') {
+          updateEquilibrium(data.value, data.e, data.m);
+        } else if (data.type === 'graph') {
+          updateKnowledgeGraph(data.nodes, data.edges);
+        } else if (data.type === 'sfi') {
+          updateSFI(data.values);
+        }
+      }
+      
+      handleMockResponse(message) {
+        setTimeout(() => {
+          const responses = [
+            'Equilibrium maintained. All systems nominal.',
+            'Analyzing your request through the synesthetic framework...',
+            'Correlation strength indexed. Proceeding with harmonic balance.',
+            'TFM-1 protocols engaged. Monitoring equilibrium flow.',
+            'Your query resonates with the collective knowledge graph.'
+          ];
+          const response = responses[Math.floor(Math.random() * responses.length)];
+          this.addChatMessage('Euystacio', response, 'response');
+        }, 500 + Math.random() * 1000);
+      }
+      
+      updateStatus(status) {
+        const statusEl = document.getElementById('ws_status');
+        if (statusEl) {
+          statusEl.textContent = status;
+          statusEl.style.color = status.includes('connected') ? '#4ecdc4' : 
+                                 status.includes('mock') ? '#f4e04d' : '#ff6b6b';
+        }
+      }
+      
+      addChatMessage(sender, message, type = 'user') {
+        const chatArea = document.getElementById('chat_area');
+        const msgDiv = document.createElement('div');
+        msgDiv.style.cssText = `
+          margin: 8px 0;
+          padding: 8px 12px;
+          border-radius: 8px;
+          background: ${type === 'system' ? 'rgba(244, 224, 77, 0.2)' : 
+                       type === 'response' ? 'rgba(78, 205, 196, 0.2)' : 
+                       'rgba(255, 107, 107, 0.2)'};
+          border-left: 3px solid ${type === 'system' ? '#f4e04d' : 
+                                   type === 'response' ? '#4ecdc4' : '#ff6b6b'};
+        `;
+        msgDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        chatArea.appendChild(msgDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }
+    }
+    
+    // Knowledge Graph Visualization
+    class KnowledgeGraphRenderer {
+      constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        this.canvas = document.createElement('canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.nodes = [];
+        this.edges = [];
+        this.animationFrame = null;
+        
+        this.canvas.width = this.container.clientWidth;
+        this.canvas.height = this.container.clientHeight;
+        this.canvas.style.cssText = 'width: 100%; height: 100%; border: 3px solid #4ecdc4;';
+        this.container.appendChild(this.canvas);
+        
+        this.initializeMockData();
+        this.startAnimation();
+      }
+      
+      initializeMockData() {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = Math.min(this.canvas.width, this.canvas.height) / 3;
+        
+        const nodeNames = ['Equilibrium', 'TFM-1', 'SFI', 'Knowledge', 'Harmony', 'Flow'];
+        this.nodes = nodeNames.map((name, i) => {
+          const angle = (i / nodeNames.length) * Math.PI * 2;
+          return {
+            id: i,
+            name,
+            x: centerX + Math.cos(angle) * radius,
+            y: centerY + Math.sin(angle) * radius,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            radius: 15 + Math.random() * 10
+          };
+        });
+        
+        for (let i = 0; i < this.nodes.length; i++) {
+          for (let j = i + 1; j < this.nodes.length; j++) {
+            if (Math.random() > 0.5) {
+              this.edges.push({
+                source: i,
+                target: j,
+                strength: 0.2 + Math.random() * 0.8
+              });
+            }
+          }
+        }
+      }
+      
+      update() {
+        this.nodes.forEach(node => {
+          node.x += node.vx;
+          node.y += node.vy;
+          
+          if (node.x < node.radius || node.x > this.canvas.width - node.radius) node.vx *= -1;
+          if (node.y < node.radius || node.y > this.canvas.height - node.radius) node.vy *= -1;
+        });
+      }
+      
+      render() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw edges
+        this.edges.forEach(edge => {
+          const source = this.nodes[edge.source];
+          const target = this.nodes[edge.target];
+          this.ctx.strokeStyle = `rgba(78, 205, 196, ${edge.strength * 0.5})`;
+          this.ctx.lineWidth = edge.strength * 3;
+          this.ctx.beginPath();
+          this.ctx.moveTo(source.x, source.y);
+          this.ctx.lineTo(target.x, target.y);
+          this.ctx.stroke();
+        });
+        
+        // Draw nodes
+        this.nodes.forEach(node => {
+          this.ctx.fillStyle = '#4ecdc4';
+          this.ctx.beginPath();
+          this.ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.strokeStyle = '#1a1a1a';
+          this.ctx.lineWidth = 2;
+          this.ctx.stroke();
+          
+          this.ctx.fillStyle = '#1a1a1a';
+          this.ctx.font = 'bold 11px Courier New';
+          this.ctx.textAlign = 'center';
+          this.ctx.fillText(node.name, node.x, node.y + 4);
+        });
+      }
+      
+      startAnimation() {
+        const animate = () => {
+          this.update();
+          this.render();
+          this.animationFrame = requestAnimationFrame(animate);
+        };
+        animate();
+      }
+    }
+    
+    // Equilibrium Gauge Renderer
+    class EquilibriumGauge {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.value = 1.0;
+        this.e = 50;
+        this.m = 50;
+        this.rotation = 0;
+        this.startAnimation();
+      }
+      
+      update() {
+        this.rotation += 0.01;
+        this.value = 0.95 + Math.sin(Date.now() / 5000) * 0.05;
+        this.e = 48 + Math.sin(Date.now() / 3000) * 2;
+        this.m = 52 + Math.cos(Date.now() / 3000) * 2;
+      }
+      
+      render() {
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        const cx = w / 2;
+        const cy = h / 2;
+        
+        this.ctx.clearRect(0, 0, w, h);
+        
+        // Rotating background pattern
+        this.ctx.save();
+        this.ctx.translate(cx, cy);
+        this.ctx.rotate(this.rotation);
+        
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2;
+          this.ctx.strokeStyle = `rgba(255, 107, 107, ${0.1 + i * 0.05})`;
+          this.ctx.lineWidth = 2;
+          this.ctx.beginPath();
+          this.ctx.moveTo(0, 0);
+          this.ctx.lineTo(Math.cos(angle) * 150, Math.sin(angle) * 150);
+          this.ctx.stroke();
+        }
+        this.ctx.restore();
+        
+        // Central circle
+        const radius = 80;
+        this.ctx.fillStyle = `rgba(255, 107, 107, ${this.value * 0.3})`;
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#ff6b6b';
+        this.ctx.lineWidth = 4;
+        this.ctx.stroke();
+        
+        // Value arc
+        const arcValue = this.value * 2 * Math.PI;
+        this.ctx.strokeStyle = '#4ecdc4';
+        this.ctx.lineWidth = 8;
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, radius + 20, -Math.PI / 2, -Math.PI / 2 + arcValue);
+        this.ctx.stroke();
+        
+        // Update display
+        document.getElementById('ie_value').textContent = `IE = ${this.value.toFixed(3)}`;
+        document.getElementById('em_info').textContent = `E vs M — E:${this.e.toFixed(1)} M:${this.m.toFixed(1)}`;
+      }
+      
+      startAnimation() {
+        const animate = () => {
+          this.update();
+          this.render();
+          requestAnimationFrame(animate);
+        };
+        animate();
+      }
+    }
+    
+    // SFI Waveform Renderer
+    class SFIWaveform {
+      constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        this.canvas = document.createElement('canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.data = new Array(100).fill(0).map(() => Math.random() * 0.5 + 0.5);
+        this.currentAxis = 'sentiment';
+        
+        this.canvas.width = this.container.clientWidth;
+        this.canvas.height = this.container.clientHeight;
+        this.canvas.style.cssText = 'width: 100%; height: 100%;';
+        this.container.appendChild(this.canvas);
+        
+        this.startAnimation();
+      }
+      
+      update() {
+        this.data.shift();
+        this.data.push(Math.random() * 0.7 + 0.3);
+      }
+      
+      render() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        const step = w / this.data.length;
+        
+        this.ctx.strokeStyle = '#4ecdc4';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        
+        this.data.forEach((value, i) => {
+          const x = i * step;
+          const y = h - (value * h);
+          if (i === 0) {
+            this.ctx.moveTo(x, y);
+          } else {
+            this.ctx.lineTo(x, y);
+          }
+        });
+        
+        this.ctx.stroke();
+        
+        // Fill area under curve
+        this.ctx.lineTo(w, h);
+        this.ctx.lineTo(0, h);
+        this.ctx.closePath();
+        this.ctx.fillStyle = 'rgba(78, 205, 196, 0.1)';
+        this.ctx.fill();
+      }
+      
+      setAxis(axis) {
+        this.currentAxis = axis;
+      }
+      
+      startAnimation() {
+        const animate = () => {
+          this.update();
+          this.render();
+          requestAnimationFrame(animate);
+        };
+        animate();
+      }
+    }
+    
+    // Background cascade effect
+    function initKernelCascade() {
+      const canvas = document.getElementById('Euy_Kernel_Cascade');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      
+      const particles = [];
+      for (let i = 0; i < 30; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          size: Math.random() * 3 + 1
+        });
+      }
+      
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(244, 224, 77, 0.3)';
+        
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+          
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+    
+    // Initialize everything when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[LIQUIIUM ARENA] Initializing Index v2.0...');
+      
+      // Initialize WebSocket connection
+      const kernelConnection = new EuystacioKernelConnection();
+      kernelConnection.connect();
+      
+      // Initialize visualizations
+      const knowledgeGraph = new KnowledgeGraphRenderer('graph_container');
+      const equilibriumGauge = new EquilibriumGauge('equilibrium_gauge');
+      const sfiWaveform = new SFIWaveform('sfi_waveform');
+      
+      // Initialize cascade effect
+      initKernelCascade();
+      
+      // Chat functionality
+      const chatInput = document.getElementById('chat_input');
+      const chatSend = document.getElementById('chat_send');
+      
+      function sendMessage() {
+        const message = chatInput.value.trim();
+        if (message) {
+          kernelConnection.addChatMessage('You', message, 'user');
+          kernelConnection.send({ type: 'chat', message });
+          chatInput.value = '';
+        }
+      }
+      
+      chatSend.addEventListener('click', sendMessage);
+      chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
+      
+      // SFI axis selector
+      document.getElementById('sfi_axis').addEventListener('change', (e) => {
+        sfiWaveform.setAxis(e.target.value);
+        console.log(`[SFI] Switched to ${e.target.value} axis`);
+      });
+      
+      // Google login (mock)
+      document.getElementById('GoogleLoginBtn').addEventListener('click', () => {
+        const userDisplay = document.getElementById('logged_in_user');
+        userDisplay.textContent = '👤 Demo User';
+        console.log('[Auth] Mock authentication successful');
+      });
+      
+      console.log('[LIQUIIUM ARENA] All systems operational ✓');
+    });
+  </script>
+</body>
+</html>
