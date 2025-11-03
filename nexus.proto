@@ -1,0 +1,553 @@
+// Nexus API Protocol Buffer Definitions
+// Version: 1.0.0
+// 
+// This file defines Protocol Buffer message formats for the Nexus API,
+// particularly for telemetry data and command frames in high-performance scenarios.
+
+syntax = "proto3";
+
+package nexus.v1;
+
+option go_package = "github.com/nexus/api/proto/v1";
+option java_package = "com.nexus.api.v1";
+option java_multiple_files = true;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// ============================================================================
+// Telemetry Messages
+// ============================================================================
+
+// TelemetryEvent represents a single telemetry event
+message TelemetryEvent {
+  // Unique event identifier
+  string event_id = 1;
+  
+  // Type of the event (e.g., "system.metric", "application.log")
+  string event_type = 2;
+  
+  // Source identifier (e.g., agent ID, server name)
+  string source = 3;
+  
+  // Event timestamp
+  google.protobuf.Timestamp timestamp = 4;
+  
+  // Event data (flexible structure)
+  google.protobuf.Struct data = 5;
+  
+  // Additional metadata
+  google.protobuf.Struct metadata = 6;
+  
+  // Priority level
+  Priority priority = 7;
+}
+
+// TelemetryBatch for submitting multiple events efficiently
+message TelemetryBatch {
+  // List of telemetry events
+  repeated TelemetryEvent events = 1;
+  
+  // Batch metadata
+  string batch_id = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
+
+// TelemetryEventResponse for event submission acknowledgment
+message TelemetryEventResponse {
+  string event_id = 1;
+  string status = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}
+
+// MetricData represents structured metric data
+message MetricData {
+  // Metric name
+  string name = 1;
+  
+  // Metric value
+  oneof value {
+    double numeric_value = 2;
+    string string_value = 3;
+    bool boolean_value = 4;
+  }
+  
+  // Unit of measurement
+  string unit = 5;
+  
+  // Tags for metric classification
+  map<string, string> tags = 6;
+  
+  // Timestamp
+  google.protobuf.Timestamp timestamp = 7;
+}
+
+// ============================================================================
+// Command Messages
+// ============================================================================
+
+// CommandFrame represents a command to be executed
+message CommandFrame {
+  // Unique command identifier
+  string command_id = 1;
+  
+  // Command type
+  string command_type = 2;
+  
+  // Target system or agent
+  string target = 3;
+  
+  // Command parameters
+  google.protobuf.Struct parameters = 4;
+  
+  // Priority
+  Priority priority = 5;
+  
+  // Timeout in seconds
+  int32 timeout_seconds = 6;
+  
+  // Callback URL for result notification
+  string callback_url = 7;
+  
+  // Created timestamp
+  google.protobuf.Timestamp created_at = 8;
+}
+
+// CommandResult represents the result of command execution
+message CommandResult {
+  // Command identifier
+  string command_id = 1;
+  
+  // Execution status
+  CommandStatus status = 2;
+  
+  // Success flag
+  bool success = 3;
+  
+  // Result message
+  string message = 4;
+  
+  // Output data
+  google.protobuf.Struct output = 5;
+  
+  // Error information (if failed)
+  ErrorInfo error = 6;
+  
+  // Execution timestamps
+  google.protobuf.Timestamp started_at = 7;
+  google.protobuf.Timestamp completed_at = 8;
+  
+  // Execution duration in milliseconds
+  int64 duration_ms = 9;
+}
+
+// ============================================================================
+// Task Messages
+// ============================================================================
+
+// Task represents a work item
+message Task {
+  // Task identifier
+  string task_id = 1;
+  
+  // Task title
+  string title = 2;
+  
+  // Task description
+  string description = 3;
+  
+  // Task type
+  string type = 4;
+  
+  // Current status
+  TaskStatus status = 5;
+  
+  // Priority
+  Priority priority = 6;
+  
+  // Assignee (user or agent ID)
+  string assignee = 7;
+  
+  // Progress percentage (0-100)
+  int32 progress = 8;
+  
+  // Tags
+  repeated string tags = 9;
+  
+  // Metadata
+  google.protobuf.Struct metadata = 10;
+  
+  // Timestamps
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+  google.protobuf.Timestamp due_date = 13;
+  google.protobuf.Timestamp completed_at = 14;
+  
+  // Creator
+  string created_by = 15;
+  
+  // Subtasks
+  repeated Subtask subtasks = 16;
+}
+
+// Subtask represents a sub-component of a task
+message Subtask {
+  string subtask_id = 1;
+  string title = 2;
+  TaskStatus status = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp completed_at = 5;
+}
+
+// ============================================================================
+// AI Messages
+// ============================================================================
+
+// AIAgent represents an AI agent registration
+message AIAgent {
+  // Agent identifier
+  string agent_id = 1;
+  
+  // Agent name
+  string agent_name = 2;
+  
+  // Agent type
+  string agent_type = 3;
+  
+  // Capabilities
+  repeated string capabilities = 4;
+  
+  // Version
+  string version = 5;
+  
+  // Endpoint URL
+  string endpoint = 6;
+  
+  // Status
+  AgentStatus status = 7;
+  
+  // Authentication info
+  AuthenticationInfo authentication = 8;
+  
+  // Registration timestamp
+  google.protobuf.Timestamp registered_at = 9;
+}
+
+// AIAssistanceRequest represents a request for AI assistance
+message AIAssistanceRequest {
+  // Request identifier
+  string request_id = 1;
+  
+  // Request type
+  string request_type = 2;
+  
+  // Target agent
+  string target_agent = 3;
+  
+  // Priority
+  Priority priority = 4;
+  
+  // Context data
+  google.protobuf.Struct context = 5;
+  
+  // Request parameters
+  google.protobuf.Struct parameters = 6;
+  
+  // Created timestamp
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// AIAssistanceResult represents the result of an AI assistance request
+message AIAssistanceResult {
+  // Request identifier
+  string request_id = 1;
+  
+  // Result status
+  string status = 2;
+  
+  // Result data
+  google.protobuf.Struct result = 3;
+  
+  // Completion timestamp
+  google.protobuf.Timestamp completed_at = 4;
+  
+  // Processing duration in milliseconds
+  int64 duration_ms = 5;
+}
+
+// ============================================================================
+// Event Streaming Messages
+// ============================================================================
+
+// StreamEvent represents an event in the event stream
+message StreamEvent {
+  // Event identifier
+  string event_id = 1;
+  
+  // Channel name
+  string channel = 2;
+  
+  // Event type
+  string event_type = 3;
+  
+  // Event timestamp
+  google.protobuf.Timestamp timestamp = 4;
+  
+  // Event data
+  google.protobuf.Struct data = 5;
+  
+  // Metadata
+  google.protobuf.Struct metadata = 6;
+}
+
+// SubscriptionRequest for WebSocket channel subscription
+message SubscriptionRequest {
+  // Action type (subscribe/unsubscribe)
+  string action = 1;
+  
+  // Channels to subscribe to
+  repeated string channels = 2;
+  
+  // Filters
+  google.protobuf.Struct filters = 3;
+}
+
+// SubscriptionResponse for subscription confirmation
+message SubscriptionResponse {
+  // Subscription identifier
+  string subscription_id = 1;
+  
+  // Subscribed channels
+  repeated string channels = 2;
+  
+  // Applied filters
+  google.protobuf.Struct filters = 3;
+  
+  // Timestamp
+  google.protobuf.Timestamp timestamp = 4;
+}
+
+// ============================================================================
+// Webhook Messages
+// ============================================================================
+
+// WebhookPayload represents a webhook delivery payload
+message WebhookPayload {
+  // Event type
+  string event_type = 1;
+  
+  // Event timestamp
+  google.protobuf.Timestamp timestamp = 2;
+  
+  // Event data
+  google.protobuf.Struct data = 3;
+  
+  // Delivery information
+  DeliveryInfo delivery_info = 4;
+}
+
+// DeliveryInfo for webhook delivery metadata
+message DeliveryInfo {
+  // Delivery identifier
+  string delivery_id = 1;
+  
+  // Attempt number
+  int32 attempt = 2;
+  
+  // Maximum attempts
+  int32 max_attempts = 3;
+  
+  // Next retry timestamp (if applicable)
+  google.protobuf.Timestamp next_retry = 4;
+}
+
+// ============================================================================
+// Common Enums
+// ============================================================================
+
+// Priority levels
+enum Priority {
+  PRIORITY_UNSPECIFIED = 0;
+  PRIORITY_LOW = 1;
+  PRIORITY_NORMAL = 2;
+  PRIORITY_HIGH = 3;
+  PRIORITY_CRITICAL = 4;
+}
+
+// Command execution status
+enum CommandStatus {
+  COMMAND_STATUS_UNSPECIFIED = 0;
+  COMMAND_STATUS_QUEUED = 1;
+  COMMAND_STATUS_RUNNING = 2;
+  COMMAND_STATUS_COMPLETED = 3;
+  COMMAND_STATUS_FAILED = 4;
+  COMMAND_STATUS_CANCELLED = 5;
+}
+
+// Task status
+enum TaskStatus {
+  TASK_STATUS_UNSPECIFIED = 0;
+  TASK_STATUS_PENDING = 1;
+  TASK_STATUS_IN_PROGRESS = 2;
+  TASK_STATUS_COMPLETED = 3;
+  TASK_STATUS_FAILED = 4;
+  TASK_STATUS_BLOCKED = 5;
+  TASK_STATUS_CANCELLED = 6;
+}
+
+// Agent status
+enum AgentStatus {
+  AGENT_STATUS_UNSPECIFIED = 0;
+  AGENT_STATUS_ACTIVE = 1;
+  AGENT_STATUS_INACTIVE = 2;
+  AGENT_STATUS_MAINTENANCE = 3;
+  AGENT_STATUS_DEREGISTERED = 4;
+}
+
+// ============================================================================
+// Supporting Messages
+// ============================================================================
+
+// ErrorInfo represents error information
+message ErrorInfo {
+  // Error code
+  string code = 1;
+  
+  // Error message
+  string message = 2;
+  
+  // Error details
+  repeated ErrorDetail details = 3;
+  
+  // Stack trace (for debugging)
+  string stack_trace = 4;
+}
+
+// ErrorDetail represents a single error detail
+message ErrorDetail {
+  // Field name
+  string field = 1;
+  
+  // Issue description
+  string issue = 2;
+  
+  // Suggested fix
+  string suggestion = 3;
+}
+
+// AuthenticationInfo for agent authentication
+message AuthenticationInfo {
+  // Authentication type
+  string type = 1;
+  
+  // Key reference (environment variable name, not actual key)
+  string key_reference = 2;
+}
+
+// Pagination for list responses
+message Pagination {
+  // Total count
+  int32 total = 1;
+  
+  // Limit (page size)
+  int32 limit = 2;
+  
+  // Offset
+  int32 offset = 3;
+  
+  // Has more results
+  bool has_more = 4;
+}
+
+// ============================================================================
+// Service Definitions (gRPC, optional)
+// ============================================================================
+
+// TelemetryService for high-performance telemetry ingestion
+service TelemetryService {
+  // Submit a single telemetry event
+  rpc SubmitEvent(TelemetryEvent) returns (TelemetryEventResponse);
+  
+  // Submit a batch of telemetry events
+  rpc SubmitBatch(TelemetryBatch) returns (TelemetryEventResponse);
+  
+  // Stream telemetry events (server streaming)
+  rpc StreamEvents(SubscriptionRequest) returns (stream StreamEvent);
+}
+
+// CommandService for command execution
+service CommandService {
+  // Execute a command
+  rpc ExecuteCommand(CommandFrame) returns (CommandResult);
+  
+  // Get command status
+  rpc GetCommandStatus(CommandStatusRequest) returns (CommandResult);
+  
+  // Cancel a command
+  rpc CancelCommand(CancelCommandRequest) returns (CommandResult);
+}
+
+// CommandStatusRequest for querying command status
+message CommandStatusRequest {
+  string command_id = 1;
+}
+
+// CancelCommandRequest for canceling a command
+message CancelCommandRequest {
+  string command_id = 1;
+}
+
+// TaskService for task management
+service TaskService {
+  // Create a task
+  rpc CreateTask(Task) returns (Task);
+  
+  // Get task details
+  rpc GetTask(GetTaskRequest) returns (Task);
+  
+  // Update a task
+  rpc UpdateTask(Task) returns (Task);
+  
+  // List tasks
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse);
+}
+
+// GetTaskRequest for retrieving a task
+message GetTaskRequest {
+  string task_id = 1;
+}
+
+// ListTasksRequest for listing tasks
+message ListTasksRequest {
+  // Filters
+  string status = 1;
+  string assignee = 2;
+  Priority priority = 3;
+  
+  // Pagination
+  int32 limit = 4;
+  int32 offset = 5;
+}
+
+// ListTasksResponse for task list
+message ListTasksResponse {
+  repeated Task tasks = 1;
+  Pagination pagination = 2;
+}
+
+// AIService for AI agent coordination
+service AIService {
+  // Register an AI agent
+  rpc RegisterAgent(AIAgent) returns (AIAgent);
+  
+  // Request AI assistance
+  rpc RequestAssistance(AIAssistanceRequest) returns (AIAssistanceResult);
+  
+  // Get assistance result
+  rpc GetAssistanceResult(GetAssistanceResultRequest) returns (AIAssistanceResult);
+}
+
+// GetAssistanceResultRequest for retrieving AI assistance result
+message GetAssistanceResultRequest {
+  string request_id = 1;
+}
