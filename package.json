@@ -1,0 +1,23 @@
+{
+  "name": "euystacio-ai-ulp-sacralis",
+  "version": "1.0.0",
+  "description": "ULP Sacralis - Ethical Parameters Verification for Euystacio AI",
+  "main": "scripts/generate_params_root.js",
+  "scripts": {
+    "generate-params": "node scripts/generate_params_root.js"
+  },
+  "keywords": [
+    "ethereum",
+    "polygon",
+    "ethical-finance",
+    "regenerative-economy",
+    "ulp",
+    "sacralis"
+  ],
+  "author": "Euystacio AI Collective",
+  "license": "MIT",
+  "dependencies": {
+    "ethers": "^6.9.0",
+    "minimist": "^1.2.8"
+  }
+}
