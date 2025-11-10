@@ -1,0 +1,93 @@
+{
+  "contract": {
+    "address": "0xCONTRACT_ADDRESS_PLACEHOLDER",
+    "network": "Polygon Mainnet",
+    "chainId": 137,
+    "deploymentDate": "TBD",
+    "version": "1.0.0"
+  },
+  "ethicalParameters": {
+    "PARAMS_ROOT": "0x1cc75e6684bac14d7607ce228c730a424821ffdda186db89777c4e9e526b6089",
+    "floorPrice": {
+      "value": 10.0,
+      "unit": "USD",
+      "description": "Protezione valore minimo assoluto"
+    },
+    "proactiveThreshold": {
+      "value": 10.55,
+      "unit": "USD",
+      "description": "Soglia di attivazione buyback proattivo"
+    },
+    "stabilizationFee": {
+      "bps": 10,
+      "percentage": 0.1,
+      "description": "Commissione di stabilizzazione"
+    },
+    "feeSplit": {
+      "restitution": {
+        "bps": 4000,
+        "percentage": 40.0,
+        "description": "Restituzione alla comunità"
+      },
+      "fluxusCompletus": {
+        "bps": 3000,
+        "percentage": 30.0,
+        "description": "Fondo contro-ciclico"
+      },
+      "burn": {
+        "bps": 3000,
+        "percentage": 30.0,
+        "description": "Meccanismo deflazionario"
+      }
+    },
+    "governance": {
+      "multisigType": "7-of-9",
+      "description": "Global Governance Council",
+      "signers": [
+        "TBD - Signer 1",
+        "TBD - Signer 2",
+        "TBD - Signer 3",
+        "TBD - Signer 4",
+        "TBD - Signer 5",
+        "TBD - Signer 6",
+        "TBD - Signer 7",
+        "TBD - Signer 8",
+        "TBD - Signer 9"
+      ]
+    },
+    "tre": {
+      "value": 0.3,
+      "unit": "% annuo",
+      "description": "Tasso di Rigenerazione Ecologica minimo richiesto"
+    }
+  },
+  "verification": {
+    "script": "scripts/generate_params_root.js",
+    "command": "node scripts/generate_params_root.js --floor 10 --proactive 10.55 --feeBps 10 --splitRestitution 4000 --splitCounter 3000 --splitBurn 3000 --multisigType \"7-of-9\" --tre 0.3",
+    "documentation": "docs/ethics/ULP_Sacralis_Attestazione.md"
+  },
+  "monitoring": {
+    "events": [
+      "ParamsIntegrityAsserted",
+      "BuybackTriggered",
+      "AllocationExecuted",
+      "DefensiveStatus"
+    ],
+    "functions": [
+      "getEthicalConfig()",
+      "getCurrentPrice()",
+      "getDefensiveStatus()"
+    ]
+  },
+  "resources": {
+    "repository": "https://github.com/hannesmitterer/euystacio-ai",
+    "dashboard": "https://hannesmitterer.github.io/euystacio-ai/",
+    "polygonscan": "TBD - Contract URL",
+    "documentation": "https://github.com/hannesmitterer/euystacio-ai/tree/main/docs/ethics"
+  },
+  "status": {
+    "phase": "Phase III - Consensus Sacralis",
+    "deploymentStatus": "Pending",
+    "lastUpdated": "2025-11-10T20:54:00Z"
+  }
+}

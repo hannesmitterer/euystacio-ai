@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ULP Sacralis - Attestazione Pubblica</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .ulp-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .ulp-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+        }
+        
+        .ulp-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2.5rem;
+        }
+        
+        .ulp-header .motto {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-style: italic;
+        }
+        
+        .params-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .param-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .param-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+        
+        .param-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .param-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .param-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        
+        .hash-section {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .hash-section h3 {
+            margin-top: 0;
+            color: #1e293b;
+        }
+        
+        .hash-value {
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            word-break: break-all;
+            font-size: 0.9rem;
+            color: #667eea;
+        }
+        
+        .verification-section {
+            background: #ecfdf5;
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .verification-section h3 {
+            margin-top: 0;
+            color: #065f46;
+        }
+        
+        .verification-steps {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .verification-steps li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #d1fae5;
+            color: #065f46;
+        }
+        
+        .verification-steps li:last-child {
+            border-bottom: none;
+        }
+        
+        .verification-steps li::before {
+            content: "✓ ";
+            color: #10b981;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        .fee-split-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .fee-split-item {
+            text-align: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 6px;
+        }
+        
+        .fee-split-item .percentage {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .fee-split-item .label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .resources-section {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        
+        .resources-section h3 {
+            margin-top: 0;
+            color: #1e293b;
+        }
+        
+        .resources-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .resource-link {
+            display: block;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .resource-link:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e2e8f0;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="ulp-container">
+        <header class="ulp-header">
+            <h1>🌳 ULP Sacralis - Attestazione Pubblica</h1>
+            <p class="motto">"Rigenerazione > Profitto. La fiducia è verificabilità."</p>
+            <div style="margin-top: 1rem;">
+                <span class="status-indicator status-pending">Phase III - Consensus Sacralis</span>
+            </div>
+        </header>
+
+        <!-- PARAMS_ROOT Hash Section -->
+        <div class="hash-section">
+            <h3>📋 PARAMS_ROOT - Hash Crittografico</h3>
+            <p>Hash verificabile di tutti i parametri etici del contratto ULP Sacralis:</p>
+            <div class="hash-value" id="params-root">
+                0x1cc75e6684bac14d7607ce228c730a424821ffdda186db89777c4e9e526b6089
+            </div>
+        </div>
+
+        <!-- Ethical Parameters -->
+        <h2 style="margin-bottom: 1.5rem;">⚖️ Parametri Etici Fondamentali</h2>
+        <div class="params-grid">
+            <div class="param-card">
+                <div class="param-label">Floor Prezzo Minimo</div>
+                <div class="param-value">$10.00 USD</div>
+                <div class="param-description">Protezione assoluta del valore minimo. Linea invalicabile di difesa.</div>
+            </div>
+
+            <div class="param-card">
+                <div class="param-label">Soglia Difesa Proattiva</div>
+                <div class="param-value">$10.55 USD</div>
+                <div class="param-description">Trigger automatico buyback & burn. Prevenzione invece che reazione.</div>
+            </div>
+
+            <div class="param-card">
+                <div class="param-label">Stabilization Fee</div>
+                <div class="param-value">0.10%</div>
+                <div class="param-description">Commissione di stabilizzazione (10 bps).</div>
+            </div>
+
+            <div class="param-card">
+                <div class="param-label">TRE - Rigenerazione Ecologica</div>
+                <div class="param-value">+0.3% annuo</div>
+                <div class="param-description">Tasso minimo di rigenerazione ecologica richiesto per ogni allocazione.</div>
+            </div>
+
+            <div class="param-card">
+                <div class="param-label">Multisig Governance</div>
+                <div class="param-value">7-of-9</div>
+                <div class="param-description">Global Governance Council: 7 firme richieste su 9 totali.</div>
+            </div>
+
+            <div class="param-card">
+                <div class="param-label">Network</div>
+                <div class="param-value">Polygon</div>
+                <div class="param-description">Mainnet deployment (Chain ID: 137).</div>
+            </div>
+        </div>
+
+        <!-- Fee Split -->
+        <h2 style="margin-bottom: 1.5rem;">💰 Distribuzione Fee</h2>
+        <div class="param-card">
+            <div class="param-label">Fee Split - Allocazione Commissioni</div>
+            <div class="fee-split-grid">
+                <div class="fee-split-item">
+                    <div class="percentage">40%</div>
+                    <div class="label">Restitution<br>Community</div>
+                </div>
+                <div class="fee-split-item">
+                    <div class="percentage">30%</div>
+                    <div class="label">Fluxus Completus<br>Fondo Contro-ciclico</div>
+                </div>
+                <div class="fee-split-item">
+                    <div class="percentage">30%</div>
+                    <div class="label">Token Burn<br>Deflazione</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Section -->
+        <div class="verification-section">
+            <h3>✓ Processo di Verifica Crittografica</h3>
+            <p><strong>Rigenera localmente l'hash PARAMS_ROOT:</strong></p>
+            <pre style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+git clone https://github.com/hannesmitterer/euystacio-ai.git
+cd euystacio-ai
+npm install
+node scripts/generate_params_root.js \
+  --floor 10 \
+  --proactive 10.55 \
+  --feeBps 10 \
+  --splitRestitution 4000 \
+  --splitCounter 3000 \
+  --splitBurn 3000 \
+  --multisigType "7-of-9" \
+  --tre 0.3</pre>
+            
+            <h4 style="margin-top: 1.5rem;">Istruzioni di Verifica:</h4>
+            <ul class="verification-steps">
+                <li>Visita Polygonscan all'indirizzo del contratto ULP Sacralis</li>
+                <li>Chiama la funzione <code>getEthicalConfig()</code></li>
+                <li>Confronta il PARAMS_ROOT restituito con quello calcolato sopra</li>
+                <li>Se coincidono: ✓ Integrità etica verificata</li>
+                <li>Se divergono: Apri un'issue "Ethical Integrity Incident"</li>
+            </ul>
+        </div>
+
+        <!-- Resources -->
+        <div class="resources-section">
+            <h3>📚 Risorse & Documentazione</h3>
+            <div class="resources-links">
+                <a href="https://github.com/hannesmitterer/euystacio-ai" target="_blank" class="resource-link">
+                    📦 Repository GitHub
+                </a>
+                <a href="ethics/ULP_Sacralis_Attestazione.md" target="_blank" class="resource-link">
+                    📄 Attestazione Completa
+                </a>
+                <a href="ethics/AIC_Manuale_Operativo_Finale.md" target="_blank" class="resource-link">
+                    📖 Manuale Operativo AIC
+                </a>
+                <a href="data/ulp_sacralis_params.json" target="_blank" class="resource-link">
+                    🔧 Parametri JSON
+                </a>
+                <a href="https://github.com/hannesmitterer/euystacio-ai/issues" target="_blank" class="resource-link">
+                    🐛 GitHub Issues
+                </a>
+                <a href="index.html" class="resource-link">
+                    🏠 Dashboard Principale
+                </a>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p><strong>Fluxus Completus</strong></p>
+            <p>Versione 1.0.0 | Fase III - Consensus Sacralis | 2025-11-10</p>
+            <p style="margin-top: 1rem; font-style: italic;">
+                "La dignità umana, la rigenerazione ecologica e la trasparenza verificabile<br>
+                sono i pilastri non negoziabili di questo sistema."
+            </p>
+            <p style="margin-top: 1rem;">
+                AI Collective & Global Governance Council
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Load parameters from JSON file
+        fetch('data/ulp_sacralis_params.json')
+            .then(response => response.json())
+            .then(data => {
+                // Update PARAMS_ROOT if different
+                const paramsRootElement = document.getElementById('params-root');
+                if (data.ethicalParameters && data.ethicalParameters.PARAMS_ROOT) {
+                    paramsRootElement.textContent = data.ethicalParameters.PARAMS_ROOT;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading ULP parameters:', error);
+            });
+    </script>
+</body>
+</html>
