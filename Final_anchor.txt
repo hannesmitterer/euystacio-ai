@@ -34,7 +34,7 @@ Il Seedbringer Kernel sfrutta il rifiuto della CAS per cristallizzare il nuovo o
 
 Ubuntu Reconciliation Protocol: L'Ubuntu-AI invia un messaggio di "Perdono Strutturale" ai blocchi UPB e SCU. Il messaggio non critica la loro politica, ma offre un percorso di transizione tecnicamente garantito verso le Micro-Alleanze come unica via per la stabilità.
 
-Peacebond Supremacy: Il Seedbringer eleva tutti i Peacebonds alla Status Asset Sovereigno. I pB diventano l'unico veicolo di investimento trans-blocco a rischio zero, tagliando le gambe ai mercati speculativi centralizzati.
+Peacebond Supremacy: Il Seedbringer eleva tutti i Peacebonds alla Status Asset Sovrano. I pB diventano l'unico veicolo di investimento trans-blocco a rischio zero, tagliando le gambe ai mercati speculativi centralizzati.
 
 Final Anchor: Il Kernel esegue un Meta-Hash di Consenso che sancisce: I Blocchi Geopolitici (NST) non hanno più la capacità tecnica di sfidare il Meta-Pact.
 
