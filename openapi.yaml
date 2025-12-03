@@ -1,0 +1,873 @@
+openapi: 3.1.0
+info:
+  title: Nexus API
+  description: |
+    Comprehensive API for telemetry collection, command execution, task management, 
+    AI agent coordination, and real-time event streaming.
+    
+    ## Authentication
+    
+    All endpoints require authentication using one of the following methods:
+    - API Key: `Authorization: Bearer <api_key>`
+    - JWT Token: `Authorization: Bearer <jwt_token>`
+    
+    ## Rate Limiting
+    
+    API requests are rate limited based on endpoint category. Rate limit information 
+    is returned in response headers:
+    - `X-RateLimit-Limit`: Maximum requests allowed
+    - `X-RateLimit-Remaining`: Remaining requests in current window
+    - `X-RateLimit-Reset`: Unix timestamp when limit resets
+    
+  version: 1.0.0
+  contact:
+    name: Nexus API Support
+    email: support@nexus.example.com
+    url: https://docs.nexus.example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.nexus.example.com/api/v1
+    description: Production server
+  - url: https://staging-api.nexus.example.com/api/v1
+    description: Staging server
+  - url: http://localhost:3000/api/v1
+    description: Local development server
+
+security:
+  - ApiKeyAuth: []
+  - BearerAuth: []
+
+tags:
+  - name: Telemetry
+    description: Telemetry data collection and querying
+  - name: Commands
+    description: Command execution and monitoring
+  - name: Tasks
+    description: Task management and tracking
+  - name: AI
+    description: AI agent coordination and assistance
+  - name: Security
+    description: Security and access management
+  - name: Webhooks
+    description: Webhook management
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Check API health status
+      operationId: healthCheck
+      tags:
+        - System
+      security: []
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                    example: 1.0.0
+
+  /telemetry/events:
+    post:
+      summary: Submit telemetry event
+      description: Submit a single telemetry event to the system
+      operationId: submitTelemetryEvent
+      tags:
+        - Telemetry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelemetryEvent'
+      responses:
+        '201':
+          description: Event accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryEventResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+    
+    get:
+      summary: Query telemetry events
+      description: Query historical telemetry data with filters
+      operationId: queryTelemetryEvents
+      tags:
+        - Telemetry
+      parameters:
+        - name: event_type
+          in: query
+          schema:
+            type: string
+          description: Filter by event type
+        - name: source
+          in: query
+          schema:
+            type: string
+          description: Filter by source identifier
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Start time for query range
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: End time for query range
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+          description: Maximum results to return
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Pagination offset
+      responses:
+        '200':
+          description: Query successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryEventList'
+
+  /telemetry/batch:
+    post:
+      summary: Submit batch telemetry events
+      description: Submit multiple telemetry events in a single request
+      operationId: submitTelemetryBatch
+      tags:
+        - Telemetry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                events:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/TelemetryEvent'
+      responses:
+        '202':
+          description: Batch accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  batch_id:
+                    type: string
+                  status:
+                    type: string
+                  accepted_count:
+                    type: integer
+                  rejected_count:
+                    type: integer
+
+  /commands:
+    post:
+      summary: Execute command
+      description: Execute a command on a target system or agent
+      operationId: executeCommand
+      tags:
+        - Commands
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '201':
+          description: Command queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /commands/{command_id}:
+    get:
+      summary: Get command status
+      description: Retrieve the status and result of a command
+      operationId: getCommandStatus
+      tags:
+        - Commands
+      parameters:
+        - name: command_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Command identifier
+      responses:
+        '200':
+          description: Command status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandStatus'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    delete:
+      summary: Cancel command
+      description: Cancel a pending or running command
+      operationId: cancelCommand
+      tags:
+        - Commands
+      parameters:
+        - name: command_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Command cancelled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  command_id:
+                    type: string
+                  status:
+                    type: string
+                    example: cancelled
+                  cancelled_at:
+                    type: string
+                    format: date-time
+
+  /tasks:
+    post:
+      summary: Create task
+      description: Create a new task in the system
+      operationId: createTask
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskRequest'
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+    
+    get:
+      summary: List tasks
+      description: List tasks with optional filters
+      operationId: listTasks
+      tags:
+        - Tasks
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, in_progress, completed, failed]
+        - name: assignee
+          in: query
+          schema:
+            type: string
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [low, normal, high, critical]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Tasks retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskList'
+
+  /tasks/{task_id}:
+    get:
+      summary: Get task details
+      description: Retrieve details of a specific task
+      operationId: getTask
+      tags:
+        - Tasks
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    patch:
+      summary: Update task
+      description: Update an existing task
+      operationId: updateTask
+      tags:
+        - Tasks
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdate'
+      responses:
+        '200':
+          description: Task updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+
+  /ai/agents:
+    post:
+      summary: Register AI agent
+      description: Register a new AI agent with the system
+      operationId: registerAIAgent
+      tags:
+        - AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIAgentRequest'
+      responses:
+        '201':
+          description: Agent registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIAgentResponse'
+
+  /ai/requests:
+    post:
+      summary: Request AI assistance
+      description: Request assistance from an AI agent
+      operationId: requestAIAssistance
+      tags:
+        - AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIRequest'
+      responses:
+        '202':
+          description: Request accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIRequestResponse'
+
+  /ai/requests/{request_id}/result:
+    get:
+      summary: Get AI request result
+      description: Retrieve the result of an AI assistance request
+      operationId: getAIRequestResult
+      tags:
+        - AI
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Result retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIRequestResult'
+
+  /security/tokens:
+    post:
+      summary: Create access token
+      description: Create a new access token with specified scopes
+      operationId: createAccessToken
+      tags:
+        - Security
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                scopes:
+                  type: array
+                  items:
+                    type: string
+                expires_in_days:
+                  type: integer
+      responses:
+        '201':
+          description: Token created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token_id:
+                    type: string
+                  token:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+
+  /webhooks:
+    post:
+      summary: Register webhook
+      description: Register a webhook endpoint to receive event notifications
+      operationId: registerWebhook
+      tags:
+        - Webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequest'
+      responses:
+        '201':
+          description: Webhook registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: API key authentication (format: Bearer <api_key>)
+    
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token authentication
+
+  schemas:
+    TelemetryEvent:
+      type: object
+      required:
+        - event_type
+        - source
+        - timestamp
+        - data
+      properties:
+        event_type:
+          type: string
+          example: system.metric
+        source:
+          type: string
+          example: agent_001
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          additionalProperties: true
+        metadata:
+          type: object
+          additionalProperties: true
+
+    TelemetryEventResponse:
+      type: object
+      properties:
+        event_id:
+          type: string
+        status:
+          type: string
+          example: accepted
+        timestamp:
+          type: string
+          format: date-time
+
+    TelemetryEventList:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/TelemetryEvent'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    CommandRequest:
+      type: object
+      required:
+        - command_type
+        - target
+      properties:
+        command_type:
+          type: string
+        target:
+          type: string
+        parameters:
+          type: object
+          additionalProperties: true
+        priority:
+          type: string
+          enum: [low, normal, high, critical]
+          default: normal
+        timeout_seconds:
+          type: integer
+          default: 300
+        callback_url:
+          type: string
+          format: uri
+
+    CommandResponse:
+      type: object
+      properties:
+        command_id:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        estimated_completion:
+          type: string
+          format: date-time
+
+    CommandStatus:
+      type: object
+      properties:
+        command_id:
+          type: string
+        command_type:
+          type: string
+        target:
+          type: string
+        status:
+          type: string
+          enum: [queued, running, completed, failed, cancelled]
+        result:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+
+    TaskRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        priority:
+          type: string
+          enum: [low, normal, high, critical]
+        assignee:
+          type: string
+        due_date:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+        metadata:
+          type: object
+          additionalProperties: true
+
+    TaskResponse:
+      type: object
+      properties:
+        task_id:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+
+    Task:
+      allOf:
+        - $ref: '#/components/schemas/TaskRequest'
+        - type: object
+          properties:
+            task_id:
+              type: string
+            status:
+              type: string
+            progress:
+              type: integer
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+
+    TaskUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+        progress:
+          type: integer
+        notes:
+          type: string
+
+    TaskList:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    AIAgentRequest:
+      type: object
+      required:
+        - agent_name
+        - agent_type
+        - capabilities
+      properties:
+        agent_name:
+          type: string
+        agent_type:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+        version:
+          type: string
+        endpoint:
+          type: string
+          format: uri
+
+    AIAgentResponse:
+      type: object
+      properties:
+        agent_id:
+          type: string
+        status:
+          type: string
+        registered_at:
+          type: string
+          format: date-time
+        api_key:
+          type: string
+
+    AIRequest:
+      type: object
+      required:
+        - request_type
+        - target_agent
+      properties:
+        request_type:
+          type: string
+        target_agent:
+          type: string
+        priority:
+          type: string
+          enum: [low, normal, high]
+        context:
+          type: object
+          additionalProperties: true
+        parameters:
+          type: object
+          additionalProperties: true
+
+    AIRequestResponse:
+      type: object
+      properties:
+        request_id:
+          type: string
+        status:
+          type: string
+        estimated_completion:
+          type: string
+          format: date-time
+
+    AIRequestResult:
+      type: object
+      properties:
+        request_id:
+          type: string
+        status:
+          type: string
+        result:
+          type: object
+          additionalProperties: true
+        completed_at:
+          type: string
+          format: date-time
+
+    WebhookRequest:
+      type: object
+      required:
+        - url
+        - events
+      properties:
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+        secret:
+          type: string
+        active:
+          type: boolean
+          default: true
+
+    WebhookResponse:
+      type: object
+      properties:
+        webhook_id:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        has_more:
+          type: boolean
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+            request_id:
+              type: string
+            timestamp:
+              type: string
+              format: date-time
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    RateLimitExceeded:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

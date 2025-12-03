@@ -1,0 +1,65 @@
+{
+  "tfm_version": "1.0",
+  "module_name": "TFM-1",
+  "operation": "equilibrium-topup",
+  "timestamp": "2025-10-28T05:37:00Z",
+  "payload": {
+    "type": "equilibrium_maintenance",
+    "priority": "high",
+    "target_systems": [
+      "liquiium-arena-index",
+      "monitoring-infrastructure",
+      "alert-management"
+    ],
+    "configuration": {
+      "equilibrium_threshold": 0.95,
+      "topup_interval_seconds": 300,
+      "max_retries": 3,
+      "fallback_enabled": true
+    },
+    "metrics": {
+      "cpu_threshold": 80,
+      "memory_threshold": 85,
+      "disk_threshold": 90,
+      "network_latency_ms": 100
+    },
+    "endpoints": {
+      "primary": "https://liquiium-arena.internal/api/v2",
+      "monitoring": "https://prometheus.internal:9090",
+      "alerts": "https://alertmanager.internal:9093"
+    },
+    "security": {
+      "encryption": "AES-256",
+      "authentication": "mutual-tls",
+      "authorization": "rbac"
+    },
+    "operational_parameters": {
+      "auto_scaling": true,
+      "load_balancing": true,
+      "health_check_interval_seconds": 30,
+      "graceful_shutdown_timeout_seconds": 60
+    },
+    "compliance": {
+      "data_retention_days": 90,
+      "audit_logging": true,
+      "gdpr_compliant": true
+    }
+  },
+  "metadata": {
+    "created_by": "TFM-1-System",
+    "environment": "production",
+    "region": "global",
+    "tags": [
+      "equilibrium",
+      "monitoring",
+      "tfm-1",
+      "liquiium-arena"
+    ]
+  },
+  "status": {
+    "state": "active",
+    "last_updated": "2025-10-28T05:37:00Z",
+    "health": "healthy",
+    "uptime_percentage": 99.99
+  }
+}

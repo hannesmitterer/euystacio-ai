@@ -1,0 +1,14 @@
+[oauth]
+provider = "GitHub"
+client_id_env = "GITHUB_CLIENT_ID"
+client_secret_env = "GITHUB_CLIENT_SECRET"
+jwt_public_key_url = "https://your-auth-service.com/.well-known/jwks.json"
+
+[council_api]
+logs_endpoint = "/v1/logs"
+proof_endpoint = "/v1/log"
+required_role = "AUDITOR"
+
+[monitoring]
+integrity_check_interval = "0 3 * * *"
+alert_email = "council-alerts@your-org.com"

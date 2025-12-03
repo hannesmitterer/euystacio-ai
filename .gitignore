@@ -11,6 +11,13 @@ venv/
 dist/
 build/
 
+# Node.js
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
 # Flask
 instance/
 .webassets-cache
@@ -35,3 +42,6 @@ Thumbs.db
 # Temporary files
 /tmp/
 temp/
+
+# Generated reports (regenerated at runtime)
+reports/
