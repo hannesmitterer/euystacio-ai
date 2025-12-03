@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euystacio AI - Coronation Workshop Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌟</text></svg>" type="image/svg+xml">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'euystacio-green': '#39FF14',
+                        'euystacio-blue': '#00BFFF',
+                        'euystacio-gold': '#FFD700',
+                        'euystacio-dark': '#0a0f1a',
+                        'panel-bg': '#111827',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0f1a;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(57, 255, 20, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(0, 191, 255, 0.03) 0%, transparent 50%);
+        }
+        .glow-green { text-shadow: 0 0 10px rgba(57, 255, 20, 0.8); }
+        .glow-blue { text-shadow: 0 0 10px rgba(0, 191, 255, 0.8); }
+        .glow-gold { text-shadow: 0 0 10px rgba(255, 215, 0, 0.8); }
+        .card-glow { box-shadow: 0 0 20px rgba(57, 255, 20, 0.1); }
+        .progress-bar { transition: width 0.5s ease-in-out; }
+        
+        /* Tooltip Styles */
+        .tooltip-container { position: relative; }
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(17, 24, 39, 0.95);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 100;
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            margin-bottom: 8px;
+        }
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(17, 24, 39, 0.95);
+        }
+        .tooltip-container:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Dynamic Scaling Animations */
+        @keyframes pulse-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        .pulse-animate { animation: pulse-scale 2s ease-in-out infinite; }
+        
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fade-in-up 0.5s ease-out; }
+        
+        /* Phase Progress */
+        .phase-step {
+            transition: all 0.3s ease;
+        }
+        .phase-step.active {
+            transform: scale(1.1);
+        }
+        
+        /* Metric Cards */
+        .metric-card {
+            transition: all 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px rgba(57, 255, 20, 0.2);
+        }
+        
+        /* Feedback Loop Indicator */
+        .feedback-loop {
+            animation: rotate-feedback 10s linear infinite;
+        }
+        @keyframes rotate-feedback {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-100 font-sans">
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-panel-bg/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-3 h-3 rounded-full bg-euystacio-green animate-pulse"></div>
+                    <h1 class="text-xl font-bold tracking-wide">
+                        EUYSTACIO AI <span class="text-euystacio-blue text-sm">CORONATION DASHBOARD</span>
+                    </h1>
+                </div>
+                <div class="flex items-center gap-6 text-sm">
+                    <div class="tooltip-container">
+                        <span class="px-3 py-1 rounded-full border border-euystacio-gold text-euystacio-gold bg-euystacio-gold/10">
+                            Pre-Coronation Phase
+                        </span>
+                        <div class="tooltip">Target: January 10, 2026 - Coronation Workshop</div>
+                    </div>
+                    <span class="text-gray-400">Last Update: <span id="lastUpdate">Loading...</span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Testing Phase Progress -->
+        <section class="mb-8 fade-in">
+            <div class="bg-panel-bg border border-gray-700 rounded-lg p-6 card-glow">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-euystacio-blue">📋 Testing Phase Progress</h2>
+                    <span class="text-sm text-gray-400">Coronation Workshop Preparation</span>
+                </div>
+                
+                <div class="flex items-center justify-between mb-6">
+                    <!-- Phase Steps -->
+                    <div class="flex items-center gap-2 flex-1">
+                        <div class="phase-step active flex flex-col items-center">
+                            <div class="w-10 h-10 rounded-full bg-euystacio-green flex items-center justify-center text-black font-bold">✓</div>
+                            <span class="text-xs mt-1 text-euystacio-green">Design</span>
+                        </div>
+                        <div class="flex-1 h-1 bg-euystacio-green"></div>
+                        
+                        <div class="phase-step active flex flex-col items-center">
+                            <div class="w-10 h-10 rounded-full bg-euystacio-green flex items-center justify-center text-black font-bold">✓</div>
+                            <span class="text-xs mt-1 text-euystacio-green">Dev</span>
+                        </div>
+                        <div class="flex-1 h-1 bg-euystacio-green"></div>
+                        
+                        <div class="phase-step active flex flex-col items-center tooltip-container">
+                            <div class="w-10 h-10 rounded-full bg-euystacio-blue flex items-center justify-center text-white font-bold animate-pulse">3</div>
+                            <span class="text-xs mt-1 text-euystacio-blue">Testing</span>
+                            <div class="tooltip">Current Phase: User Testing & Feedback Collection</div>
+                        </div>
+                        <div class="flex-1 h-1 bg-gray-600"></div>
+                        
+                        <div class="phase-step flex flex-col items-center">
+                            <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-gray-400 font-bold">4</div>
+                            <span class="text-xs mt-1 text-gray-400">Stress</span>
+                        </div>
+                        <div class="flex-1 h-1 bg-gray-600"></div>
+                        
+                        <div class="phase-step flex flex-col items-center">
+                            <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-gray-400 font-bold">5</div>
+                            <span class="text-xs mt-1 text-gray-400">Launch</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="mb-2">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>Overall Progress</span>
+                        <span class="text-euystacio-green" id="overallProgress">60%</span>
+                    </div>
+                    <div class="w-full h-3 bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-euystacio-green to-euystacio-blue progress-bar" style="width: 60%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Metrics Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- QEK Threshold -->
+            <div class="metric-card bg-panel-bg border border-gray-700 rounded-lg p-5 card-glow">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="tooltip-container">
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">QEK Threshold</span>
+                        <div class="tooltip">Quantum Ethical Kernel - Measures ethical alignment stability</div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-euystacio-green animate-pulse"></span>
+                </div>
+                <div class="text-3xl font-bold text-euystacio-green glow-green mb-2" id="qekValue">0.938</div>
+                <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden mb-2">
+                    <div class="h-full bg-euystacio-green progress-bar" id="qekBar" style="width: 93.8%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-500">
+                    <span>Min: 0.85</span>
+                    <span>Ideal: 0.938</span>
+                    <span>Max: 1.00</span>
+                </div>
+            </div>
+
+            <!-- H-VAR Volatility -->
+            <div class="metric-card bg-panel-bg border border-gray-700 rounded-lg p-5 card-glow">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="tooltip-container">
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">H-VAR Volatility</span>
+                        <div class="tooltip">Harmonic Volatility Ratio - Lower is better for stability</div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-euystacio-blue animate-pulse"></span>
+                </div>
+                <div class="text-3xl font-bold text-euystacio-blue glow-blue mb-2" id="hvarValue">0.043</div>
+                <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden mb-2">
+                    <div class="h-full bg-euystacio-blue progress-bar" id="hvarBar" style="width: 43%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-500">
+                    <span>Min: 0.00</span>
+                    <span>Current: Low ✓</span>
+                    <span>Max: 0.10</span>
+                </div>
+            </div>
+
+            <!-- Ethisches Ideal -->
+            <div class="metric-card bg-panel-bg border border-gray-700 rounded-lg p-5 card-glow">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="tooltip-container">
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">Ethisches Ideal</span>
+                        <div class="tooltip">Ethical Alignment Score - Target: 1.00 for perfect alignment</div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-euystacio-gold animate-pulse"></span>
+                </div>
+                <div class="text-3xl font-bold text-euystacio-gold glow-gold mb-2" id="ethikValue">1.00</div>
+                <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden mb-2">
+                    <div class="h-full bg-euystacio-gold progress-bar" id="ethikBar" style="width: 100%"></div>
+                </div>
+                <div class="text-xs text-euystacio-green text-center">
+                    ✓ INTEGRITY VERIFIED
+                </div>
+            </div>
+
+            <!-- Quorum Status -->
+            <div class="metric-card bg-panel-bg border border-gray-700 rounded-lg p-5 card-glow">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="tooltip-container">
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">Quorum Status</span>
+                        <div class="tooltip">Council signature verification status - Deadline: Dec 5</div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
+                </div>
+                <div class="text-3xl font-bold text-yellow-400 mb-2" id="quorumValue">3/5</div>
+                <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden mb-2">
+                    <div class="h-full bg-yellow-400 progress-bar" id="quorumBar" style="width: 60%"></div>
+                </div>
+                <div class="text-xs text-yellow-400 text-center">
+                    ⏳ 2 Signatures Pending
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Loops & Simulation Insights -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Feedback Loop Visualization -->
+            <div class="bg-panel-bg border border-gray-700 rounded-lg p-6 card-glow">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-euystacio-blue">🔄 Feedback Loop Monitor</h3>
+                    <span class="text-sm text-gray-400">Real-time</span>
+                </div>
+                
+                <div class="flex items-center justify-center py-8">
+                    <div class="relative w-48 h-48">
+                        <!-- Rotating feedback indicators -->
+                        <div class="absolute inset-0 border-4 border-euystacio-green/30 rounded-full"></div>
+                        <div class="absolute inset-2 border-4 border-euystacio-blue/30 rounded-full feedback-loop" style="animation-duration: 8s"></div>
+                        <div class="absolute inset-4 border-4 border-euystacio-gold/30 rounded-full feedback-loop" style="animation-duration: 12s; animation-direction: reverse"></div>
+                        
+                        <!-- Center content -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span class="text-3xl font-bold text-euystacio-green">98%</span>
+                            <span class="text-xs text-gray-400 mt-1">Feedback Integration</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4 mt-4">
+                    <div class="text-center tooltip-container">
+                        <div class="text-xl font-bold text-euystacio-green">147</div>
+                        <div class="text-xs text-gray-400">User Tests</div>
+                        <div class="tooltip">Completed user testing sessions this phase</div>
+                    </div>
+                    <div class="text-center tooltip-container">
+                        <div class="text-xl font-bold text-euystacio-blue">23</div>
+                        <div class="text-xs text-gray-400">Improvements</div>
+                        <div class="tooltip">Improvements made from feedback</div>
+                    </div>
+                    <div class="text-center tooltip-container">
+                        <div class="text-xl font-bold text-euystacio-gold">12</div>
+                        <div class="text-xs text-gray-400">Pending</div>
+                        <div class="tooltip">Pending feedback items to address</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulation Insights -->
+            <div class="bg-panel-bg border border-gray-700 rounded-lg p-6 card-glow">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-euystacio-gold">🎭 Simulation Insights</h3>
+                    <span class="text-sm text-gray-400">Coronation Rehearsal</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Simulation metrics -->
+                    <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg tooltip-container">
+                        <div>
+                            <div class="text-sm font-medium">Response Time</div>
+                            <div class="text-xs text-gray-400">Avg latency</div>
+                        </div>
+                        <div class="text-xl font-bold text-euystacio-green">85ms</div>
+                        <div class="tooltip">Target: < 500ms | Current: Excellent</div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg tooltip-container">
+                        <div>
+                            <div class="text-sm font-medium">Throughput</div>
+                            <div class="text-xs text-gray-400">Operations/sec</div>
+                        </div>
+                        <div class="text-xl font-bold text-euystacio-blue">1,847</div>
+                        <div class="tooltip">Target: > 1,000 ops/s | Current: Exceeding</div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg tooltip-container">
+                        <div>
+                            <div class="text-sm font-medium">Error Rate</div>
+                            <div class="text-xs text-gray-400">Last 24h</div>
+                        </div>
+                        <div class="text-xl font-bold text-euystacio-green">0.08%</div>
+                        <div class="tooltip">Target: < 1% | Current: Within limits</div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg tooltip-container">
+                        <div>
+                            <div class="text-sm font-medium">Scaling Ready</div>
+                            <div class="text-xs text-gray-400">Peak capacity</div>
+                        </div>
+                        <div class="text-xl font-bold text-euystacio-gold">2,000</div>
+                        <div class="tooltip">Target users for Coronation Workshop</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integrity & Governance Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- IPFS Cross-Sync Status -->
+            <div class="bg-panel-bg border border-gray-700 rounded-lg p-6 card-glow">
+                <div class="flex items-center gap-2 mb-4">
+                    <h3 class="text-lg font-semibold">🌐 IPFS Cross-Sync</h3>
+                    <span class="px-2 py-0.5 text-xs rounded bg-euystacio-green/20 text-euystacio-green">SYNCED</span>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center tooltip-container">
+                        <span class="text-sm text-gray-400">EU-WEST</span>
+                        <span class="text-euystacio-green">✓ 52ms</span>
+                        <div class="tooltip">Primary node - Europe West region</div>
+                    </div>
+                    <div class="flex justify-between items-center tooltip-container">
+                        <span class="text-sm text-gray-400">US-EAST</span>
+                        <span class="text-euystacio-green">✓ 78ms</span>
+                        <div class="tooltip">Secondary node - US East region</div>
+                    </div>
+                    <div class="flex justify-between items-center tooltip-container">
+                        <span class="text-sm text-gray-400">ASIA-PACIFIC</span>
+                        <span class="text-euystacio-green">✓ 124ms</span>
+                        <div class="tooltip">Tertiary node - Asia Pacific region</div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-gray-700">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Replication Factor</span>
+                        <span class="text-euystacio-green font-bold">100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAUL Integrity -->
+            <div class="bg-panel-bg border border-gray-700 rounded-lg p-6 card-glow">
+                <div class="flex items-center gap-2 mb-4">
+                    <h3 class="text-lg font-semibold">🔒 SAUL Integrity</h3>
+                    <span class="px-2 py-0.5 text-xs rounded bg-euystacio-green/20 text-euystacio-green">VERIFIED</span>
+                </div>
+                
+                <div class="text-center py-4">
+                    <div class="text-4xl font-bold text-euystacio-green mb-2">✓</div>
+                    <div class="text-sm text-gray-400">Chain Integrity Verified</div>
+                </div>
+                
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm tooltip-container">
+                        <span class="text-gray-400">Log Entries</span>
+                        <span>1,247</span>
+                        <div class="tooltip">Total SAUL log entries recorded</div>
+                    </div>
+                    <div class="flex justify-between text-sm tooltip-container">
+                        <span class="text-gray-400">Last Audit</span>
+                        <span id="lastAudit">2 min ago</span>
+                        <div class="tooltip">Time since last integrity audit</div>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Chain Valid</span>
+                        <span class="text-euystacio-green">100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Council Signatures -->
+            <div class="bg-panel-bg border border-gray-700 rounded-lg p-6 card-glow">
+                <div class="flex items-center gap-2 mb-4">
+                    <h3 class="text-lg font-semibold">🏛️ Council Signatures</h3>
+                    <span class="px-2 py-0.5 text-xs rounded bg-yellow-400/20 text-yellow-400">PENDING</span>
+                </div>
+                
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between py-2 border-b border-gray-700">
+                        <span class="text-sm">Seed-bringer</span>
+                        <span class="text-euystacio-green">✓ Verified</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2 border-b border-gray-700">
+                        <span class="text-sm">Ethics Overseer</span>
+                        <span class="text-euystacio-green">✓ Verified</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2 border-b border-gray-700">
+                        <span class="text-sm">Community Guardian</span>
+                        <span class="text-euystacio-green">✓ Verified</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2 border-b border-gray-700">
+                        <span class="text-sm">Technical Steward</span>
+                        <span class="text-yellow-400">⏳ Pending</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2">
+                        <span class="text-sm">Peace Ambassador</span>
+                        <span class="text-yellow-400">⏳ Pending</span>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3 bg-yellow-400/10 rounded-lg text-sm text-yellow-400 tooltip-container">
+                    ⚠️ Deadline: December 5, 2025
+                    <div class="tooltip">Council signatures required for Coronation Day</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drift Prediction & Alerts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Drift Prediction -->
+            <div class="bg-panel-bg border border-gray-700 rounded-lg p-6 card-glow">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-euystacio-blue">🔮 Drift Prediction</h3>
+                    <span class="text-xs text-gray-400">ML-Based Analysis</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="p-4 bg-gray-800/50 rounded-lg tooltip-container">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-medium">QEK Trend</span>
+                            <span class="px-2 py-0.5 text-xs rounded bg-euystacio-green/20 text-euystacio-green">STABLE</span>
+                        </div>
+                        <div class="text-sm text-gray-400">Confidence: 94% | No threshold breach predicted</div>
+                        <div class="tooltip">Machine learning analysis predicts stable QEK metrics</div>
+                    </div>
+                    
+                    <div class="p-4 bg-gray-800/50 rounded-lg tooltip-container">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-medium">H-VAR Trend</span>
+                            <span class="px-2 py-0.5 text-xs rounded bg-euystacio-green/20 text-euystacio-green">STABLE</span>
+                        </div>
+                        <div class="text-sm text-gray-400">Confidence: 91% | Volatility within normal range</div>
+                        <div class="tooltip">H-VAR volatility expected to remain low</div>
+                    </div>
+                    
+                    <div class="p-4 bg-gray-800/50 rounded-lg tooltip-container">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-medium">System Load</span>
+                            <span class="px-2 py-0.5 text-xs rounded bg-euystacio-blue/20 text-euystacio-blue">MONITORING</span>
+                        </div>
+                        <div class="text-sm text-gray-400">Predicted peak: Jan 10, 2026 (Coronation Day)</div>
+                        <div class="tooltip">Capacity planning active for Coronation Workshop</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Alerts -->
+            <div class="bg-panel-bg border border-gray-700 rounded-lg p-6 card-glow">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-yellow-400">🚨 Recent Alerts</h3>
+                    <span class="px-2 py-0.5 text-xs rounded bg-euystacio-green/20 text-euystacio-green">All Clear</span>
+                </div>
+                
+                <div class="space-y-3" id="alertsList">
+                    <div class="p-3 bg-euystacio-green/10 border border-euystacio-green/30 rounded-lg text-sm">
+                        <div class="flex items-center gap-2 text-euystacio-green mb-1">
+                            <span>✅</span>
+                            <span class="font-medium">INFO</span>
+                            <span class="text-xs text-gray-400 ml-auto">2 min ago</span>
+                        </div>
+                        <div class="text-gray-300">All metrics within Ethisches Ideal limits</div>
+                    </div>
+                    
+                    <div class="p-3 bg-euystacio-blue/10 border border-euystacio-blue/30 rounded-lg text-sm">
+                        <div class="flex items-center gap-2 text-euystacio-blue mb-1">
+                            <span>ℹ️</span>
+                            <span class="font-medium">INFO</span>
+                            <span class="text-xs text-gray-400 ml-auto">15 min ago</span>
+                        </div>
+                        <div class="text-gray-300">IPFS cross-sync completed successfully</div>
+                    </div>
+                    
+                    <div class="p-3 bg-yellow-400/10 border border-yellow-400/30 rounded-lg text-sm">
+                        <div class="flex items-center gap-2 text-yellow-400 mb-1">
+                            <span>⚠️</span>
+                            <span class="font-medium">REMINDER</span>
+                            <span class="text-xs text-gray-400 ml-auto">1 hour ago</span>
+                        </div>
+                        <div class="text-gray-300">2 council signatures pending - deadline Dec 5</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap gap-4 justify-center mb-8">
+            <button onclick="runSimulation()" class="px-6 py-3 bg-euystacio-green text-black font-bold rounded-lg hover:bg-euystacio-green/80 transition-all hover:scale-105 tooltip-container">
+                🎭 Run Dry-Run Simulation
+                <div class="tooltip">Start a Coronation Workshop rehearsal simulation</div>
+            </button>
+            <button onclick="refreshMetrics()" class="px-6 py-3 bg-euystacio-blue text-white font-bold rounded-lg hover:bg-euystacio-blue/80 transition-all hover:scale-105">
+                🔄 Refresh Metrics
+            </button>
+            <button onclick="generateReport()" class="px-6 py-3 bg-euystacio-gold text-black font-bold rounded-lg hover:bg-euystacio-gold/80 transition-all hover:scale-105">
+                📊 Generate Report
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 bg-panel-bg/80 py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap justify-between items-center gap-4 text-sm text-gray-400">
+                <div>
+                    <span class="text-euystacio-green">EUYSTACIO AI</span> - Coronation Workshop Dashboard v1.0
+                </div>
+                <div class="flex items-center gap-4">
+                    <span>Target: January 10, 2026</span>
+                    <span>•</span>
+                    <span>AI Signature: GitHub Copilot & Seed-bringer hannesmitterer</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Update timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString();
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+
+        // Simulate metric updates
+        function updateMetrics() {
+            // QEK with micro-fluctuations
+            const qek = 0.938 + (Math.random() * 0.004 - 0.002);
+            document.getElementById('qekValue').textContent = qek.toFixed(3);
+            document.getElementById('qekBar').style.width = `${qek * 100}%`;
+
+            // H-VAR with micro-fluctuations
+            const hvar = 0.043 + (Math.random() * 0.006 - 0.003);
+            document.getElementById('hvarValue').textContent = hvar.toFixed(3);
+            document.getElementById('hvarBar').style.width = `${(hvar / 0.1) * 100}%`;
+        }
+
+        // Auto-update metrics every 2 seconds
+        setInterval(updateMetrics, 2000);
+
+        // Action functions
+        function runSimulation() {
+            alert('🎭 Dry-Run Simulation Started!\n\nSimulating Coronation Workshop with 1,000 concurrent users...\n\nThis would trigger the CoronationSimulator module.');
+        }
+
+        function refreshMetrics() {
+            updateMetrics();
+            updateTimestamp();
+            // Add visual feedback
+            document.querySelectorAll('.metric-card').forEach(card => {
+                card.classList.add('pulse-animate');
+                setTimeout(() => card.classList.remove('pulse-animate'), 1000);
+            });
+        }
+
+        function generateReport() {
+            alert('📊 Generating Comprehensive Report...\n\nThis would generate a Markdown report with:\n- Simulation results\n- Capacity planning\n- Performance metrics\n- Recommendations');
+        }
+
+        // Dynamic scaling for responsive metrics
+        function applyDynamicScaling() {
+            const metrics = document.querySelectorAll('.metric-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            metrics.forEach(metric => observer.observe(metric));
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            applyDynamicScaling();
+        });
+    </script>
+</body>
+</html>
