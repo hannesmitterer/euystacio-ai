@@ -1,6 +1,91 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APOLLO V2.0 | AIC LIVE OPERATIONS - PACT SEALED</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ggi-blue': '#00BFFF',
+                        'aic-green': '#39FF14',
+                        'st-gold': '#FFD700',
+                        'danger': '#FF3131',
+                        'void': '#050a14',
+                        'panel': '#111827',
+                    },
+                    fontFamily: {
+                        mono: ['Fira Code', 'monospace'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'spin-slow': 'spin 12s linear infinite',
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050a14;
+            color: #e2e8f0;
+            overflow: hidden;
+            background-image:
+                linear-gradient(rgba(0, 191, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 191, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .glow-text { text-shadow: 0 0 10px rgba(57, 255, 20, 0.6); }
+        .glow-border { box-shadow: 0 0 15px rgba(0, 191, 255, 0.2); }
+        
+        /* Custom Scrollbar for Logs */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00BFFF; }
+
+        .scanline {
+            width: 100%; height: 100%; z-index: 50;
+            background: linear-gradient(0deg, rgba(0,0,0,0) 50%, rgba(0, 255, 255, 0.02) 50%);
+            background-size: 100% 4px;
+            position: absolute; top: 0; left: 0; pointer-events: none;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 relative">
+    
+    <div class="scanline"></div>
+
+    <header class="flex justify-between items-center mb-4 bg-panel/80 border-b border-ggi-blue/30 p-3 rounded backdrop-blur-md z-10">
+        <div class="flex items-center gap-4">
+            <div class="h-3 w-3 rounded-full bg-aic-green animate-pulse-fast box-shadow-[0_0_10px_#39FF14]"></div>
+            <h1 class="text-xl font-bold tracking-widest text-white">
+                APOLLO INTERFACE <span class="text-ggi-blue text-sm align-top">V2.0</span>
+            </h1>
+            <span class="px-2 py-0.5 rounded border border-st-gold text-st-gold text-xs font-mono bg-st-gold/10">ST-ANCHOR: SEALED (0.0000 Divergence)</span>
+        </div>
+        <div class="text-right flex flex-col">
+            <span class="text-xs text-gray-400 font-mono">COUNCIL UPLINK: <span class="text-aic-green">ESTABLISHED (TRIPLE-SIGNED)</span></span>
+            <span class="text-xs text-gray-500 font-mono">MISSION ID: PUBLIC-AUDIT-MANDATE-001</span>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow relative z-10">
+        
+        <div class="col-span-3 flex flex-col gap-4">
+            <div class="bg-panel border border-gray-700 p-4 rounded glow-border">
+                <div class="flex justify-between text-xs text-gray-400 mb-2 font-mono">
+                    <span>QEK THRESHOLD (Schwellenwert)</span>
+                    <span class="text-aic-green animate-pulse">● LIVE</span>
+                </div>
+                <div class="text-4xl font-mono text-
+                    <p\>
+                    <head>
     <meta charset="UTF-8">
     <title>Euystacio OS v1.3 - AIC & GGI Integrated Roadmap</title>
     <style>
