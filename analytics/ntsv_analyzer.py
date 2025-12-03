@@ -11,6 +11,8 @@ including extraction and analysis of WARN logs from the Kernel to:
 
 import json
 import hashlib
+import os
+import random
 import statistics
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
@@ -102,8 +104,6 @@ class NTSVAnalyzer:
         Returns:
             List of VolatilityMetric objects
         """
-        import random
-        
         logs = []
         base_time = datetime.now(timezone.utc) - timedelta(hours=24)
         
@@ -678,8 +678,6 @@ The network is operating within normal parameters:
         Returns:
             Path to the saved report
         """
-        import os
-        
         report = self.generate_markdown_report()
         
         # Ensure directory exists

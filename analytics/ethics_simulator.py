@@ -12,6 +12,8 @@ including:
 
 import json
 import hashlib
+import os
+import random
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, field
@@ -127,8 +129,6 @@ class EthicsSimulator:
         Returns:
             List of EthicalDecision objects representing the case
         """
-        import random
-        
         decisions = []
         base_time = datetime.now(timezone.utc) - timedelta(hours=48)
         
@@ -227,7 +227,6 @@ class EthicsSimulator:
             ]
         }
         
-        import random
         base_desc = random.choice(descriptions.get(category, ["General ethical evaluation"]))
         
         if cc41_active:
@@ -792,8 +791,6 @@ Target:     [{"█" * 40}] 1.00
         Returns:
             Path to the saved report
         """
-        import os
-        
         report = self.generate_markdown_report()
         
         # Ensure directory exists
