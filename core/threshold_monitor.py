@@ -192,12 +192,14 @@ class ThresholdMonitor:
         # Calculate if within limits
         within_limits = threshold["min"] <= value <= threshold["max"]
         
-        # Calculate deviation from ideal
+        # Calculate deviation from ideal using absolute difference when ideal is zero
         ideal = threshold["ideal"]
         if ideal != 0:
             deviation_pct = abs((value - ideal) / ideal) * 100
         else:
-            deviation_pct = abs(value) * 100
+            # For zero ideal (like H-VAR min), use the max threshold as reference
+            max_threshold = threshold["max"]
+            deviation_pct = (abs(value) / max_threshold) * 100 if max_threshold != 0 else 0.0
         
         snapshot = MetricSnapshot(
             timestamp=timestamp,

@@ -143,6 +143,12 @@ class CoronationSimulator:
         "max_network_latency_ms": 100
     }
     
+    # Simulation bounds (configurable ceiling values for metrics)
+    SIMULATION_BOUNDS = {
+        "max_cpu_ceiling": 0.99,
+        "max_memory_ceiling": 0.95
+    }
+    
     # Load multipliers for different levels
     LOAD_MULTIPLIERS = {
         LoadLevel.MINIMAL: 0.2,
@@ -293,13 +299,16 @@ class CoronationSimulator:
             base_throughput = 2000 / load_multiplier
             base_cpu = 0.20 + (load_multiplier * 0.12)
             
-            # Add realistic variation
+            # Add realistic variation with configurable bounds
+            cpu_ceiling = self.SIMULATION_BOUNDS["max_cpu_ceiling"]
+            memory_ceiling = self.SIMULATION_BOUNDS["max_memory_ceiling"]
+            
             metrics = SimulationMetrics(
                 response_time_ms=base_response + random.uniform(-10, 50 * load_multiplier),
                 throughput_ops=base_throughput + random.uniform(-200, 200),
                 error_rate=0.001 * load_multiplier + random.uniform(0, 0.005 * load_multiplier),
-                cpu_utilization=min(0.99, base_cpu + random.uniform(-0.05, 0.15)),
-                memory_utilization=min(0.95, 0.30 + (load_multiplier * 0.10) + random.uniform(-0.05, 0.10)),
+                cpu_utilization=min(cpu_ceiling, base_cpu + random.uniform(-0.05, 0.15)),
+                memory_utilization=min(memory_ceiling, 0.30 + (load_multiplier * 0.10) + random.uniform(-0.05, 0.10)),
                 network_latency_ms=20 + (load_multiplier * 10) + random.uniform(-5, 20),
                 concurrent_users=int(scenario.target_users * (0.8 + random.uniform(0, 0.4)))
             )

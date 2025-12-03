@@ -227,8 +227,9 @@ class IPFSIntegrityManager:
                 # Simulate sync operation
                 node.last_sync = timestamp
                 node.sync_status = SyncStatus.SYNCED
-                # Simulate latency (would be actual measurement in production)
-                node.latency_ms = 50.0 + (hash(node_id) % 100)
+                # Simulate latency using hashlib for consistent behavior across Python versions
+                latency_hash = int(hashlib.md5(node_id.encode()).hexdigest()[:8], 16)
+                node.latency_ms = 50.0 + (latency_hash % 100)
                 
                 sync_results["nodes_synced"] += 1
                 sync_results["node_details"][node_id] = {

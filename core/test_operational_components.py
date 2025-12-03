@@ -12,8 +12,11 @@ Tests:
 import sys
 import os
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Ensure the parent directory is in the path for proper imports
+# This is necessary when running the test file directly
+_parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _parent_dir not in sys.path:
+    sys.path.insert(0, _parent_dir)
 
 from core.threshold_monitor import (
     ThresholdMonitor, MetricType, AlertLevel, MetricSnapshot, Alert, DriftPrediction
