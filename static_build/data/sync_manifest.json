@@ -1,0 +1,42 @@
+{
+  "sync_timestamp": "2025-12-04T05:06:37.816392+00:00",
+  "files": [
+    {
+      "source": "red_code.json",
+      "destination": "data/red_code.json",
+      "checksum": "c65707e4f255a0d21bf8ea654ba61cc41dee2316cf73b915c60e1dd9a7c1e137",
+      "synced": true
+    },
+    {
+      "source": "HARMONIC_CONFIRMATION_CUSTOS_SENTIMENTO.json",
+      "destination": "data/harmonic_confirmation.json",
+      "checksum": "cbcf5185e125a01f4be8722d834dbae155e701c50e56365877a83cf365f0c9da",
+      "synced": false
+    },
+    {
+      "source": "SIGIL_CUSTOS_SENTIMENTO.json",
+      "destination": "data/sigil.json",
+      "checksum": "2fb4a0a65b4c0faaadb52523eee8ad79a8fc64196e0f4780c247d4f04592dd1f",
+      "synced": false
+    },
+    {
+      "source": "ACTUS_RESONANTIAE_CUSTOS_SENTIMENTO.json",
+      "destination": "data/actus_resonantiae.json",
+      "checksum": "00003684e0e94666e2f93b8f4a72125129df71dd403b1df84aa0d90ea3c90b67",
+      "synced": false
+    },
+    {
+      "source": "fractal_registry.json",
+      "destination": "data/fractal_registry.json",
+      "checksum": "a3a990c9dd174ce039dd973d86993b72323eb60463c93a8cc595062216e8ce56",
+      "synced": false
+    },
+    {
+      "source": "reflection_tree.json",
+      "destination": "data/reflection_tree.json",
+      "checksum": "ba99c0cfdd82f6b0ecedb8830025936fcfc6dbaa7f55e67b109ff9550dbb7214",
+      "synced": false
+    }
+  ],
+  "integrity_verified": true
+}

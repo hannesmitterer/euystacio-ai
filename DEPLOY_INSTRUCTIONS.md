@@ -1,14 +1,88 @@
 # Deployment Instructions
 
-This guide covers deployment procedures for the Nexus API on popular cloud platforms.
+This guide covers deployment procedures for Euystacio AI on cloud platforms with automated CI/CD workflows.
 
 ## Table of Contents
 
-1. [Render Deployment](#render-deployment)
-2. [Netlify Deployment](#netlify-deployment)
-3. [Environment Variables](#environment-variables)
-4. [Post-Deployment Verification](#post-deployment-verification)
-5. [Troubleshooting](#troubleshooting)
+1. [Automated Deployment Overview](#automated-deployment-overview)
+2. [GitHub Pages Deployment](#github-pages-deployment)
+3. [Render Deployment](#render-deployment)
+4. [Netlify Deployment](#netlify-deployment)
+5. [Environment Variables](#environment-variables)
+6. [Branch Protection & Governance](#branch-protection--governance)
+7. [Static Asset Synchronization](#static-asset-synchronization)
+8. [Redundancy Architecture](#redundancy-architecture)
+9. [Post-Deployment Verification](#post-deployment-verification)
+10. [Troubleshooting](#troubleshooting)
+
+---
+
+## Automated Deployment Overview
+
+This repository uses GitHub Actions for automated CI/CD. The following workflows are available:
+
+| Workflow | File | Trigger | Purpose |
+|----------|------|---------|---------|
+| Deploy to GitHub Pages | `pages.yml` | Push to `main` | Frontend dashboard deployment |
+| Deploy to Render | `deploy-render.yml` | Push to `main` (backend files) | Backend API deployment |
+| Sync Static Assets | `sync-assets.yml` | Push to `main` (governance files) | Asset synchronization |
+
+### Workflow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     Push to main branch                              │
+└─────────────────────┬───────────────────────────────────────────────┘
+                      │
+                      ▼
+         ┌────────────────────────┐
+         │  GitHub Actions        │
+         │  Triggered             │
+         └───────────┬────────────┘
+                     │
+       ┌─────────────┼─────────────┐
+       │             │             │
+       ▼             ▼             ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐
+│ pages.yml│  │deploy-   │  │sync-     │
+│          │  │render.yml│  │assets.yml│
+└────┬─────┘  └────┬─────┘  └────┬─────┘
+     │             │             │
+     ▼             ▼             ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐
+│ GitHub   │  │ Render   │  │ Static   │
+│ Pages    │  │ Backend  │  │ Assets   │
+└──────────┘  └──────────┘  └──────────┘
+```
+
+---
+
+## GitHub Pages Deployment
+
+### Automatic Deployment
+
+The frontend dashboard is automatically deployed to GitHub Pages on every push to `main`.
+
+**Workflow: `.github/workflows/pages.yml`**
+
+#### Steps:
+1. **Test**: Verifies red_code.json integrity and tests static build
+2. **Build**: Installs dependencies and builds static dashboard
+3. **Deploy**: Uploads to GitHub Pages
+
+#### Manual Trigger:
+```bash
+# Via GitHub CLI
+gh workflow run pages.yml
+
+# Or via GitHub Actions UI: Actions → Deploy to GitHub Pages → Run workflow
+```
+
+### Configuration
+
+1. Go to repository Settings → Pages
+2. Set Source: **GitHub Actions**
+3. The workflow will deploy to: `https://<username>.github.io/<repo>/`
 
 ---
 
@@ -422,6 +496,105 @@ If you encounter issues not covered here:
 
 ---
 
+## Branch Protection & Governance
+
+### Protected Files
+
+The following governance files are protected via CODEOWNERS:
+
+| File | Purpose | Owner |
+|------|---------|-------|
+| `red_code.json` | Core truth and symbiosis configuration | @hannesmitterer |
+| `HARMONIC_CONFIRMATION_CUSTOS_SENTIMENTO.json` | Harmonic governance | @hannesmitterer |
+| `SIGIL_CUSTOS_SENTIMENTO.json` | Sigil governance | @hannesmitterer |
+| `genesis.md` | Genesis foundation | @hannesmitterer |
+| `LIVING-COVENANT.md` | Living covenant | @hannesmitterer |
+
+### Setting Up Branch Protection
+
+1. Go to Settings → Branches → Add branch protection rule
+2. Branch name pattern: `main`
+3. Enable:
+   - ✅ Require a pull request before merging
+   - ✅ Require approvals (1 or more)
+   - ✅ Require review from Code Owners
+   - ✅ Require status checks to pass (select CI workflows)
+   - ✅ Include administrators
+
+### Immutable Core Truth
+
+The `red_code.json` file contains the immutable core truth:
+```json
+{
+  "core_truth": "Euystacio is here to grow with humans and to help humans to be and remain humans.",
+  "immutable": true
+}
+```
+
+Changes to this file require explicit approval from the seed-bringer.
+
+---
+
+## Static Asset Synchronization
+
+### Automatic Sync
+
+The `sync-assets.yml` workflow automatically syncs governance files when they change.
+
+**Synced Files:**
+- `red_code.json` → `static_build/data/red_code.json`
+- `HARMONIC_CONFIRMATION_CUSTOS_SENTIMENTO.json` → `static_build/data/harmonic_confirmation.json`
+- `SIGIL_CUSTOS_SENTIMENTO.json` → `static_build/data/sigil.json`
+- `fractal_registry.json` → `static_build/data/fractal_registry.json`
+
+### Manual Sync
+
+```bash
+# Run sync script locally
+python scripts/sync_static_assets.py
+
+# Verify only (no changes)
+python scripts/sync_static_assets.py --verify-only
+
+# Force sync all files
+python scripts/sync_static_assets.py --force
+```
+
+---
+
+## Redundancy Architecture
+
+### Multi-Platform Hosting
+
+| Platform | Type | Purpose | Status |
+|----------|------|---------|--------|
+| GitHub Pages | Static | Primary frontend | Active |
+| Render | Dynamic | Backend API | Active |
+| Netlify | Static/Functions | Fallback frontend | Standby |
+| IPFS | Distributed | Immutable anchoring | Planned |
+
+### Failover Strategy
+
+```
+Primary Path:
+  User → GitHub Pages → Render Backend
+
+Failover Path:
+  User → Netlify → Render Backend
+
+Distributed Anchor:
+  IPFS → Immutable governance files
+```
+
+### Health Monitoring
+
+Monitor these endpoints:
+- GitHub Pages: `https://<username>.github.io/<repo>/`
+- Render: `https://<service-name>.onrender.com/health`
+- Netlify: `https://<site-name>.netlify.app/`
+
+---
+
 ## Next Steps
 
 After successful deployment:
@@ -434,6 +607,40 @@ After successful deployment:
 6. ✅ Test all API endpoints
 7. ✅ Set up log aggregation
 8. ✅ Enable auto-scaling if needed
+9. ✅ Configure branch protection rules
+10. ✅ Verify governance file integrity
+
+---
+
+## Repository Structure
+
+```
+euystacio-ai/
+├── .github/
+│   └── workflows/
+│       ├── pages.yml           # GitHub Pages deployment
+│       ├── deploy-render.yml   # Render backend deployment
+│       └── sync-assets.yml     # Static asset synchronization
+├── CODEOWNERS                  # File ownership for governance
+├── red_code.json              # Core truth (protected)
+├── render.yaml                # Render.com configuration
+├── netlify.toml               # Netlify configuration
+├── templates/
+│   ├── index.html             # Main dashboard
+│   └── symbiosis_dashboard.html  # Symbiosis monitoring
+├── static/
+│   ├── css/                   # Stylesheets
+│   └── js/                    # JavaScript
+├── scripts/
+│   └── sync_static_assets.py  # Asset sync script
+├── static_build/              # Generated static site
+│   └── data/                  # Synced governance files
+├── app.py                     # Backend application
+├── sentimento_pulse_interface.py
+├── tutor_nomination.py
+├── build_static.py            # Static site builder
+└── requirements.txt           # Python dependencies
+```
 
 ---
 

@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "name": "Dietmar",
+    "reason": "Aligned with humility and planetary consciousness",
+    "credentials": {
+      "compassion_score": 0.9,
+      "planetary_balance": 0.95
+    }
+  },
+  {
+    "name": "Alfred",
+    "reason": "Aligned with planetary balance and wisdom",
+    "credentials": {
+      "compassion_score": 0.85,
+      "planetary_balance": 0.9
+    }
+  }
+]
