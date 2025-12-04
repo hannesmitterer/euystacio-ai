@@ -72,9 +72,14 @@ def verify_json_integrity(filepath: Path, required_fields: list = None) -> tuple
         try:
             data = json.loads(content)
         except json.JSONDecodeError:
-            # Try replacing literal \n with actual newlines
+            # Some files in the repo have literal \n instead of actual newlines
+            # Try replacing them for backwards compatibility
             content_fixed = content.replace('\\n', '\n')
-            data = json.loads(content_fixed)
+            try:
+                data = json.loads(content_fixed)
+                print(f"  ⚠ {filepath.name} - Parsed with \\n fix (consider reformatting)")
+            except json.JSONDecodeError:
+                raise  # Re-raise if still invalid
         
         # Check required fields
         if required_fields:

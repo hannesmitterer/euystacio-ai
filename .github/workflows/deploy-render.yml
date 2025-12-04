@@ -19,6 +19,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+# Minimal permissions required for this workflow
+permissions:
+  contents: read
+
 env:
   PYTHON_VERSION: '3.12'
 
@@ -117,16 +121,23 @@ except Exception as e:
     steps:
       - name: Trigger Render Deploy Hook
         if: ${{ vars.RENDER_DEPLOY_HOOK_URL != '' }}
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ vars.RENDER_DEPLOY_HOOK_URL }}
         run: |
           echo "Triggering Render deployment..."
-          curl -X POST "${{ vars.RENDER_DEPLOY_HOOK_URL }}" \
-            -H "Accept: application/json" \
-            -d '{}' \
-            --fail \
-            --silent \
-            --show-error \
-            || echo "Note: Deployment hook may not be configured yet"
-          echo "✓ Render deployment triggered"
+          if [ -n "$RENDER_DEPLOY_HOOK_URL" ]; then
+            curl -X POST "$RENDER_DEPLOY_HOOK_URL" \
+              -H "Accept: application/json" \
+              -d '{}' \
+              --fail \
+              --silent \
+              --show-error \
+              || echo "⚠ Deployment hook request failed"
+            echo "✓ Render deployment triggered"
+          else
+            echo "Note: RENDER_DEPLOY_HOOK_URL not configured. Skipping deployment trigger."
+            echo "Configure this in repository variables: Settings → Secrets and variables → Actions → Variables"
+          fi
 
       - name: Log deployment info
         run: |

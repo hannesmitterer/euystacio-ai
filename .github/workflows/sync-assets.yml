@@ -118,9 +118,24 @@ print('\\n✓ All governance files verified')
           if git diff --quiet static_build/; then
             echo "No changes to commit"
           else
-            git add static_build/
-            git commit -m "chore: sync static assets [skip ci]" || echo "Nothing to commit"
-            git push || echo "Push skipped"
+            # Check for any uncommitted changes first
+            if git status --porcelain static_build/ | grep -q .; then
+              git add static_build/
+              git commit -m "chore: sync static assets [skip ci]" || echo "Nothing to commit"
+              
+              # Try to push, but handle potential conflicts gracefully
+              if ! git push; then
+                echo "⚠ Push failed - there may be new changes on the remote branch"
+                echo "Attempting to pull and retry..."
+                git pull --rebase origin ${{ github.ref_name }} || {
+                  echo "⚠ Could not resolve automatically. Manual intervention may be needed."
+                  exit 1
+                }
+                git push || echo "Push still failed after rebase"
+              fi
+            else
+              echo "No staged changes to commit"
+            fi
           fi
 
   # Notify about sync completion

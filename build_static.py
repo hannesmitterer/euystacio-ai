@@ -1,6 +1,7 @@
 import os
 import shutil
 import json
+import re
 from jinja2 import Template
 
 # Templates to convert from Flask to static HTML
@@ -12,20 +13,30 @@ TEMPLATES_TO_BUILD = [
 
 def convert_flask_to_static(template_content):
     """
-    Convert Flask template syntax to static paths
+    Convert Flask template syntax to static paths.
+    Uses regex to handle various url_for patterns.
     """
-    # Replace Flask url_for with static paths
-    replacements = [
-        ("{{ url_for('static', filename='css/style.css') }}", "static/css/style.css"),
-        ("{{ url_for('static', filename='js/app.js') }}", "static/js/app.js"),
-        ("{{ url_for('static', filename='css/pulse.css') }}", "static/css/pulse.css"),
-        ("{{ url_for('static', filename='js/pulse.js') }}", "static/js/pulse.js"),
-    ]
+    # Pattern to match Flask url_for('static', filename='...') expressions
+    # Handles both single and double quotes
+    url_for_pattern = re.compile(
+        r"\{\{\s*url_for\s*\(\s*['\"]static['\"]\s*,\s*filename\s*=\s*['\"]([^'\"]+)['\"]\s*\)\s*\}\}"
+    )
     
-    for old, new in replacements:
-        template_content = template_content.replace(old, new)
+    # Replace all url_for occurrences with static paths
+    def replace_url_for(match):
+        filename = match.group(1)
+        return f"static/{filename}"
     
-    return template_content
+    converted = url_for_pattern.sub(replace_url_for, template_content)
+    
+    # Verify all Flask template syntax is converted
+    remaining_patterns = re.findall(r"\{\{\s*url_for\s*\([^)]+\)\s*\}\}", converted)
+    if remaining_patterns:
+        print(f"  ⚠ Warning: {len(remaining_patterns)} url_for patterns not converted:")
+        for pattern in remaining_patterns[:3]:  # Show first 3
+            print(f"      {pattern[:50]}...")
+    
+    return converted
 
 
 def create_static_version():
