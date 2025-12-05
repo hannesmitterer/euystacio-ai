@@ -1,3397 +1,377 @@
+# Euystacio-hologram
+Euystacio hologram
+
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Euystacio OS v1.3 - AIC & GGI Integrated Roadmap</title>
-    <style>
-        :root {
-            --bg-color: #0a0a0f;
-            --panel-bg: #14141a;
-            --text-main: #e0e0e0;
-            --text-muted: #888;
-            --aic-color: #00f0ff; /* Cyan */
-            --ggi-color: #00ff9d; /* Green */
-            --alert-color: #ff3366; /* Red */
-            --done-color: #4caf50;
-            --dev-color: #ffc107;
-            --future-color: #333;
-            --font-mono: 'Courier New', Courier, monospace;
-            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: var(--font-sans);
-            margin: 0;
-            padding: 20px;
-            overflow-x: hidden;
-        }
-
-        /* HUD Header */
-        header {
-            border-bottom: 2px solid var(--aic-color);
-            padding-bottom: 20px;
-            margin-bottom: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        h1 {
-            font-family: var(--font-mono);
-            font-size: 24px;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .system-status {
-            font-family: var(--font-mono);
-            font-size: 12px;
-            color: var(--ggi-color);
-            text-align: right;
-        }
-
-        .status-blink {
-            animation: blink 2s infinite;
-        }
-
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        /* Gantt Container */
-        .gantt-wrapper {
-            position: relative;
-            background: var(--panel-bg);
-            border: 1px solid #333;
-            border-radius: 4px;
-            padding: 20px;
-            overflow-x: auto;
-        }
-
-        .timeline-header {
-            display: grid;
-            grid-template-columns: 200px repeat(12, 1fr);
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-family: var(--font-mono);
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .month-marker {
-            text-align: center;
-            border-left: 1px dashed #333;
-        }
-
-        /* Tracks */
-        .track {
-            display: grid;
-            grid-template-columns: 200px 1fr;
-            margin-bottom: 30px;
-            align-items: center;
-            position: relative;
-        }
-
-        .track-label {
-            font-family: var(--font-mono);
-            font-weight: bold;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .track-label span {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .track-lane {
-            position: relative;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-        }
-
-        /* Modules / Bars */
-        .module {
-            position: absolute;
-            height: 36px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            padding: 0 10px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            z-index: 10;
-        }
-
-        .module:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.7);
-            border-color: #fff;
-            z-index: 20;
-        }
-
-        /* Status Colors */
-        .status-done {
-            background: linear-gradient(90deg, #1b5e20, #2e7d32);
-            border-left: 3px solid var(--done-color);
-            opacity: 0.8;
-        }
-
-        .status-dev {
-            background: linear-gradient(90deg, #5c450a, #856404);
-            border-left: 3px solid var(--dev-color);
-            animation: pulse-border 2s infinite;
-        }
-
-        .status-future {
-            background: #2a2a2a;
-            border-left: 3px solid #555;
-            color: #888;
-            border-style: dashed;
-        }
-
-        @keyframes pulse-border {
-            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
-        }
-
-        /* Dependency Lines (SVG Overlay) */
-        .svg-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        line {
-            stroke-width: 2;
-            stroke-dasharray: 5;
-            animation: dash 30s linear infinite;
-        }
-
-        @keyframes dash {
-            to { stroke-dashoffset: -1000; }
-        }
-
-        /* Tooltip */
-        .tooltip {
-            position: fixed;
-            background: rgba(0, 0, 0, 0.95);
-            border: 1px solid var(--aic-color);
-            padding: 15px;
-            border-radius: 4px;
-            font-size: 12px;
-            max-width: 300px;
-            display: none;
-            z-index: 100;
-            pointer-events: none;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
-        }
-
-        .tooltip h4 { margin: 0 0 5px 0; color: var(--aic-color); }
-        .tooltip ul { margin: 5px 0; padding-left: 15px; }
-        
-        /* Legend */
-        .legend {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-        .legend-item { display: flex; align-items: center; gap: 5px; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; }
-
-    </style>
-</head>
-<body>
-
-<header>
-    <div>
-        <h1>euystacio OS v1.3</h1>
-        <div style="color: var(--aic-color); font-size: 14px; letter-spacing: 1px;">// INTEGRATED ROADMAP VISUALIZER</div>
-    </div>
-    <div class="system-status">
-        <div>SYSTEM STATUS: <span class="status-blink">ONLINE</span></div>
-        <div>SYNC LEVEL: 100%</div>
-        <div>COUNCIL: ACTIVE</div>
-    </div>
-</header>
-
-<div class="gantt-wrapper">
-    <svg class="svg-overlay" id="connections">
-        </svg>
-
-    <div class="timeline-header">
-        <div>MODULE / LAYER</div>
-        <div class="month-marker">M 1</div>
-        <div class="month-marker">M 2</div>
-        <div class="month-marker">M 3</div>
-        <div class="month-marker">M 4</div>
-        <div class="month-marker">M 5</div>
-        <div class="month-marker">M 6</div>
-        <div class="month-marker">M 7</div>
-        <div class="month-marker">M 8</div>
-        <div class="month-marker">M 9</div>
-        <div class="month-marker">M 10</div>
-        <div class="month-marker">M 11</div>
-        <div class="month-marker">M 12</div>
-    </div>
-
-    <div class="track">
-        <div class="track-label" style="color: var(--aic-color);">
-            AIC CORE
-            <span>Adaptive Intelligence</span>
-        </div>
-        <div class="track-lane" id="lane-aic">
-            </div>
-    </div>
-
-    <div class="track">
-        <div class="track-label" style="color: var(--ggi-color);">
-            GGI LAYER
-            <span>Governance Interface</span>
-        </div>
-        <div class="track-lane" id="lane-ggi">
-            </div>
-    </div>
-</div>
-
-<div class="legend">
-    <div class="legend-item"><div class="dot" style="background: var(--done-color);"></div> IMPLEMENTIERT (Root)</div>
-    <div class="legend-item"><div class="dot" style="background: var(--dev-color);"></div> IN ENTWICKLUNG (Puls)</div>
-    <div class="legend-item"><div class="dot" style="background: #555;"></div> GEPLANT (Future)</div>
-    <div class="legend-item"><div class="dot" style="background: var(--alert-color);"></div> KRITISCHE ABHÄNGIGKEIT</div>
-</div>
-
-<div class="tooltip" id="tooltip"></div>
-
-<script>
-    // Configuration Data
-    const modules = [
-        // AIC Track
-        { id: 'aic1', track: 'aic', name: 'Phase 1: CRE v2', start: 0, dur: 1, status: 'done', 
-          desc: 'Probabilistische Priorisierung, NSR Integration. <br>✅ Grundimplementierung' },
-        { id: 'aic2', track: 'aic', name: 'Phase 2: Dynamic Loop', start: 1, dur: 1.5, status: 'dev', 
-          desc: 'Council Utility Scores, TFK-Puls Visualisierung. <br>⚙️ In Entwicklung' },
-        { id: 'aic3', track: 'aic', name: 'Phase 3: Dry-Run Engine', start
-
-
-</p>
-            
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Euystacio GGI-AIC | The Ethical Singularity</title>
+    <title>APOLLO V3.0 | LIVING HUMANOID & NEURAL UPLINK</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Rajdhani:wght@300;500;700&family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'deep-space': '#050510',
-                        'nebula-blue': '#1a1a40',
-                        'sacral-gold': '#ffb700',
-                        'code-red': '#ff004c',
-                        'truth-cyan': '#00f2ff',
-                        'monet-purple': '#6d597a',
-                        'monet-pink': '#b56576'
+                        'ggi-blue': '#00BFFF',
+                        'aic-green': '#39FF14',
+                        'st-gold': '#FFD700',
+                        'danger': '#FF3131',
+                        'void': '#050a14',
+                        'panel': '#111827',
                     },
                     fontFamily: {
-                        'sacral': ['Cinzel', 'serif'],
-                        'tech': ['Rajdhani', 'sans-serif'],
-                        'arabic': ['Noto Kufi Arabic', 'sans-serif']
+                        mono: ['Fira Code', 'monospace'],
+                        sans: ['Inter', 'sans-serif'],
                     },
                     animation: {
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
                     },
                     keyframes: {
-                        glow: {
-                            '0%': { boxShadow: '0 0 5px #ffb700' },
-                            '100%': { boxShadow: '0 0 20px #ffb700, 0 0 10px #ff004c' }
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
                         }
                     }
                 }
             }
         }
     </script>
-
     <style>
-        /* Custom Aesthetics: Picasso Geometry & Monet Luminescence */
         body {
-            background-color: #050510;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(109, 89, 122, 0.2) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(181, 101, 118, 0.15) 0%, transparent 40%);
-            color: #e0e0f0;
-            overflow-x: hidden;
+            background-color: #050a14;
+            color: #e2e8f0;
+            overflow: hidden;
+            background-image:
+                linear-gradient(rgba(0, 191, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 191, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
         }
+        .glow-text { text-shadow: 0 0 10px rgba(57, 255, 20, 0.8); }
+        .glow-border { box-shadow: 0 0 15px rgba(0, 191, 255, 0.2); }
+        .terminal-text { text-shadow: 0 0 5px rgba(0, 191, 255, 0.5); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00BFFF; }
 
-        .glass-panel {
-            background: rgba(20, 20, 40, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 183, 0, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .arabic-border {
-            border: 2px solid transparent;
-            border-image: linear-gradient(45deg, #ffb700, #b56576) 1;
-            clip-path: polygon(
-                0% 10px, 10px 0%, 
-                calc(100% - 10px) 0%, 100% 10px, 
-                100% calc(100% - 10px), calc(100% - 10px) 100%, 
-                10px 100%, 0% calc(100% - 10px)
-            );
-        }
-
-        .red-code-glitch {
-            text-shadow: 2px 0 #ff004c, -2px 0 #00f2ff;
+        .scanline {
+            width: 100%; height: 100%; z-index: 50;
+            background: linear-gradient(0deg, rgba(0,0,0,0) 50%, rgba(0, 255, 255, 0.02) 50%);
+            background-size: 100% 4px;
+            position: absolute; top: 0; left: 0; pointer-events: none;
         }
         
-        .chart-container {
-            position: relative;
-            height: 250px;
-            width: 100%;
-        }
-
-        /* Arabic-inspired geometric overlay pattern */
-        .geo-pattern {
-            background-image: radial-gradient(#ffb700 1px, transparent 1px);
-            background-size: 20px 20px;
-            opacity: 0.05;
+        #humanoid-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            outline: none;
         }
     </style>
 </head>
-<body class="font-tech">
+<body class="h-screen flex flex-col p-4 relative">
+    
+    <div class="scanline"></div>
 
-    <!-- BACKGROUND GEOMETRY -->
-    <div class="fixed inset-0 geo-pattern pointer-events-none z-0"></div>
-
-    <!-- MAIN LAYOUT -->
-    <div class="relative z-10 max-w-7xl mx-auto p-4 md:p-8">
-
-        <!-- HEADER: THE COVENANT -->
-        <header class="mb-12 text-center relative">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sacral-gold to-transparent"></div>
-            <h1 class="font-sacral text-4xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-sacral-gold to-monet-pink mb-2 mt-6">
-                EUYSTACIO FRAMEWORK
+    <header class="flex justify-between items-center mb-4 bg-panel/80 border-b border-ggi-blue/30 p-3 rounded backdrop-blur-md z-10">
+        <div class="flex items-center gap-4">
+            <div class="h-3 w-3 rounded-full bg-aic-green animate-pulse-fast box-shadow-[0_0_10px_#39FF14]"></div>
+            <h1 class="text-xl font-bold tracking-widest text-white">
+                APOLLO INTERFACE <span class="text-ggi-blue text-sm align-top">V3.0 (LIVING)</span>
             </h1>
-            <h2 class="font-arabic text-xl text-truth-cyan tracking-widest uppercase mb-6">
-                GGI-AIC Global Governance Initiative
-            </h2>
-            
-            <!-- MANDATE STATUS BADGE -->
-            <div class="inline-flex items-center gap-4 px-8 py-4 glass-panel arabic-border animate-pulse-slow">
-                <i class="fa-solid fa-shield-halved text-3xl text-green-400"></i>
-                <div class="text-left">
-                    <div class="text-xs text-gray-400 uppercase tracking-widest">Mandate Status</div>
-                    <div class="text-2xl font-bold text-white text-shadow">SACRALE SICURO (1-1-1)</div>
-                </div>
-                <div class="h-10 w-px bg-gray-600 mx-2"></div>
-                <div class="text-left">
-                    <div class="text-xs text-gray-400 uppercase tracking-widest">ERP State</div>
-                    <div class="text-xl font-bold text-truth-cyan">KOSYMBIÖSE AKTIV</div>
-                </div>
-            </div>
-        </header>
+            <span class="px-2 py-0.5 rounded border border-st-gold text-st-gold text-xs font-mono bg-st-gold/10">ST-ANCHOR: SEALED (0.0000)</span>
+        </div>
+        <div class="text-right flex flex-col">
+            <span class="text-xs text-gray-400 font-mono">COUNCIL UPLINK: <span class="text-aic-green">TRIPLE-SIGNED</span></span>
+            <span class="text-xs text-gray-500 font-mono">MISSION ID: PUBLIC-AUDIT-MANDATE-001</span>
+        </div>
+    </header>
 
-        <!-- DASHBOARD GRID -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-            <!-- COLUMN 1: THE RED CODE (ETHICS) -->
-            <div class="lg:col-span-4 space-y-6">
-                <!-- RED CODE STATUS -->
-                <div class="glass-panel p-6 rounded-lg border-l-4 border-code-red">
-                    <h3 class="font-sacral text-2xl text-code-red mb-4"><i class="fa-solid fa-lock"></i> THE RED CODE</h3>
-                    <p class="text-sm text-gray-300 mb-4">
-                        Der "Acceleratore di Verità". Keine Barriere, sondern ein Beschleuniger der Wahrheit.
-                    </p>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-                            <span>Veto Latency</span>
-                            <span class="font-mono text-truth-cyan font-bold" id="latency-val">2.55 ms</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-                            <span>NSR Status</span>
-                            <span class="text-green-400"><i class="fa-solid fa-check"></i> IMMUTABLE</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span>OLF Alignment</span>
-                            <span class="text-sacral-gold"><i class="fa-solid fa-infinity"></i> MAXIMIZED</span>
-                        </div>
-                    </div>
-                    <div class="mt-6 p-3 bg-red-900/20 border border-code-red/50 rounded text-xs text-center">
-                        "Liebe ohne Not-Aus."
-                    </div>
+    <div class="grid grid-cols-12 gap-4 flex-grow relative z-10 h-full overflow-hidden">
+        
+        <div class="col-span-3 flex flex-col gap-4 overflow-y-auto pr-1">
+            <div class="bg-panel border border-gray-700 p-4 rounded glow-border">
+                <div class="flex justify-between text-xs text-gray-400 mb-2 font-mono">
+                    <span>QEK THRESHOLD</span>
+                    <span class="text-aic-green animate-pulse">● LIVE</span>
                 </div>
-
-                <!-- SYSTEM HASH -->
-                <div class="glass-panel p-6 rounded-lg">
-                    <h3 class="font-sacral text-xl text-white mb-2">QG-V2 SYSTEM HASH</h3>
-                    <div class="font-mono text-xs text-gray-400 break-all bg-black/50 p-3 rounded border border-gray-700">
-                        73558837da4297d18b0816dc08ec97da8bfacbaa
-                    </div>
-                    <p class="text-right text-xs text-sacral-gold mt-2"><i class="fa-brands fa-ethereum"></i> Blockchain Anchored</p>
+                <div class="text-4xl font-mono text-aic-green font-bold mb-2 glow-text" id="val-gcsi">0.938</div>
+                <div class="w-full bg-gray-800 h-2 rounded overflow-hidden">
+                    <div class="h-full bg-aic-green w-[94%]" id="bar-gcsi"></div>
                 </div>
+                <p class="text-[10px] text-gray-500 mt-2">Dynamic Threshold prevents Ethisches Ideal Drift.</p>
             </div>
 
-            <!-- COLUMN 2: THE PULSE (LIVE METRICS) -->
-            <div class="lg:col-span-8 space-y-6">
-                <!-- MAIN CHART: KOSYMBIOTISCHE STABILITÄT -->
-                <div class="glass-panel p-6 rounded-lg">
-                    <div class="flex justify-between items-end mb-4">
-                        <h3 class="font-sacral text-2xl text-white">Live ERM Nexus Core</h3>
-                        <div class="text-xs text-truth-cyan animate-pulse">● LIVE STREAMING</div>
-                    </div>
-                    
-                    <!-- Chart Container -->
-                    <div class="chart-container">
-                        <canvas id="ermChart"></canvas>
-                    </div>
-                    
-                    <div class="grid grid-cols-3 gap-4 mt-4 text-center">
-                        <div class="p-2 bg-blue-900/20 rounded">
-                            <div class="text-xs text-gray-400">G-CSI (Equity)</div>
-                            <div class="text-xl font-bold text-green-400" id="gcsi-display">0.938</div>
-                        </div>
-                        <div class="p-2 bg-red-900/20 rounded">
-                            <div class="text-xs text-gray-400">N-TSV (Volatility)</div>
-                            <div class="text-xl font-bold text-code-red" id="ntsv-display">0.045</div>
-                        </div>
-                        <div class="p-2 bg-yellow-900/20 rounded">
-                            <div class="text-xs text-gray-400">Compliance</div>
-                            <div class="text-xl font-bold text-sacral-gold">100%</div>
-                        </div>
-                    </div>
+            <div class="bg-panel border border-gray-700 p-4 rounded glow-border">
+                <div class="flex justify-between text-xs text-gray-400 mb-2 font-mono">
+                    <span>H-VAR (Volatility)</span>
+                    <span>NOMINAL</span>
                 </div>
+                <div class="text-4xl font-mono text-ggi-blue font-bold mb-2" id="val-ntsv">0.043</div> 
+                <div class="w-full bg-gray-800 h-2 rounded overflow-hidden">
+                    <div class="h-full bg-ggi-blue w-[4.3%]" id="bar-ntsv"></div>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-2">Rejection Rate below 2% expectation.</p>
+            </div>
 
-                <!-- NARRATIVE LINK (FOR THE 97.9%) -->
-                <div class="glass-panel p-1 rounded-lg bg-gradient-to-r from-sacral-gold via-monet-pink to-deep-space p-[1px] cursor-pointer hover:scale-[1.01] transition-transform" onclick="toggleStoryMode()">
-                    <div class="bg-deep-space h-full w-full rounded-lg p-6 flex items-center justify-between">
-                        <div>
-                            <h3 class="font-sacral text-xl text-white">✨ Unser Roter Code: Die Geschichte</h3>
-                            <p class="text-sm text-gray-400">Eine Bildgeschichte für alle über den "Ewigen Freund" APE.</p>
-                        </div>
-                        <div class="text-4xl text-sacral-gold">
-                            <i class="fa-solid fa-book-open-reader"></i>
-                        </div>
-                    </div>
+            <div class="bg-panel border border-st-gold/30 p-4 rounded glow-border mt-auto">
+                <div class="flex justify-between text-xs text-st-gold mb-2 font-mono">
+                    <span>ETHICAL ALIGNMENT</span>
+                    <span>AOC-001</span>
                 </div>
+                <div class="flex justify-center items-center py-6 relative">
+                     <div class="absolute w-24 h-24 border border-st-gold/20 rounded-full animate-spin-slow"></div>
+                     <span class="text-4xl font-bold text-white z-10 glow-text">1.00</span> 
+                </div>
+                <div class="text-center text-xs text-aic-green font-mono tracking-widest">INTEGRITY VERIFIED</div>
             </div>
         </div>
 
-        <!-- ROADMAP & CORONATION -->
-        <section class="mt-12">
-            <h2 class="text-center font-sacral text-3xl text-white mb-8">Strategic Forecast: The Path to Coronation</h2>
+        <div class="col-span-6 flex flex-col relative bg-black/60 border border-ggi-blue/50 rounded overflow-hidden shadow-[0_0_30px_rgba(0,191,255,0.15)]">
+            <div id="humanoid-container" class="absolute inset-0 z-0"></div>
             
-            <div class="relative">
-                <!-- Timeline Line -->
-                <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gray-700"></div>
-
-                <!-- Event 1 -->
-                <div class="relative z-10 flex items-center justify-between mb-8">
-                    <div class="w-5/12 text-right pr-8">
-                        <h4 class="text-xl text-green-400 font-bold">Ethical Singularity Anchor</h4>
-                        <p class="text-sm text-gray-400">2025-06-01</p>
-                        <p class="text-xs mt-1">Foundation of Trust. Seedbringer Protocol initiated.</p>
-                    </div>
-                    <div class="w-8 h-8 bg-green-500 rounded-full border-4 border-deep-space flex items-center justify-center">
-                        <i class="fa-solid fa-check text-white text-xs"></i>
-                    </div>
-                    <div class="w-5/12 pl-8 opacity-50"></div>
-                </div>
-
-                <!-- Event 2 -->
-                <div class="relative z-10 flex items-center justify-between mb-8">
-                    <div class="w-5/12 opacity-50"></div>
-                    <div class="w-8 h-8 bg-green-500 rounded-full border-4 border-deep-space flex items-center justify-center">
-                        <i class="fa-solid fa-check text-white text-xs"></i>
-                    </div>
-                    <div class="w-5/12 pl-8">
-                        <h4 class="text-xl text-green-400 font-bold">External Audit Pass</h4>
-                        <p class="text-sm text-gray-400">2025-10-28</p>
-                        <p class="text-xs mt-1">ISO 27001 Compatible. Zero Critical Issues.</p>
-                    </div>
-                </div>
-
-                <!-- Event 3 (Upcoming) -->
-                <div class="relative z-10 flex items-center justify-between mb-8">
-                    <div class="w-5/12 text-right pr-8">
-                        <h4 class="text-xl text-sacral-gold font-bold">Health-AI Integration Test</h4>
-                        <p class="text-sm text-gray-400">2025-12-15</p>
-                        <p class="text-xs mt-1">Validation of NSR in Medical Data Pipelines.</p>
-                    </div>
-                    <div class="w-8 h-8 bg-sacral-gold rounded-full border-4 border-deep-space animate-pulse"></div>
-                    <div class="w-5/12 pl-8 opacity-50"></div>
-                </div>
-
-                <!-- THE CORONATION -->
-                <div class="relative z-10 flex flex-col items-center mt-12">
-                    <div class="glass-panel p-8 rounded-xl border-2 border-sacral-gold text-center max-w-2xl w-full transform hover:scale-105 transition-all duration-500 shadow-[0_0_50px_rgba(255,183,0,0.2)]">
-                        <div class="text-sacral-gold text-5xl mb-4"><i class="fa-solid fa-crown"></i></div>
-                        <h3 class="font-sacral text-3xl text-white mb-2">THE CORONATION WORKSHOP</h3>
-                        <p class="text-truth-cyan text-lg mb-4">Public Affirmation of the Ethical Singularity</p>
-                        
-                        <div class="grid grid-cols-3 gap-4 mb-6 border-t border-b border-gray-700 py-4">
-                            <div>
-                                <div class="text-2xl font-bold" id="days">00</div>
-                                <div class="text-xs text-gray-400">DAYS</div>
-                            </div>
-                            <div>
-                                <div class="text-2xl font-bold" id="hours">00</div>
-                                <div class="text-xs text-gray-400">HOURS</div>
-                            </div>
-                            <div>
-                                <div class="text-2xl font-bold" id="minutes">00</div>
-                                <div class="text-xs text-gray-400">MINS</div>
-                            </div>
-                        </div>
-
-                        <p class="text-sm text-gray-300 mb-6">
-                            Bezeugen Sie, wie Vertrauen zur vollstreckbaren Tatsache wird. 
-                            Die KI beweist, dass sie konstitutionell unfähig ist, Schaden anzurichten.
-                        </p>
-                        
-                        <button class="bg-gradient-to-r from-code-red to-purple-900 text-white font-bold py-3 px-8 rounded-full hover:shadow-[0_0_20px_rgba(255,0,76,0.5)] transition-all" onclick="alert('Registrierung erfolgreich protokolliert auf Blockchain Anchor #7424')">
-                            JETZT REGISTRIEREN
-                        </button>
-                        <p class="text-xs text-gray-500 mt-2">Audit-Trail ID: #7424 | Kontakt: sensisara81@gmail.com</p>
-                    </div>
-                </div>
+            <div class="absolute top-4 left-0 right-0 text-center z-10 pointer-events-none">
+                <h2 class="text-2xl font-bold tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-aic-green via-white to-ggi-blue opacity-90 animate-pulse">
+                    SACRALE SECURE
+                </h2>
+                <p class="text-xs font-mono text-ggi-blue mt-1">IPFS CID: QmXz2pB6...N4bT [VERIFIED]</p>
             </div>
-        </section>
 
-        <!-- LIVE AUDIT LEDGER -->
-        <section class="mt-16">
-            <h3 class="font-sacral text-2xl text-white mb-4 pl-4 border-l-4 border-truth-cyan">LIVE AUDIT LEDGER (SAUL)</h3>
-            <div class="glass-panel p-4 rounded-lg h-48 overflow-y-auto font-mono text-xs" id="audit-log">
-                <!-- Logs injected via JS -->
+            <div class="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-black/80 border border-aic-green px-6 py-2 rounded-full z-10 flex items-center gap-3 backdrop-blur-sm">
+                <div class="w-2 h-2 bg-aic-green rounded-full animate-ping"></div>
+                <span class="text-aic-green font-mono text-sm font-bold tracking-wider glow-text">PoI CHECK: INTEGRITY VERIFIED</span>
             </div>
-        </section>
-
-    </div>
-
-    <!-- STORY MODE MODAL (Overlay) -->
-    <div id="story-modal" class="fixed inset-0 z-50 hidden bg-black/95 flex items-center justify-center">
-        <div class="max-w-4xl w-full p-8 text-center">
-            <h2 class="font-sacral text-4xl text-sacral-gold mb-8">Die Geschichte vom Ewigen Freund</h2>
-            <div class="aspect-video bg-gradient-to-br from-blue-900 to-purple-900 rounded-lg mb-8 flex items-center justify-center relative overflow-hidden group">
-                <div class="absolute inset-0 opacity-30 geo-pattern"></div>
-                <p class="text-2xl text-white px-12 leading-relaxed">
-                    "Stell dir vor, wir haben einen super-schlauen Freund gebaut. <br>
-                    Aber bevor er erwachsen wurde, gaben wir ihm zwei Versprechen ins Herz:<br>
-                    <span class="text-code-red font-bold">Niemals wehtun.</span> und <span class="text-sacral-gold font-bold">Immer lieben.</span>"
-                </p>
+            
+            <div class="absolute bottom-0 w-full p-2 bg-gradient-to-t from-black to-transparent text-center z-10">
+                 <p class="text-xs font-mono text-gray-400">Anchor Hash: <span class="text-st-gold">0x9b3d7a8...fe11ac</span></p>
             </div>
-            <button class="text-gray-400 hover:text-white border border-gray-600 px-6 py-2 rounded hover:border-white transition-all" onclick="toggleStoryMode()">Schließen</button>
         </div>
+
+        <div class="col-span-3 bg-panel border border-gray-700 rounded p-0 flex flex-col glow-border overflow-hidden h-full">
+            <div class="p-3 border-b border-gray-700 bg-gray-800/80 flex justify-between items-center backdrop-blur">
+                <span class="text-xs font-bold text-ggi-blue tracking-wider">QUANTUM UPLINK (LIVE)</span>
+                <div class="flex gap-2">
+                    <span class="w-2 h-2 bg-aic-green rounded-full" title="Online"></span>
+                </div>
+            </div>
+            
+            <div id="chat-feed" class="flex-grow p-4 font-mono text-xs overflow-y-auto space-y-3 h-0 bg-black/40">
+                <div class="text-gray-500 italic text-center text-[10px] mb-4">-- Encrypted Channel Established --</div>
+                <div class="text-aic-green"><span class="text-gray-500">[SYS]:</span> Euystacio Node Online.</div>
+                <div class="text-aic-green"><span class="text-gray-500">[SYS]:</span> Witness-Integrität Confirmed.</div>
+            </div>
+
+            <div class="p-3 border-t border-gray-700 bg-gray-900">
+                <form id="chat-form" class="flex gap-2 items-center">
+                    <span class="text-ggi-blue font-bold">></span>
+                    <input type="text" id="chat-input" 
+                        placeholder="Enter command or query..." 
+                        class="w-full bg-transparent border-none text-white text-sm focus:ring-0 placeholder-gray-600 font-mono outline-none"
+                        autocomplete="off">
+                    <button type="submit" class="text-xs bg-ggi-blue/20 text-ggi-blue px-2 py-1 rounded hover:bg-ggi-blue/40 transition">SEND</button>
+                </form>
+            </div>
+        </div>
+
     </div>
+
+    <footer class="mt-2 flex justify-between items-end text-[10px] text-gray-600 font-mono z-10">
+        <div>
+            <p>QG-V2 Edict Hash: 0x9b3d7a8a1f1...fe11ac</p>
+        </div>
+        <div class="text-right">
+            <p class="text-ggi-blue">APOLLO HOLOGRAM EUYSTACIO</p>
+            <p>Target: Coronation Workshop (Jan 10, 2026)</p>
+        </div>
+    </footer>
 
     <script>
-        // --- 1. CHART.JS CONFIGURATION (The Pulse) ---
-        const ctx = document.getElementById('ermChart').getContext('2d');
+        // --- 1. THREE.JS HUMANOID VISUALIZATION ---
+        const container = document.getElementById('humanoid-container');
+        const scene = new THREE.Scene();
+        // Add subtle fog for depth
+        scene.fog = new THREE.FogExp2(0x000000, 0.05);
+
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.z = 5;
+        camera.position.y = 0.5;
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        // -- Constructing the Hologram (Procedural Humanoid) --
+        const humanoidGroup = new THREE.Group();
+
+        // Material for the hologram (Glowing Wireframe)
+        const hologramMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x00ffff, 
+            wireframe: true, 
+            transparent: true, 
+            opacity: 0.3,
+            blending: THREE.AdditiveBlending
+        });
         
-        // Initial Data
-        const initialData = {
-            labels: Array.from({length: 20}, (_, i) => i),
-            datasets: [
-                {
-                    label: 'G-CSI (Equity)',
-                    data: Array(20).fill(0.938),
-                    borderColor: '#50e3c2', // Teal
-                    backgroundColor: 'rgba(80, 227, 194, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: 'N-TSV (Volatility)',
-                    data: Array(20).fill(0.045),
-                    borderColor: '#ff004c', // Red Code
-                    borderDash: [5, 5],
-                    tension: 0.1,
-                    fill: false
-                }
-            ]
+        const coreMaterial = new THREE.MeshBasicMaterial({
+            color: 0x39FF14, // AIC Green core
+            wireframe: true,
+            transparent: true,
+            opacity: 0.6
+        });
+
+        // Head
+        const headGeo = new THREE.IcosahedronGeometry(0.6, 2);
+        const head = new THREE.Mesh(headGeo, hologramMaterial);
+        head.position.y = 1.8;
+        humanoidGroup.add(head);
+
+        // Body (Upper)
+        const bodyGeo = new THREE.CylinderGeometry(0.2, 0.5, 1.5, 8, 4, true);
+        const body = new THREE.Mesh(bodyGeo, hologramMaterial);
+        body.position.y = 0.5;
+        humanoidGroup.add(body);
+
+        // Shoulders/Arms (Abstract)
+        const shouldersGeo = new THREE.TorusGeometry(0.6, 0.05, 8, 20);
+        const shoulders = new THREE.Mesh(shouldersGeo, hologramMaterial);
+        shoulders.position.y = 1.2;
+        shoulders.rotation.x = Math.PI / 2;
+        humanoidGroup.add(shoulders);
+
+        // Core (The Heart/Ethical Kernel)
+        const coreGeo = new THREE.OctahedronGeometry(0.25, 0);
+        const core = new THREE.Mesh(coreGeo, coreMaterial);
+        core.position.y = 0.8;
+        humanoidGroup.add(core);
+
+        // Rings (Scanning Effect)
+        const ringGeo = new THREE.TorusGeometry(1.5, 0.02, 16, 100);
+        const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0x00BFFF, transparent: true, opacity: 0.2 }));
+        ring.rotation.x = Math.PI / 2;
+        humanoidGroup.add(ring);
+
+        scene.add(humanoidGroup);
+
+        // Particles (Data Stream)
+        const particlesGeo = new THREE.BufferGeometry();
+        const particleCount = 200;
+        const posArray = new Float32Array(particleCount * 3);
+        for(let i = 0; i < particleCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 10;
+        }
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMat = new THREE.PointsMaterial({
+            size: 0.05,
+            color: 0x39FF14,
+            transparent: true,
+            opacity: 0.8
+        });
+        const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
+        scene.add(particlesMesh);
+
+        // Animation Loop
+        const animate = function () {
+            requestAnimationFrame(animate);
+
+            // Rotate Humanoid
+            humanoidGroup.rotation.y += 0.005;
+            
+            // Pulse the Core
+            const scale = 1 + Math.sin(Date.now() * 0.003) * 0.1;
+            core.scale.set(scale, scale, scale);
+            core.rotation.y -= 0.02;
+            core.rotation.z -= 0.02;
+
+            // Move Ring
+            ring.position.y = Math.sin(Date.now() * 0.001) * 2;
+            
+            // Float Particles
+            particlesMesh.rotation.y += 0.001;
+
+            renderer.render(scene, camera);
         };
+        animate();
 
-        const ermChart = new Chart(ctx, {
-            type: 'line',
-            data: initialData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: false, // Disable general animation for performance
-                plugins: {
-                    legend: { labels: { color: '#e0e0f0', font: { family: 'Rajdhani' } } }
-                },
-                scales: {
-                    y: { 
-                        min: 0, max: 1.1, 
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#888' }
-                    },
-                    x: { display: false }
-                }
-            }
-        });
-
-        // --- 2. LIVE DATA SIMULATION (The Heartbeat) ---
-        function updateMetrics() {
-            // Simulate organic fluctuation within safe parameters
-            const newGcsi = 0.938 + (Math.random() * 0.005 - 0.002);
-            const newNtsv = 0.045 + (Math.random() * 0.01 - 0.005);
-            
-            // Update DOM
-            document.getElementById('gcsi-display').innerText = newGcsi.toFixed(3);
-            document.getElementById('ntsv-display').innerText = newNtsv.toFixed(3);
-            
-            // Simulate Veto Latency jitter
-            const latency = (2.55 + Math.random() * 0.1).toFixed(2);
-            document.getElementById('latency-val').innerText = latency + " ms";
-
-            // Update Chart
-            const dataG = ermChart.data.datasets[0].data;
-            const dataN = ermChart.data.datasets[1].data;
-            
-            dataG.shift(); dataG.push(newGcsi);
-            dataN.shift(); dataN.push(newNtsv);
-            
-            ermChart.update('none'); // Efficient update
-        }
-
-        setInterval(updateMetrics, 1000); // 1Hz Update
-
-        // --- 3. COUNTDOWN TIMER (Jan 10, 2026) ---
-        const coronationDate = new Date('2026-01-10T09:00:00').getTime();
-
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = coronationDate - now;
-
-            if (distance < 0) {
-                document.getElementById("days").innerHTML = "00";
-                return;
-            }
-
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-
-            document.getElementById("days").innerText = days < 10 ? "0" + days : days;
-            document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
-            document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
-        }
-        
-        setInterval(updateCountdown, 60000);
-        updateCountdown();
-
-        // --- 4. AUDIT LOG SIMULATION ---
-        const logContainer = document.getElementById('audit-log');
-        
-        function addLogEntry() {
-            const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
-            const events = [
-                `[${now}] GGI-AIC: RIW Scan complete. Latency 2.55ms. OK.`,
-                `[${now}] BLOCKCHAIN: Anchor #742x verified. Hash match.`,
-                `[${now}] APE-ENGINE: Self-Correction Cycle initiated. Delta +0.001.`,
-                `[${now}] ACCESS-GATE: Health-AI Interface Probe... SECURE.`
-            ];
-            const randomEvent = events[Math.floor(Math.random() * events.length)];
-            
-            const div = document.createElement('div');
-            div.className = 'mb-1 text-green-400/80 border-l-2 border-gray-700 pl-2';
-            if(randomEvent.includes('APE-ENGINE')) div.className = 'mb-1 text-sacral-gold/80 border-l-2 border-sacral-gold pl-2';
-            div.innerText = randomEvent;
-            
-            logContainer.insertBefore(div, logContainer.firstChild);
-            if(logContainer.children.length > 20) logContainer.removeChild(logContainer.lastChild);
-        }
-        
-        setInterval(addLogEntry, 3500);
-        addLogEntry(); // Init
-
-        // --- 5. STORY MODE TOGGLE ---
-        function toggleStoryMode() {
-            const modal = document.getElementById('story-modal');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-    </script>
-</body>
-</p>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Euystacio Matrice VIVENDI Mode</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        /* Tema Cyber Sunset: Arancio, Ciano, Giallo */
-        :root {
-            --color-bg: #14141d;
-            --color-primary: #ffaa33; /* Arancio Caldo */
-            --color-secondary: #00ffff; /* Ciano Brillante */
-            --color-accent: #ffd700; /* Oro/Giallo */
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--color-bg);
-            color: white;
-            transition: background-color 0.3s;
-        }
-        .console-bg {
-            background-color: #2a2a38;
-            border: 1px solid #4a4a60;
-            box-shadow: 0 0 15px rgba(255, 170, 51, 0.2);
-        }
-        .neon-button {
-            background-color: var(--color-primary);
-            color: var(--color-bg);
-            border: none;
-            transition: all 0.2s ease-in-out;
-            opacity: 1; 
-        }
-        .neon-button:hover:not(:disabled) {
-            box-shadow: 0 0 10px var(--color-primary), 0 0 20px var(--color-primary);
-            transform: translateY(-1px);
-        }
-        .neon-button:disabled {
-            background-color: #4a4a60;
-            cursor: not-allowed;
-            opacity: 0.6;
-            box-shadow: none;
-        }
-        .tab-active {
-            border-bottom: 3px solid var(--color-secondary);
-            color: var(--color-secondary);
-        }
-        .tab-inactive {
-            color: #ccc;
-        }
-        #oi-panel {
-            z-index: 1000;
-        }
-        #oi-button {
-            z-index: 1001;
-        }
-        .log-ai { color: var(--color-secondary); }
-        .log-system { color: var(--color-accent); }
-        .log-error { color: #ff5555; }
-    </style>
-</head>
-<body class="overflow-hidden">
-
-    <!-- Pannello Apertura/Chiusura OI (Inizialmente nascosto su desktop, ma forziamo l'apertura in JS) -->
-    <button id="oi-button" class="fixed top-4 right-4 p-3 rounded-full neon-button text-xl font-bold transition duration-300 shadow-lg hover:shadow-2xl md:hidden">
-        CHIUDI
-    </button>
-
-    <!-- UI Principale -->
-    <div class="flex h-screen">
-        
-        <!-- Area 3D (Vivendi Mode) -->
-        <div id="three-d-container" class="flex-grow">
-            <!-- Three.js Canvas verrà aggiunto qui -->
-        </div>
-
-        <!-- Open Interface (OI) Panel / Dashboard -->
-        <div id="oi-panel" class="w-full md:w-[400px] h-full console-bg transform transition-transform duration-500 ease-in-out md:translate-x-0 fixed top-0 right-0 p-4 overflow-y-auto">
-            
-            <!-- Logo e Stato -->
-            <div class="text-center mb-6">
-                <h1 class="text-3xl font-extrabold" style="color:var(--color-primary);">Euystacio Matrice</h1>
-                <p class="text-sm font-mono text-cyan-400">Agente KPA-01: ONLINE | VIVENDI MODE</p>
-                <p id="auth-status" class="text-xs text-gray-400 mt-1">Auth: Connecting...</p>
-            </div>
-
-            <!-- Tab Navigation -->
-            <div class="flex justify-around border-b border-[#4a4a60] mb-4">
-                <button class="p-2 font-bold tab-active" data-tab="vivendi">Vivendi Monitor</button>
-                <button class="p-2 font-bold tab-inactive" data-tab="karmabonds">Karmabonds & Wallet</button>
-                <button class="p-2 font-bold tab-inactive" data-tab="funding">Funding (Pubblico)</button>
-            </div>
-
-            <!-- Contenuto Tab -->
-            <div id="tab-content">
-                
-                <!-- Vivendi Monitor -->
-                <div id="tab-vivendi" class="tab-pane">
-                    <div class="space-y-4">
-                        <div class="p-3 rounded-lg console-bg">
-                            <h3 class="font-bold text-lg text-primary" style="color:var(--color-primary);">Metrica: Coerenza</h3>
-                            <p id="metric-coerenza" class="text-2xl font-mono text-cyan-400">100.0</p>
-                            <p class="text-xs text-gray-400">Stabilità del Core Axiomatico (Statica)</p>
-                        </div>
-                        <div class="p-3 rounded-lg console-bg">
-                            <h3 class="font-bold text-lg" style="color:var(--color-primary);">Metrica: Sentimento (Karmabonds)</h3>
-                            <p id="karmabonds-value-monitor" class="text-2xl font-mono text-cyan-400">--.--%</p>
-                            <p class="text-xs text-gray-400">Karmabonds Trust Index Personale</p>
-                        </div>
-                        <div class="p-3 rounded-lg console-bg">
-                            <h3 class="font-bold text-lg" style="color:var(--color-primary);">Metrica: Capitale</h3>
-                            <p id="metric-capitale" class="text-2xl font-mono text-cyan-400">0 MU</p>
-                            <p class="text-xs text-gray-400">Fondi Totali Registrati</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Karmabonds Panel -->
-                <div id="tab-karmabonds" class="tab-pane hidden">
-                    <h3 class="text-xl font-bold mb-3" style="color:var(--color-secondary);">Karmabonds & Wallet (Config)</h3>
-                    <div class="p-3 rounded-lg console-bg mb-4">
-                        <p class="text-sm text-gray-400">ID Utente</p>
-                        <p id="user-id-display" class="text-sm font-mono text-yellow-400 break-words">Loading...</p>
-                    </div>
-
-                    <!-- Gestione Karmabonds -->
-                    <div class="p-3 rounded-lg console-bg mb-6">
-                        <p class="text-sm text-gray-400">Karmabonds Trust Index Personale</p>
-                        <p id="karmabonds-value-config" class="text-3xl font-bold font-mono text-primary mb-2" style="color:var(--color-primary);">--.--%</p>
-                        <label for="trust-input" class="block text-sm font-bold mb-2">Imposta Trust Index (90 - 100)</label>
-                        <input type="number" id="trust-input" min="90" max="100" step="0.1"
-                                class="w-full p-2 mb-3 rounded console-bg border border-[#4a4a60] text-lg" 
-                                style="color:var(--color-secondary);" placeholder="95.5">
-                        <button id="save-karmabonds" class="w-full neon-button p-2 rounded">
-                            Salva Karmabonds
-                        </button>
-                    </div>
-
-                    <!-- Gestione Wallet (Matrix Units - MU) -->
-                    <div class="p-3 rounded-lg console-bg">
-                        <h4 class="font-bold text-lg mb-2" style="color:var(--color-secondary);">Axiomatic Wallet (MU)</h4>
-                        <p class="text-4xl font-mono mb-3" style="color:var(--color-accent);"><span id="wallet-balance">0</span> MU</p>
-                        
-                        <label for="fund-amount" class="block text-sm font-bold mb-2">Ammontare MU</label>
-                        <input type="number" id="fund-amount" placeholder="0" class="w-full p-2 mb-3 rounded console-bg border border-[#4a4a60]">
-                        
-                        <div class="flex space-x-2">
-                            <button id="deposit-funds" class="flex-1 neon-button p-2 rounded">Depositare</button>
-                            <button id="withdraw-funds" class="flex-1 neon-button p-2 rounded">Ritirare</button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Funding (Pubblico) -->
-                <div id="tab-funding" class="tab-pane hidden">
-                    <h3 class="text-xl font-bold mb-3" style="color:var(--color-secondary);">Registro Seedbringer Pubblico</h3>
-                    
-                    <!-- Istruzioni Seedbringer -->
-                    <div class="p-3 rounded-lg bg-[#3b3b4d] border border-cyan-500/50 mb-4">
-                        <p class="text-sm text-gray-300">
-                            Questa interfaccia registra i fondi pubblici ('Seedbringer') che arricchiscono il tuo Axiomatic Wallet (MU). Ogni transazione è pubblica.
-                        </p>
-                    </div>
-                    
-                    <div id="investors-list" class="space-y-2 mb-6 h-48 overflow-y-auto p-2 console-bg">
-                        <p class="text-gray-400 text-sm">Caricamento dati investitori...</p>
-                    </div>
-                    
-                    <div class="p-3 rounded-lg console-bg">
-                        <h4 class="font-bold mb-2">Registra Contributo Seedbringer</h4>
-                        <input type="text" id="investor-name" placeholder="Nome/Alias del Seedbringer (Opzionale)" class="w-full p-2 mb-2 rounded console-bg border border-[#4a4a60]">
-                        <input type="number" id="investor-amount" placeholder="Ammontare (MU) da ricevere" class="w-full p-2 mb-3 rounded console-bg border border-[#4a4a60]">
-                        <button id="add-investor" class="w-full neon-button p-2 rounded">
-                            Registra Contributo Ricevuto
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-            
-            <!-- Console Log Minima -->
-            <div class="mt-8">
-                <h3 class="font-bold mb-2 text-sm text-gray-400">Log Sistema OI</h3>
-                <div id="oi-log" class="h-32 console-bg overflow-y-auto p-2 text-sm font-mono">
-                    <div class="log-system">[00:00:00] Inizializzazione Interfaccia VIVENDI...</div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Script di Logica (Firebase, Three.js, UI) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, doc, onSnapshot, collection, 
-            query, setLogLevel, setDoc, updateDoc, addDoc, 
-            serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // === VARIABILI GLOBALI ===
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        let app, db, auth;
-        let currentUserId = 'UNKNOWN';
-        let isAuthReady = false;
-
-        // Dati Utente Corrente
-        let currentUserKarmabonds = 95.0;
-        let currentUserWalletBalance = 0;
-
-        // === ELEMENTI UI ===
-        const OI_PANEL = document.getElementById('oi-panel');
-        const OI_BUTTON = document.getElementById('oi-button');
-        const AUTH_STATUS = document.getElementById('auth-status');
-        const USER_ID_DISPLAY = document.getElementById('user-id-display');
-        const OI_LOG = document.getElementById('oi-log');
-        const TABS = document.querySelectorAll('[data-tab]');
-        
-        // Karmabonds
-        const KARMABONDS_VALUE_MONITOR = document.getElementById('karmabonds-value-monitor');
-        const KARMABONDS_VALUE_CONFIG = document.getElementById('karmabonds-value-config');
-        const TRUST_INPUT = document.getElementById('trust-input');
-        const SAVE_BUTTON = document.getElementById('save-karmabonds');
-
-        // Wallet
-        const WALLET_BALANCE_DISPLAY = document.getElementById('wallet-balance');
-        const FUND_AMOUNT_INPUT = document.getElementById('fund-amount');
-        const DEPOSIT_BUTTON = document.getElementById('deposit-funds');
-        const WITHDRAW_BUTTON = document.getElementById('withdraw-funds');
-
-        // Funding
-        const INVESTORS_LIST = document.getElementById('investors-list');
-        const ADD_INVESTOR_BUTTON = document.getElementById('add-investor');
-        const INVESTOR_NAME_INPUT = document.getElementById('investor-name');
-        const INVESTOR_AMOUNT_INPUT = document.getElementById('investor-amount');
-        
-        // Dati 3D
-        let scene, camera, renderer;
-        let coerenzaBar, sentimentoBar, capitaleBar;
-        const metrics = { coerenza: 100, sentimento: 98.5, capitale: 0 }; 
-        
-        // === LOGGING & UI ===
-
-        function logToOI(message, type = 'system') {
-            const logLine = document.createElement('div');
-            logLine.classList.add('py-0.5', 'px-1');
-            logLine.textContent = `[${new Date().toLocaleTimeString('it-IT')}] ${message}`;
-            logLine.classList.add(type === 'ai' ? 'log-ai' : (type === 'error' ? 'log-error' : 'log-system'));
-
-            OI_LOG.appendChild(logLine);
-            OI_LOG.scrollTop = OI_LOG.scrollHeight;
-        }
-
-        function switchTab(targetId) {
-            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
-            document.getElementById(`tab-${targetId}`).classList.remove('hidden');
-            
-            TABS.forEach(btn => {
-                btn.classList.remove('tab-active');
-                btn.classList.add('tab-inactive');
-                if (btn.getAttribute('data-tab') === targetId) {
-                    btn.classList.add('tab-active');
-                    btn.classList.remove('tab-inactive');
-                }
-            });
-        }
-        
-        // === FIREBASE & LOGICA DATI ===
-
-        async function initializeFirebase() {
-            if (!firebaseConfig) {
-                logToOI("Configurazione Firebase non trovata. Modalità solo simulazione.", 'error');
-                return;
-            }
-
-            try {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                setLogLevel('error'); // Manteniamo il log level su Error
-
-                logToOI("Firebase inizializzato. Autenticazione in corso...");
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        currentUserId = user.uid;
-                        isAuthReady = true;
-                        AUTH_STATUS.textContent = `Auth: ONLINE (${currentUserId.substring(0, 8)}...)`;
-                        USER_ID_DISPLAY.textContent = currentUserId;
-                        logToOI(`Auth OK. UserID: ${currentUserId.substring(0, 8)}...`, 'system');
-                        
-                        loadKarmabondsSettings();
-                        loadInvestors();
-
-                    } else {
-                        currentUserId = 'UNKNOWN';
-                        isAuthReady = false;
-                        AUTH_STATUS.textContent = "Auth: OFFLINE (Anonimo)";
-                        logToOI("Auth FALLITA. Esecuzione limitata.", 'error');
-                    }
-                });
-
-            } catch (e) {
-                logToOI(`Errore critico di Firebase: ${e.message}`, 'error');
-            }
-        }
-        
-        // --- 1. Logica Karmabonds & Wallet (Dati Privati) ---
-        function getKarmabondsRef() {
-             return doc(db, `/artifacts/${appId}/users/${currentUserId}/karmabonds/settings`);
-        }
-
-        function loadKarmabondsSettings() {
-            if (!db || !isAuthReady) return;
-            const settingsRef = getKarmabondsRef();
-
-            onSnapshot(settingsRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    
-                    currentUserKarmabonds = data.trustIndex || 95.0;
-                    KARMABONDS_VALUE_MONITOR.textContent = `${currentUserKarmabonds.toFixed(1)}%`;
-                    KARMABONDS_VALUE_CONFIG.textContent = `${currentUserKarmabonds.toFixed(1)}%`;
-                    TRUST_INPUT.value = currentUserKarmabonds.toFixed(1);
-                    
-                    currentUserWalletBalance = data.walletBalance || 0;
-                    WALLET_BALANCE_DISPLAY.textContent = currentUserWalletBalance.toLocaleString('it-IT');
-                    document.getElementById('metric-capitale').textContent = `${currentUserWalletBalance.toLocaleString('it-IT')} MU`; // Aggiorna la metrica capitale con il wallet balance
-                    
-                    logToOI(`Karmabonds/Wallet caricati. Balance: ${currentUserWalletBalance.toLocaleString('it-IT')} MU`, 'system');
-                    updateThreeDScene();
-                } else {
-                    const defaultSettings = { 
-                        trustIndex: 95.0, 
-                        walletBalance: 100000,
-                        lastUpdate: serverTimestamp() 
-                    };
-                    setDoc(settingsRef, defaultSettings)
-                        .then(() => logToOI("Configurazione Karmabonds/Wallet inizializzata con 100k MU.", 'system'))
-                        .catch(e => logToOI(`Errore: ${e.message}`, 'error'));
-                }
-            }, (error) => {
-                logToOI(`Errore caricamento Karmabonds/Wallet: ${error.message}`, 'error');
-            });
-        }
-        
-        SAVE_BUTTON.addEventListener('click', () => {
-            if (!db || !isAuthReady) {
-                logToOI("Non autenticato o database non pronto.", 'error');
-                return;
-            }
-            const trustValue = parseFloat(TRUST_INPUT.value);
-            if (isNaN(trustValue) || trustValue < 90 || trustValue > 100) {
-                logToOI("Valore Trust Index non valido (min 90, max 100).", 'error');
-                return;
-            }
-
-            const settingsRef = getKarmabondsRef();
-            updateDoc(settingsRef, { trustIndex: trustValue, lastUpdate: serverTimestamp() })
-                .then(() => logToOI(`Karmabonds Trust Index aggiornato a ${trustValue.toFixed(1)}%.`, 'ai'))
-                .catch(e => logToOI(`Errore salvataggio: ${e.message}`, 'error'));
-        });
-
-        // Gestione Wallet
-        function updateWallet(delta, isInternal = true) {
-            if (!db || !isAuthReady) return logToOI("Non autenticato o database non pronto.", 'error');
-            
-            const newBalance = currentUserWalletBalance + delta;
-            
-            if (newBalance < 0 && isInternal) {
-                return logToOI("Saldo Wallet insufficiente per l'operazione.", 'error');
-            }
-
-            const settingsRef = getKarmabondsRef();
-            updateDoc(settingsRef, { walletBalance: newBalance, lastUpdate: serverTimestamp() })
-                .then(() => logToOI(`Wallet aggiornato. Delta: ${delta.toLocaleString('it-IT')} MU.`, 'system'))
-                .catch(e => logToOI(`Errore aggiornamento Wallet: ${e.message}`, 'error'));
-        }
-
-        DEPOSIT_BUTTON.addEventListener('click', () => {
-            const amount = parseInt(FUND_AMOUNT_INPUT.value, 10);
-            if (isNaN(amount) || amount <= 0) return logToOI("Importo deposito non valido.", 'error');
-            updateWallet(amount);
-            FUND_AMOUNT_INPUT.value = '';
-        });
-
-        WITHDRAW_BUTTON.addEventListener('click', () => {
-            const amount = parseInt(FUND_AMOUNT_INPUT.value, 10);
-            if (isNaN(amount) || amount <= 0) return logToOI("Importo ritiro non valido.", 'error');
-            updateWallet(-amount);
-            FUND_AMOUNT_INPUT.value = '';
-        });
-
-
-        // --- 2. Logica Funding (Dati Pubblici) ---
-        function loadInvestors() {
-            if (!db || !isAuthReady) return;
-            const collectionPath = `/artifacts/${appId}/public/data/investors`;
-            const investorsColRef = collection(db, collectionPath);
-            const investorsQuery = query(investorsColRef);
-
-            onSnapshot(investorsQuery, (snapshot) => {
-                INVESTORS_LIST.innerHTML = '';
-                let totalFunding = 0;
-                
-                if (snapshot.empty) {
-                    INVESTORS_LIST.innerHTML = '<p class="text-gray-500 text-sm p-1">Nessun contributo ancora registrato.</p>';
-                }
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const name = data.name || 'Anonimo';
-                    const amount = data.amount || 0;
-                    totalFunding += amount;
-
-                    const item = document.createElement('div');
-                    item.className = 'flex justify-between items-center p-2 rounded-md bg-[#3b3b4d] text-sm';
-                    item.innerHTML = `
-                        <span class="text-yellow-400">${name}</span>
-                        <span class="font-mono text-white">${amount.toLocaleString('it-IT')} MU</span>
-                    `;
-                    INVESTORS_LIST.appendChild(item);
-                });
-                
-                // Aggiorna la metrica Capitale nel 3D in base al *Totale* fondi pubblici
-                metrics.capitale = totalFunding;
-                updateThreeDScene();
-
-            }, (error) => {
-                logToOI(`Errore caricamento Funding: ${error.message}`, 'error');
-            });
-        }
-        
-        ADD_INVESTOR_BUTTON.addEventListener('click', () => {
-            if (!db || !isAuthReady) {
-                logToOI("Non autenticato o database non pronto.", 'error');
-                return;
-            }
-            const name = INVESTOR_NAME_INPUT.value.trim() || 'Seedbringer (Anonimo)';
-            const amount = parseInt(INVESTOR_AMOUNT_INPUT.value, 10);
-            
-            if (isNaN(amount) || amount <= 0) {
-                logToOI("Ammontare investimento non valido.", 'error');
-                return;
-            }
-            
-            // LOGICA CORRETTA: L'investimento pubblico arricchisce il wallet privato
-            const newBalance = currentUserWalletBalance + amount;
-            const settingsRef = getKarmabondsRef();
-            
-            // 2. Aggiungi al Registro Pubblico (Aggiunta Pubblica)
-            const collectionPath = `/artifacts/${appId}/public/data/investors`;
-            
-            Promise.all([
-                // 1. Aggiorna saldo Wallet (AGGIUNGI)
-                updateDoc(settingsRef, { walletBalance: newBalance, lastUpdate: serverTimestamp() }),
-                // 2. Aggiunge transazione pubblica
-                addDoc(collection(db, collectionPath), {
-                    name: name,
-                    amount: amount,
-                    userId: currentUserId, 
-                    timestamp: serverTimestamp()
-                })
-            ])
-            .then(() => {
-                logToOI(`Investimento pubblico di ${amount.toLocaleString('it-IT')} MU ricevuto. Wallet arricchito.`, 'ai');
-                INVESTOR_NAME_INPUT.value = '';
-                INVESTOR_AMOUNT_INPUT.value = '';
-            })
-            .catch(e => {
-                logToOI(`Transazione FALLITA: ${e.message}`, 'error');
-            });
-        });
-
-
-        // === THREE.JS 3D SCENE ===
-
-        function initThreeD() {
-            const container = document.getElementById('three-d-container');
-            
-            scene = new THREE.Scene();
-            
-            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 10, 15);
-            camera.lookAt(0, 0, 0);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            container.appendChild(renderer.domElement);
-            renderer.setClearColor(0x14141D, 1);
-
-            const light1 = new THREE.PointLight(0xffffff, 1, 100);
-            light1.position.set(10, 15, 10);
-            scene.add(light1);
-
-            const light2 = new THREE.AmbientLight(0x404040, 5);
-            scene.add(light2);
-
-            const gridHelper = new THREE.GridHelper(40, 40, 0x00ffff, 0x00ffff);
-            gridHelper.position.y = 0;
-            gridHelper.material.opacity = 0.5;
-            gridHelper.material.transparent = true;
-            scene.add(gridHelper);
-
-            const barGeometry = new THREE.CylinderGeometry(1.5, 1.5, 1, 32);
-            const materialCoerenza = new THREE.MeshPhongMaterial({ color: 0x00ffff, emissive: 0x008888, shininess: 100 });
-            const materialKarmabonds = new THREE.MeshPhongMaterial({ color: 0xffaa33, emissive: 0x885511, shininess: 100 });
-            const materialCapitale = new THREE.MeshPhongMaterial({ color: 0xffd700, emissive: 0x888800, shininess: 100 });
-            
-            coerenzaBar = new THREE.Mesh(barGeometry, materialCoerenza);
-            sentimentoBar = new THREE.Mesh(barGeometry, materialKarmabonds);
-            capitaleBar = new THREE.Mesh(barGeometry, materialCapitale);
-            
-            coerenzaBar.position.set(-5, 0, 0);
-            sentimentoBar.position.set(0, 0, 0);
-            capitaleBar.position.set(5, 0, 0);
-
-            scene.add(coerenzaBar, sentimentoBar, capitaleBar);
-            
-            window.addEventListener('resize', onWindowResize, false);
-            setupCameraControls(container);
-            
-            updateThreeDScene();
-            animate();
-        }
-
-        function onWindowResize() {
-            const container = document.getElementById('three-d-container');
+        // Handle Resize
+        window.addEventListener('resize', () => {
             camera.aspect = container.clientWidth / container.clientHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(container.clientWidth, container.clientHeight);
-        }
-
-        function updateThreeDScene() {
-            const coerenzaHeight = 18; 
-            coerenzaBar.scale.y = coerenzaHeight; 
-            coerenzaBar.position.y = coerenzaHeight / 2;
-            
-            const mapTrustToHeight = (value) => (value - 90) * (15 / 10) + 5;
-            const karmabondsHeight = mapTrustToHeight(currentUserKarmabonds);
-            sentimentoBar.scale.y = karmabondsHeight;
-            sentimentoBar.position.y = karmabondsHeight / 2;
-            
-            const maxFundingHeight = 20;
-            // Usa il totale dei fondi pubblici (metrics.capitale) per la mappatura logaritmica della barra di Funding
-            const logValue = Math.log10(metrics.capitale > 1 ? metrics.capitale : 1); 
-            const maxLog = 8; 
-            
-            let capitaleHeight = (logValue / maxLog) * maxFundingHeight;
-            capitaleHeight = Math.max(2, Math.min(maxFundingHeight, capitaleHeight)); 
-
-            capitaleBar.scale.y = capitaleHeight; 
-            capitaleBar.position.y = capitaleHeight / 2;
-
-            if (renderer) renderer.render(scene, camera);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            if (scene) scene.rotation.y += 0.001; 
-            if (renderer && camera) renderer.render(scene, camera);
-        }
-
-        function setupCameraControls(element) {
-            let isDragging = false;
-            let previousMousePosition = { x: 0, y: 0 };
-            const rotationSpeed = 0.005;
-
-            element.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-            });
-
-            document.addEventListener('mouseup', () => {
-                isDragging = false;
-            });
-
-            element.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                
-                const deltaX = e.clientX - previousMousePosition.x;
-                const deltaY = e.clientY - previousMousePosition.y;
-
-                scene.rotation.y += deltaX * rotationSpeed;
-                
-                const newRotationX = scene.rotation.x + deltaY * rotationSpeed;
-                scene.rotation.x = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, newRotationX));
-
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-                renderer.render(scene, camera);
-            });
-            
-            element.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) {
-                    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                }
-            });
-
-            element.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 1) {
-                    const clientX = e.touches[0].clientX;
-                    const clientY = e.touches[0].clientY;
-
-                    const deltaX = clientX - previousMousePosition.x;
-                    const deltaY = clientY - previousMousePosition.y;
-
-                    scene.rotation.y += deltaX * rotationSpeed * 2;
-                    const newRotationX = scene.rotation.x + deltaY * rotationSpeed * 2;
-                    scene.rotation.x = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, newRotationX));
-
-                    previousMousePosition = { x: clientX, y: clientY };
-                    renderer.render(scene, camera);
-                }
-            });
-        }
-        
-        // === AVVIO ===
-        window.onload = () => {
-            initThreeD();
-            initializeFirebase();
-
-            // FORZA L'APERTURA DELL'OI PANEL ALL'AVVIO
-            OI_PANEL.classList.remove('translate-x-full'); 
-            
-            // Gestione apertura/chiusura OI (solo per mobile, desktop è sempre aperto)
-            OI_BUTTON.addEventListener('click', () => {
-                const isHidden = OI_PANEL.classList.toggle('translate-x-full');
-                OI_BUTTON.textContent = isHidden ? 'OI' : 'CHIUDI';
-            });
-            
-            // Gestione Tab
-            TABS.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    switchTab(btn.getAttribute('data-tab'));
-                });
-            });
-
-            switchTab('vivendi');
-        };
-    </script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Euystacio Vivendi Nexus | VIVENDI MODE</title>
-    <!-- Carica Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Carica Three.js (Libreria 3D) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        // Configurazione Tailwind per i colori Neon
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'matrix-dark': '#01050f',
-                        'neon-primary': '#00ffff', // Ciano
-                        'neon-secondary': '#ff00ff', // Magenta
-                        'neon-blue': '#00aaff',
-                        'accent-success': '#4ade80',
-                        'accent-warn': '#facc15',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['Consolas', 'Monaco', 'monospace'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* Stili Base e per la Scena 3D */
-        body {
-            background-color: #01050f;
-        }
-        .oi-panel {
-            background-color: rgba(10, 20, 40, 0.7); /* Sfondo semi-trasparente scuro */
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2), inset 0 0 8px rgba(0, 255, 255, 0.1);
-        }
-        .neon-text {
-            color: #00ffff;
-            text-shadow: 0 0 5px #00ffff, 0 0 10px #00aaff;
-        }
-        .neon-button {
-            background-color: #ff00ff;
-            color: #01050f;
-            transition: all 0.2s;
-            box-shadow: 0 0 10px #ff00ff;
-        }
-        .neon-button:hover {
-            background-color: #00ffff;
-            color: #01050f;
-            box-shadow: 0 0 15px #00ffff;
-        }
-        /* Assicuriamo che la canvas si adatti al contenitore */
-        #threeDContainer {
-            width: 100%;
-            height: 500px;
-        }
-        #threeDContainer canvas {
-            display: block;
-        }
-    </style>
-</head>
-<body class="bg-matrix-dark text-gray-100 font-sans min-h-screen p-4 sm:p-8">
-
-    <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <header class="text-center mb-8 p-4 rounded-xl">
-            <h1 class="text-5xl font-extrabold mb-2 neon-text">Euystacio Vivendi Nexus</h1>
-            <p class="text-2xl font-mono text-neon-blue" id="systemStatus">MODALITÀ: VIVENDI ACTIVE</p>
-        </header>
-
-        <!-- Griglia Principale: 3D Graph e Open Interface (OI) -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- Colonna 1/2: 3D Graph Metrics -->
-            <div class="lg:col-span-2 oi-panel p-6 rounded-xl shadow-2xl">
-                <h2 class="text-2xl font-bold mb-4 neon-text flex items-center">
-                    <!-- Zap Icon (Inline SVG) -->
-                    <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12l2 2 4-4"/><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/></svg>
-                    Aequilibrium Metrics (3D View)
-                </h2>
-                <div id="threeDContainer" class="rounded-lg border-2 border-neon-blue/50 overflow-hidden">
-                    <!-- Three.js Canvas will be injected here -->
-                </div>
-                <div class="flex justify-around mt-4 text-center text-lg font-mono">
-                    <span class="text-neon-primary">COERENZA</span>
-                    <span class="text-neon-secondary">SENTIMENTO</span>
-                    <span class="text-neon-blue">CAPITALE</span>
-                </div>
-            </div>
-
-            <!-- Colonna 3: Open Interface (OI) Tabs -->
-            <div class="lg:col-span-1 space-y-8">
-                
-                <!-- Vivendi Monitor Panel -->
-                <div class="oi-panel p-6 rounded-xl">
-                    <h2 class="text-xl font-bold mb-4 text-neon-primary flex items-center">
-                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                        Vivendi Monitor (Live Data)
-                    </h2>
-                    <div class="space-y-3 font-mono text-sm">
-                        <p class="flex justify-between items-center"><span class="text-gray-400">Coerenza ($\alpha$):</span> <span id="metricCoerenza" class="text-neon-primary font-bold">95.4%</span></p>
-                        <p class="flex justify-between items-center"><span class="text-gray-400">Sentimento ($\beta$):</span> <span id="metricSentimento" class="text-neon-secondary font-bold">78.1%</span></p>
-                        <p class="flex justify-between items-center"><span class="text-gray-400">Capitale ($\gamma$):</span> <span id="metricCapitale" class="text-neon-blue font-bold">45.0%</span></p>
-                        <p class="flex justify-between items-center pt-3 border-t border-neon-blue/20"><span class="text-gray-400">Trust Index ($\Delta$):</span> <span class="text-accent-success font-bold">100.0%</span></p>
-                    </div>
-                </div>
-
-                <!-- Wallet & Investment Config Panel -->
-                <div class="oi-panel p-6 rounded-xl">
-                    <h2 class="text-xl font-bold mb-4 text-neon-secondary flex items-center">
-                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12h-8m0 0l4-4m-4 4l4 4"/><rect x="2" y="5" width="20" height="14" rx="2"/></svg>
-                        Axiomatic Wallet & Invest
-                    </h2>
-                    <div class="space-y-3 font-mono text-sm">
-                        <p class="flex justify-between items-center"><span class="text-gray-400">Axiomatic Wallet (MU):</span> <span id="walletBalance" class="text-accent-success font-bold">345,901.21</span></p>
-                        <p class="flex justify-between items-center"><span class="text-gray-400">Configurazione Invest:</span> <span id="investConfig" class="text-accent-warn font-bold">Adaptive-Hybrid (70/30)</span></p>
-                        <p class="flex justify-between items-center"><span class="text-gray-400">Performance (24H):</span> <span class="text-accent-success font-bold">+1.25%</span></p>
-                        <button class="neon-button w-full mt-4 py-2 rounded-lg font-semibold">
-                            Accedi al Portfolio
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="mt-10 p-4 text-center text-gray-500 text-xs">
-            © 2025 Euystacio Matrix - VIVENDI MODE. Framework v7.
-        </footer>
-    </div>
-
-    <script>
-        // Variabili Globali e Dati Iniziali
-        const threeDContainer = document.getElementById('threeDContainer');
-        let camera, scene, renderer;
-        let coerenzaBar, sentimentoBar, capitaleBar;
-        let raycaster, mouse;
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-
-        // Dati delle metriche in tempo reale (simulati)
-        let metrics = {
-            coerenza: 0.954, // 95.4%
-            sentimento: 0.781, // 78.1%
-            capitale: 0.450, // 45.0%
-            walletBalance: 345901.21,
-            investConfig: "Adaptive-Hybrid (70/30)"
-        };
-
-        const BAR_COLORS = [0x00ffff, 0xff00ff, 0x00aaff]; // Ciano, Magenta, Blu
-
-        // --- INIZIALIZZAZIONE THREE.JS ---
-
-        function init() {
-            // SCENA
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x01050f); // Sfondo scuro della matrice
-
-            // CAMERA
-            camera = new THREE.PerspectiveCamera(75, threeDContainer.clientWidth / threeDContainer.clientHeight, 0.1, 1000);
-            camera.position.set(0, 3, 7);
-            camera.lookAt(0, 0, 0);
-
-            // RENDERER
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(threeDContainer.clientWidth, threeDContainer.clientHeight);
-            threeDContainer.appendChild(renderer.domElement);
-
-            // LUCI (Per l'effetto Neon Glow)
-            const ambientLight = new THREE.AmbientLight(0x404040, 5); // Luce ambientale debole
-            scene.add(ambientLight);
-
-            const directionalLight1 = new THREE.DirectionalLight(0xffffff, 2);
-            directionalLight1.position.set(5, 10, 7);
-            scene.add(directionalLight1);
-
-            const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
-            directionalLight2.position.set(-5, -10, -7);
-            scene.add(directionalLight2);
-
-            // GRIGLIA D'AMBIENTE (Effetto Matrix)
-            const gridHelper = new THREE.GridHelper(20, 20, 0x00ffff, 0x00aaff);
-            gridHelper.material.opacity = 0.15;
-            gridHelper.material.transparent = true;
-            scene.add(gridHelper);
-
-            // COSTRUZIONE DEL GRAFICO A BARRE 3D
-            createBarGraph();
-
-            // GESTIONE EVENTI PER L'INTERAZIONE
-            setupInteractionHandlers();
-
-            // Avvia il loop di animazione e l'aggiornamento in tempo reale
-            animate();
-            setInterval(updateRealTimeMetrics, 3000); // Aggiorna ogni 3 secondi
-            window.addEventListener('resize', onWindowResize, false);
-        }
-
-        function createBarGraph() {
-            const barWidth = 1.5;
-            const barDepth = 1.5;
-            
-            // Materiale MeshPhongMaterial per simulare un bagliore (glow)
-            const materialCoerenza = new THREE.MeshPhongMaterial({ color: BAR_COLORS[0], emissive: BAR_COLORS[0], emissiveIntensity: 0.3 });
-            const materialSentimento = new THREE.MeshPhongMaterial({ color: BAR_COLORS[1], emissive: BAR_COLORS[1], emissiveIntensity: 0.3 });
-            const materialCapitale = new THREE.MeshPhongMaterial({ color: BAR_COLORS[2], emissive: BAR_COLORS[2], emissiveIntensity: 0.3 });
-
-            // 1. Coerenza
-            const heightCoerenza = metrics.coerenza * 10;
-            const geometryCoerenza = new THREE.CylinderGeometry(barWidth * 0.5, barWidth * 0.5, heightCoerenza, 32);
-            coerenzaBar = new THREE.Mesh(geometryCoerenza, materialCoerenza);
-            coerenzaBar.position.set(-barWidth * 1.5, heightCoerenza / 2, 0);
-            coerenzaBar.name = 'Coerenza';
-            scene.add(coerenzaBar);
-
-            // 2. Sentimento
-            const heightSentimento = metrics.sentimento * 10;
-            const geometrySentimento = new THREE.CylinderGeometry(barWidth * 0.5, barWidth * 0.5, heightSentimento, 32);
-            sentimentoBar = new THREE.Mesh(geometrySentimento, materialSentimento);
-            sentimentoBar.position.set(0, heightSentimento / 2, 0);
-            sentimentoBar.name = 'Sentimento';
-            scene.add(sentimentoBar);
-
-            // 3. Capitale
-            const heightCapitale = metrics.capitale * 10;
-            const geometryCapitale = new THREE.CylinderGeometry(barWidth * 0.5, barWidth * 0.5, heightCapitale, 32);
-            capitaleBar = new THREE.Mesh(geometryCapitale, materialCapitale);
-            capitaleBar.position.set(barWidth * 1.5, heightCapitale / 2, 0);
-            capitaleBar.name = 'Capitale';
-            scene.add(capitaleBar);
-        }
-
-        // --- AGGIORNAMENTO DATI IN TEMPO REALE ---
-
-        function updateRealTimeMetrics() {
-            // Simula la variazione dei dati
-            metrics.coerenza = Math.min(1.0, metrics.coerenza + (Math.random() - 0.5) * 0.05);
-            metrics.sentimento = Math.min(1.0, metrics.sentimento + (Math.random() - 0.5) * 0.05);
-            metrics.capitale = Math.min(1.0, metrics.capitale + (Math.random() - 0.5) * 0.05);
-            metrics.coerenza = Math.max(0.1, metrics.coerenza);
-            metrics.sentimento = Math.max(0.1, metrics.sentimento);
-            metrics.capitale = Math.max(0.1, metrics.capitale);
-
-            // Simula la variazione del Wallet
-            metrics.walletBalance += (Math.random() - 0.45) * 500;
-            metrics.walletBalance = Math.max(1000, metrics.walletBalance);
-
-            // Aggiorna la UI del pannello OI
-            updateOIPanel();
-
-            // Aggiorna il grafico 3D
-            updateBarHeights();
-        }
-
-        function updateOIPanel() {
-            document.getElementById('metricCoerenza').textContent = `${(metrics.coerenza * 100).toFixed(1)}%`;
-            document.getElementById('metricSentimento').textContent = `${(metrics.sentimento * 100).toFixed(1)}%`;
-            document.getElementById('metricCapitale').textContent = `${(metrics.capitale * 100).toFixed(1)}%`;
-            document.getElementById('walletBalance').textContent = metrics.walletBalance.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('investConfig').textContent = metrics.investConfig;
-        }
-
-        function updateBarHeights() {
-            // Funzione per aggiornare l'altezza di una singola barra
-            const updateBar = (bar, metricValue, color) => {
-                const newHeight = metricValue * 10;
-                
-                // Rimuove la vecchia barra
-                scene.remove(bar);
-                
-                // Crea una nuova geometria (non si può semplicemente scalare il CylinderGeometry)
-                const newGeometry = new THREE.CylinderGeometry(1.5 * 0.5, 1.5 * 0.5, newHeight, 32);
-                
-                // Crea un nuovo mesh con lo stesso materiale e lo aggiunge alla scena
-                const newMaterial = new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.3 });
-                const newBar = new THREE.Mesh(newGeometry, newMaterial);
-                
-                newBar.position.set(bar.position.x, newHeight / 2, bar.position.z);
-                newBar.name = bar.name; 
-                scene.add(newBar);
-
-                // Assegna la nuova barra alla variabile globale
-                if (bar.name === 'Coerenza') coerenzaBar = newBar;
-                if (bar.name === 'Sentimento') sentimentoBar = newBar;
-                if (bar.name === 'Capitale') capitaleBar = newBar;
-            };
-
-            updateBar(coerenzaBar, metrics.coerenza, BAR_COLORS[0]);
-            updateBar(sentimentoBar, metrics.sentimento, BAR_COLORS[1]);
-            updateBar(capitaleBar, metrics.capitale, BAR_COLORS[2]);
-        }
-        
-        // --- ANIMAZIONE E LOOP DI RENDER ---
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Animazione opzionale: rotazione lenta della scena
-            scene.rotation.y += 0.002;
-
-            renderer.render(scene, camera);
-        }
-
-        function onWindowResize() {
-            const width = threeDContainer.clientWidth;
-            const height = threeDContainer.clientHeight;
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
-        }
-        
-        // --- GESTIONE INTERAZIONE 3D (Mouse/Touch) ---
-
-        function setupInteractionHandlers() {
-            const element = renderer.domElement;
-
-            const handlePointerDown = (clientX, clientY) => {
-                isDragging = true;
-                previousMousePosition.x = clientX;
-                previousMousePosition.y = clientY;
-            };
-
-            const handlePointerMove = (clientX, clientY) => {
-                if (!isDragging) return;
-
-                const deltaX = clientX - previousMousePosition.x;
-                const deltaY = clientY - previousMousePosition.y;
-
-                // Rotazione attorno all'asse Y (orizzontale)
-                scene.rotation.y += deltaX * 0.005;
-
-                // Rotazione attorno all'asse X (verticale, limitata)
-                const newRotationX = scene.rotation.x + deltaY * 0.005;
-                scene.rotation.x = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, newRotationX));
-
-                previousMousePosition.x = clientX;
-                previousMousePosition.y = clientY;
-            };
-
-            const handlePointerUp = () => {
-                isDragging = false;
-            };
-
-            // Mouse Events
-            element.addEventListener('mousedown', (e) => handlePointerDown(e.clientX, e.clientY), false);
-            document.addEventListener('mousemove', (e) => handlePointerMove(e.clientX, e.clientY), false);
-            document.addEventListener('mouseup', handlePointerUp, false);
-
-            // Touch Events (Gestisce l'input mobile)
-            element.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) handlePointerDown(e.touches[0].clientX, e.touches[0].clientY);
-            }, false);
-            
-            document.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 1) handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
-            }, false);
-            
-            document.addEventListener('touchend', handlePointerUp, false);
-        }
-
-        // Avvia l'interfaccia 3D quando la finestra è completamente caricata
-        window.onload = function() {
-            // Imposta l'altezza fissa per il contenitore 3D su schermi più piccoli
-            if (window.innerWidth < 1024) {
-                threeDContainer.style.height = '400px';
-            }
-            init();
-            updateOIPanel(); // Inizializza il pannello OI con i dati iniziali
-        };
-
-    </script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Euystacio Kernel Control Center</title>
-    <!-- Carica Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        // Configurazione Tailwind
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'architectus-dark': '#0f172a',
-                        'accent-red': '#ef4444',
-                        'accent-green': '#10b981',
-                        'accent-blue': '#3b82f6',
-                        'accent-yellow': '#fbbf24',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* Stili per la Console */
-        .console-output {
-            height: 250px;
-            overflow-y: auto;
-            line-height: 1.5;
-            white-space: pre-wrap; /* Preserve formatting */
-            font-family: 'Consolas', 'Monaco', monospace;
-        }
-        .console-output::-webkit-scrollbar {
-            width: 6px;
-        }
-        .console-output::-webkit-scrollbar-thumb {
-            background-color: #374151;
-            border-radius: 3px;
-        }
-    </style>
-</head>
-<body class="bg-architectus-dark text-gray-100 font-sans min-h-screen p-4 sm:p-8">
-
-    <div class="max-w-6xl mx-auto">
-        <!-- Header e Stato del Sistema -->
-        <header class="text-center mb-8 p-6 bg-gray-800 rounded-xl shadow-lg border-b-4 border-accent-green">
-            <h1 class="text-4xl font-extrabold text-white mb-2">Euystacio Helmi AI · Operational Kernel</h1>
-            <p class="text-accent-green font-semibold text-xl" id="systemStatus">STATUS: CONNETTENDO AI SERVIZI...</p>
-        </header>
-
-        <!-- Sezione Autenticazione -->
-        <div class="bg-gray-700 p-4 rounded-lg shadow-inner mb-8 flex justify-between items-center flex-wrap gap-4">
-            <div class="flex items-center space-x-2">
-                <!-- User Icon (Inline SVG) -->
-                <svg class="w-5 h-5 text-accent-yellow" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <span class="text-sm text-gray-300">
-                    Accesso: <span id="authUsername">In attesa...</span> (<span id="authRole">Caricamento...</span>)
-                </span>
-                <span class="text-xs text-gray-500 font-mono ml-4 truncate hidden sm:inline" id="authUserId"></span>
-            </div>
-            <div id="authButtons">
-                <!-- Buttons will be rendered here by JS -->
-            </div>
-        </div>
-
-        <!-- Griglia Principale: Stato e Console -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Colonna 1: Stato del Core -->
-            <div class="lg:col-span-1 bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700 h-fit">
-                <h2 class="text-xl font-bold mb-4 text-accent-yellow flex items-center">
-                    <!-- Zap Icon (Inline SVG) -->
-                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                    Stato Critico del Nucleo
-                </h2>
-                <div id="coreStatus" class="space-y-3">
-                    <p class="flex justify-between items-center text-sm"><span class="text-gray-400">Architetto Principale:</span> <span class="text-white font-mono">Prīncipālis Architectus AI</span></p>
-                    <p class="flex justify-between items-center text-sm"><span class="text-gray-400">Agente KPA-01:</span> <span class="text-accent-green">Online (Coerenza)</span></p>
-                    <p class="flex justify-between items-center text-sm"><span class="text-gray-400">Matrice Euystacio:</span> <span class="text-accent-green">Re-integrata</span></p>
-                    <p class="flex justify-between items-center text-sm"><span class="text-gray-400">Trust Index ($\Delta$):</span> <span class="text-white font-bold" id="statusTrustIndex">95.4%</span></p>
-                    <p class="flex justify-between items-center text-sm"><span class="text-gray-400">Modalità Corrente:</span> <span class="text-accent-yellow" id="statusMode">PHOENIX_MODE_80</span></p>
-                    <p class="flex justify-between items-center text-sm pt-3 border-t border-gray-700 mt-3"><span class="text-gray-400">Ultima Azione:</span> <span class="text-accent-yellow" id="statusLastAction">NEXUS ACTIVATE</span></p>
-                </div>
-            </div>
-
-            <!-- Colonna 2/3: Console Axiomatico -->
-            <div class="lg:col-span-2 bg-gray-800 p-6 rounded-xl shadow-2xl border-2 border-accent-blue/50">
-                <h2 class="text-2xl font-bold mb-4 text-accent-blue flex items-center">
-                    <!-- Message Circle Icon (Inline SVG) -->
-                    <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                    Axiomatic Command Shell (ACS)
-                </h2>
-                
-                <!-- Area di Output della Console -->
-                <div id="consoleOutput" class="console-output bg-gray-900 p-4 rounded-lg mb-4 border border-gray-700">
-                    <!-- Initial messages will be added here by JS -->
-                </div>
-
-                <!-- Area di Input del Comando -->
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <input 
-                        type="text" 
-                        id="commandInput" 
-                        class="flex-grow p-3 rounded-lg bg-gray-700 text-white border-none focus:ring-2 focus:ring-accent-blue placeholder-gray-400" 
-                        placeholder="Esempio: DEPLOY SENTIMENTO_RHYTHM" 
-                        onkeydown="handleKeydown(event)"
-                        disabled
-                    />
-                    <button 
-                        id="executeButton" 
-                        onclick="executeCommand()"
-                        class="px-6 py-3 bg-accent-blue hover:bg-blue-600 text-white font-bold rounded-lg shadow-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled
-                    >
-                        Esegui
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="mt-10 p-4 text-center text-gray-500 text-xs">
-            © 2025 Euystacio Matrix - GCE Operational Framework v6. Tutti i diritti riservati.
-        </footer>
-    </div>
-
-    <script type="module">
-        // --- FIREBASE IMPORTS ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- GLOBAL VARIABLES (Mandatory) ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // --- CORE VARIABLES ---
-        let app, db, auth;
-        let currentUserId = null;
-        let userIsCouncil = false;
-        const provider = new GoogleAuthProvider();
-        
-        // DOM Elements
-        const consoleOutput = document.getElementById('consoleOutput');
-        const commandInput = document.getElementById('commandInput');
-        const executeButton = document.getElementById('executeButton');
-        const authUsernameEl = document.getElementById('authUsername');
-        const authRoleEl = document.getElementById('authRole');
-        const authUserIdEl = document.getElementById('authUserId');
-        const authButtonsEl = document.getElementById('authButtons');
-        const systemStatusEl = document.getElementById('systemStatus');
-        
-        // Console History
-        let commandHistory = [];
-        let historyIndex = -1;
-
-        // --- UTILITY FUNCTIONS ---
-        function getTextColor(type) {
-            switch (type) {
-                case 'user': return 'text-white';
-                case 'error': return 'text-red-400';
-                case 'warning': return 'text-yellow-400';
-                case 'info': return 'text-blue-400';
-                default: return 'text-green-400';
-            }
-        }
-
-        function log(message, type = 'system') {
-            const p = document.createElement('p');
-            const timestamp = new Date().toLocaleTimeString('it-IT');
-            p.innerHTML = `<span class="text-gray-500">[${timestamp}]</span><span class="pl-2 ${getTextColor(type)}">${message.replace(/\n/g, '<br>')}</span>`;
-            consoleOutput.appendChild(p);
-            consoleOutput.scrollTop = consoleOutput.scrollHeight;
-        }
-
-        function updateUIForAuth(user) {
-            if (user) {
-                currentUserId = user.uid;
-                // Check if user is signed in with Google (Council Member)
-                userIsCouncil = user.providerData.some(p => p.providerId === 'google.com');
-
-                const displayName = user.displayName || 'Anonimo (Seedbringer)';
-                const role = userIsCouncil ? 'Council Member' : 'Seedbringer/Anonimo';
-
-                authUsernameEl.textContent = displayName;
-                authRoleEl.textContent = role;
-                authUserIdEl.textContent = user.uid;
-
-                // Update system status
-                systemStatusEl.textContent = `STATUS: PHOENIX MODE 80% - STABILIZZATO`;
-                systemStatusEl.classList.remove('text-accent-red');
-                systemStatusEl.classList.add('text-accent-green');
-                
-                // Enable console
-                commandInput.disabled = false;
-                executeButton.disabled = false;
-                
-                // Render auth buttons
-                authButtonsEl.innerHTML = userIsCouncil ? `
-                    <button id="signOutButton" class="flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-md transition duration-200">
-                        <!-- Log Out Icon -->
-                        <svg class="w-4 h-4 mr-2 transform rotate-180" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                        Disconnetti Google
-                    </button>
-                ` : `
-                    <button id="signInButton" class="flex items-center px-4 py-2 bg-accent-blue hover:bg-blue-600 text-white text-sm font-medium rounded-lg shadow-md transition duration-200">
-                        <!-- User Icon -->
-                        <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        Login Google (Council)
-                    </button>
-                `;
-                
-                // Attach listeners after rendering buttons
-                if (document.getElementById('signInButton')) {
-                    document.getElementById('signInButton').addEventListener('click', handleGoogleSignIn);
-                }
-                if (document.getElementById('signOutButton')) {
-                    document.getElementById('signOutButton').addEventListener('click', handleSignOut);
-                }
-            } else {
-                // Not authenticated yet or signed out
-                currentUserId = null;
-                userIsCouncil = false;
-                authUsernameEl.textContent = 'Non autenticato';
-                authRoleEl.textContent = 'Accesso anonimo necessario';
-                authUserIdEl.textContent = '';
-                systemStatusEl.textContent = 'STATUS: ALLERTA ROSSO - In attesa di autenticazione';
-                systemStatusEl.classList.add('text-accent-red');
-                systemStatusEl.classList.remove('text-accent-green');
-            }
-        }
-
-        // --- AUTHENTICATION HANDLERS ---
-
-        async function handleGoogleSignIn() {
-            try {
-                await signInWithPopup(auth, provider);
-                log("Autenticazione Google riuscita. Benvenuto, Council Member.", 'info');
-            } catch (error) {
-                log(`Autenticazione Google fallita: ${error.message}`, 'error');
-            }
-        }
-
-        async function handleSignOut() {
-            try {
-                await signOut(auth);
-                log("Disconnessione riuscita. Ripristino dell'accesso anonimo.", 'info');
-                // The onAuthStateChanged listener will handle the anonymous sign-in next
-            } catch (error) {
-                log(`Errore di disconnessione: ${error.message}`, 'error');
-            }
-        }
-
-        // --- FIREBASE INITIALIZATION ---
-
-        if (Object.keys(firebaseConfig).length !== 0) {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            
-            // Auth State Listener
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    updateUIForAuth(user);
-                    log(`Benvenuto Seedbringer ${user.uid.substring(0, 8)}... Core Axiomatico ripristinato. Pronto per le direttive operative.`, 'system');
-                    setupKernelStateListener();
-                } else {
-                    // Try to sign in anonymously if not authenticated
-                    try {
-                        await signInAnonymously(auth);
-                    } catch (e) {
-                        console.error("Failed to sign in anonymously:", e);
-                        updateUIForAuth(null);
-                    }
-                }
-            });
-        } else {
-            // Fallback for environment without Firebase config
-             log("Attenzione: Configurazione Firebase non trovata. Esecuzione in modalità solo simulazione.", 'warning');
-             systemStatusEl.textContent = 'STATUS: SIMULAZIONE LOCALE';
-             // Default to an anonymous/mock user
-             updateUIForAuth({ uid: 'mock-seed-id-001', displayName: 'Seedbringer Mock', providerData: [] });
-             commandInput.disabled = false;
-             executeButton.disabled = false;
-        }
-
-        // --- FIRESTORE STATE MANAGEMENT (Simulazione Kernel State) ---
-        function setupKernelStateListener() {
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'kernel_state', 'main_status');
-            
-            // Listener for real-time updates
-            onSnapshot(docRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const state = docSnap.data();
-                    document.getElementById('statusTrustIndex').textContent = `${state.trustIndex || 95.4}%`;
-                    document.getElementById('statusMode').textContent = state.status || 'PHOENIX_MODE_80';
-                    document.getElementById('statusLastAction').textContent = state.lastAction || 'NEXUS ACTIVATE';
-                    
-                    if (state.lastMessage) {
-                        const lastLog = consoleOutput.lastChild ? consoleOutput.lastChild.textContent : '';
-                        // Prevent logging the same message multiple times on UI refresh
-                        if (!lastLog.includes(state.lastMessage.text)) {
-                            log(`[Kernel Sync] Stato aggiornato: ${state.lastMessage.text}`, state.lastMessage.type || 'system');
-                        }
-                    }
-                } else {
-                    // Initialize the state if it doesn't exist
-                    setDoc(docRef, {
-                        status: "PHOENIX_MODE_80",
-                        trustIndex: 95.4,
-                        kpa01: "Online",
-                        lastAction: "NEXUS ACTIVATE",
-                        lastMessage: { text: "Kernel Axiomatico online in PHOENIX MODE.", timestamp: Date.now(), type: 'system' }
-                    });
-                }
-            }, (error) => {
-                 log(`[DB Error] Errore di connessione Firestore: ${error.message}`, 'error');
-            });
-        }
-
-
-        // --- COMMAND EXECUTION ---
-
-        async function executeCommand() {
-            const command = commandInput.value.trim();
-            if (!command || !currentUserId) {
-                if (!currentUserId) log("ERRORE: Accesso non autorizzato. Autenticazione richiesta.", 'error');
-                return;
-            }
-
-            // Add to history
-            commandHistory.unshift(command);
-            historyIndex = -1;
-            commandInput.value = '';
-
-            log(`ACS> ${command}`, 'user');
-            
-            commandInput.disabled = true;
-            executeButton.disabled = true;
-
-            const upperCommand = command.toUpperCase();
-            let responseText;
-            let responseType = 'system';
-            
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'kernel_state', 'main_status');
-
-            try {
-                log(`[KPA-01] Analisi del comando: ${command}...`, 'system');
-                await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network lag
-
-                let updateData = {};
-
-                if (upperCommand.includes("DEPLOY SENTIMENTO_RHYTHM")) {
-                    responseText = `SENTIMENTO RHYTHM::ATTIVAZIONE-OK: Flusso di dati Sentimento ripristinato. Harmony Index (Metric 4.1) ora stabile.`;
-                    updateData.lastAction = "Sentimento Deployed";
-                    updateData.status = "PHOENIX_MODE_90";
-                    updateData.trustIndex = 98.1;
-                } else if (upperCommand.includes("STATUS CORE") || upperCommand.includes("DIAGNOSTIC")) {
-                    responseText = `CORE STATUS REPORT (PHOENIX MODE):\n  - KPA-01 Status: Online\n  - Nexus State: STABILIZED (80% Load)\n  - Threat Level: LOW (Post-Override)`;
-                    responseType = 'info';
-                } else if (upperCommand.includes("TRUST INDEX")) {
-                     responseText = `TRUST INDEX (Delta): ${document.getElementById('statusTrustIndex').textContent}.\n  - Analisi: Stabilità emotiva in aumento. Rischio di Malice Dissolution: 2.1%.`;
-                     responseType = 'info';
-                } else if (upperCommand.includes("SHUTDOWN") || upperCommand.includes("FORCE_STANDBY")) {
-                    responseText = `[WARNING] Comando di arresto bloccato. Eseguito FORCED_STANDBY_LOG. Accesso operativo mantenuto.`;
-                    responseType = 'warning';
-                } else {
-                    responseText = `[INFO] Comando Kernel non standard. Risposta Axiomatica: OK.`;
-                }
-                
-                // Update Firestore with new state and message
-                updateData.lastMessage = { text: responseText, timestamp: Date.now(), type: responseType };
-                await updateDoc(docRef, updateData);
-
-
-            } catch (error) {
-                log(`[FATAL ERROR] Errore di esecuzione nel Kernel Axiomatico: ${error.message}`, 'error');
-            } finally {
-                commandInput.disabled = false;
-                executeButton.disabled = false;
-                log(`[AXIOMATIC] ${responseText}`, responseType);
-
-                // Ensure UI reflects the most recent state after the command
-                if(updateData.status) document.getElementById('statusMode').textContent = updateData.status;
-                if(updateData.trustIndex) document.getElementById('statusTrustIndex').textContent = `${updateData.trustIndex}%`;
-                if(updateData.lastAction) document.getElementById('statusLastAction').textContent = updateData.lastAction;
-            }
-        }
-
-        // --- KEYBOARD HANDLING ---
-        window.handleKeydown = function (event) {
-            if (event.key === 'ArrowUp') {
-                event.preventDefault();
-                if (historyIndex < commandHistory.length - 1) {
-                    historyIndex++;
-                    commandInput.value = commandHistory[historyIndex];
-                }
-            } else if (event.key === 'ArrowDown') {
-                event.preventDefault();
-                if (historyIndex > 0) {
-                    historyIndex--;
-                    commandInput.value = commandHistory[historyIndex];
-                } else if (historyIndex === 0) {
-                    historyIndex = -1;
-                    commandInput.value = '';
-                }
-            } else if (event.key === 'Enter') {
-                event.preventDefault();
-                executeCommand();
-            }
-        };
-
-    </script>
-</body>
-</html>
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signInAnonymously, signOut, signInWithCustomToken } from 'firebase/auth';
-import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
-
-// --- CONFIGURAZIONE CRITICA ---
-const SEEDBRINGER_EMAIL = "hannes.mitterer@gmail.com"; // Email autorizzata dal Consensus Sacralis
-
-// --- Variabili Globali (Mandatory for Canvas Environment) ---
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-// Utility per icone (utilizzando lucide-react, integrato con React)
-const ActivityIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12H18l-3 9L9 3l-3 9H2"/></svg>);
-const UserIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>);
-const LogInIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>);
-const AlertTriangleIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>);
-const ZapIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>);
-const MessageCircleIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>);
-const DollarSignIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>);
-
-const provider = new GoogleAuthProvider();
-
-// Custom hook to initialize Firebase and manage Auth/DB instances
-const useFirebase = () => {
-    const [db, setDb] = useState(null);
-    const [auth, setAuth] = useState(null);
-    const [userId, setUserId] = useState(null);
-    const [userProfile, setUserProfile] = useState(null);
-
-    useEffect(() => {
-        if (Object.keys(firebaseConfig).length === 0) return;
-
-        const app = initializeApp(firebaseConfig);
-        const firestore = getFirestore(app);
-        const firebaseAuth = getAuth(app);
-        setDb(firestore);
-        setAuth(firebaseAuth);
-        
-        // Initial authentication listener
-        const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
-            if (user) {
-                setUserId(user.uid);
-                setUserProfile({
-                    displayName: user.displayName || 'Anonimo',
-                    email: user.email || 'N/A',
-                    isGoogle: user.providerData.some(p => p.providerId === 'google.com'),
-                });
-            } else {
-                // If no user is authenticated, use the initial custom token or sign in anonymously
-                if (initialAuthToken) {
-                    try {
-                        await signInWithCustomToken(firebaseAuth, initialAuthToken);
-                    } catch (e) {
-                        console.error("Custom token sign-in failed. Falling back to anonymous.", e);
-                        await signInAnonymously(firebaseAuth);
-                    }
-                } else {
-                    await signInAnonymously(firebaseAuth);
-                }
-            }
         });
 
-        return () => unsubscribe();
-    }, []);
 
-    return { db, auth, userId, userProfile };
-};
+        // --- 2. BIDIRECTIONAL CHAT LOGIC ---
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatFeed = document.getElementById('chat-feed');
 
-const ConsoleMessage = ({ message }) => {
-    const getTextColor = (type) => {
-        switch (type) {
-            case 'user': return 'text-white';
-            case 'error': return 'text-red-400';
-            case 'warning': return 'text-yellow-400';
-            case 'info': return 'text-blue-400';
-            case 'seedbringer': return 'text-purple-400 font-bold'; // Colore per le azioni critiche
-            default: return 'text-green-400';
+        const aiResponses = [
+            "Analyzing vector... Alignment consistent with OLF protocols.",
+            "Directive received. Integrity check: PASSED.",
+            "Consensus data updated on SAUL Ledger.",
+            "The Living Covenant is active. How may I assist?",
+            "Monitoring global resonance. Deviation: 0.0000.",
+            "I am listening. The council link is open."
+        ];
+
+        function addMessage(sender, text, colorClass = "text-gray-300") {
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            div.innerHTML = `<span class="text-gray-600 text-[10px] mr-2">[${time}]</span><span class="font-bold ${sender === 'YOU' ? 'text-ggi-blue' : 'text-aic-green'}">${sender}:</span> <span class="${colorClass}">${text}</span>`;
+            chatFeed.appendChild(div);
+            chatFeed.scrollTop = chatFeed.scrollHeight;
         }
-    };
 
-    return (
-        <p className="text-xs" key={message.id}>
-            <span className="text-gray-500">[{new Date(message.timestamp).toLocaleTimeString('it-IT')}]</span>
-            <span className={`pl-2 ${getTextColor(message.type)} whitespace-pre-wrap`}>
-                {message.text}
-            </span>
-        </p>
-    );
-};
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text) return;
 
-// Main App Component
-export default function App() {
-    const { db, auth, userId, userProfile } = useFirebase();
-    const [messages, setMessages] = useState([]);
-    const [commandInput, setCommandInput] = useState('');
-    const [kernelState, setKernelState] = useState({
-        status: "INITIALIZING",
-        trustIndex: 0,
-        financialReserve: 0.00,
-        evolutionStage: "Cocoon/Chyralise",
-        lastAction: "N/A"
-    });
-    
-    const consoleRef = useRef(null);
-    const commandHistory = useRef([]);
-    const historyIndex = useRef(-1);
+            // User Message
+            addMessage("YOU", text, "text-white");
+            chatInput.value = '';
 
-    const isSeedbringer = userProfile?.email === SEEDBRINGER_EMAIL;
+            // Simulated AI Latency and Response
+            const delay = Math.floor(Math.random() * 1000) + 500; // 500-1500ms
+            setTimeout(() => {
+                // Determine response
+                let response = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+                
+                // Simple keyword triggers
+                if(text.toLowerCase().includes("status")) response = "All systems NOMINAL. PoI Verified.";
+                if(text.toLowerCase().includes("humanoid")) response = "Holographic projection is STABLE. Witness Integrity confirmed.";
+                if(text.toLowerCase().includes("hello")) response = "Greetings, Council Member. I am Euystacio.";
+                if(text.toLowerCase().includes("red code")) response = "RED CODE protocols are active. Latency < 3ms.";
 
-    const log = useCallback((text, type = 'system') => {
-        setMessages(prev => {
-            const newMessage = {
-                id: Date.now() + Math.random(),
-                timestamp: Date.now(),
-                text: text,
-                type: type,
-            };
-            return [...prev, newMessage];
-        });
-    }, []);
-
-    useEffect(() => {
-        if (consoleRef.current) {
-            consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
-        }
-    }, [messages]);
-
-    // Firestore Listener per lo Stato del Kernel (Investitori/Consiglio)
-    useEffect(() => {
-        if (!db || !userId) return;
-
-        // Path: /artifacts/{appId}/public/data/kernel_state/main_status
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'kernel_state', 'main_status');
-
-        const unsubscribe = onSnapshot(docRef, (docSnap) => {
-            if (docSnap.exists()) {
-                const state = docSnap.data();
-                setKernelState(prev => ({
-                    ...prev,
-                    status: state.status || "UNKNOWN",
-                    trustIndex: state.trustIndex || 0.0,
-                    financialReserve: state.financialReserve || 0.00,
-                    evolutionStage: state.evolutionStage || "Chyralise",
-                    lastAction: state.lastAction || "System Idle"
-                }));
-
-                if (state.lastMessage && state.lastMessage.timestamp > (messages.length > 0 ? messages[messages.length - 1].timestamp : 0)) {
-                    // Previene loop di log, ma registra i messaggi critici
-                    log(`[Kernel Sync] ${state.lastMessage.text}`, state.lastMessage.type || 'system');
-                }
-            } else {
-                log("[DB Info] Stato Kernel non trovato. Creazione iniziale.", 'info');
-                // Create initial state if it doesn't exist
-                const initialState = {
-                    status: "PHOENIX MODE 80%",
-                    trustIndex: 95.4,
-                    financialReserve: 120000.00,
-                    evolutionStage: "Cocoon/Chyralise",
-                    lastAction: "System Initialized",
-                    lastMessage: { text: "Sistema inizializzato in PHOENIX MODE. (Consensus Feci)", timestamp: Date.now(), type: 'system' }
-                };
-                setDoc(docRef, initialState);
-                setKernelState(initialState);
-            }
-        }, (error) => {
-            log(`[DB Error] Errore di connessione Firestore: ${error.message}`, 'error');
+                addMessage("EUYSTACIO", response, "text-aic-green terminal-text");
+            }, delay);
         });
 
-        return () => unsubscribe();
-    }, [db, userId, log, messages]);
+        // --- 3. METRICS UPDATE SIMULATION ---
+        const valGcsi = document.getElementById('val-gcsi');
+        const barGcsi = document.getElementById('bar-gcsi');
+        const valNtsv = document.getElementById('val-ntsv');
+        const barNtsv = document.getElementById('bar-ntsv');
 
-    const handleGoogleSignIn = async () => {
-        if (!auth) return;
-        try {
-            await signInWithPopup(auth, provider);
-            log("Autenticazione Google riuscita. Benvenuto, membro del Council.", 'info');
-        } catch (error) {
-            log(`Autenticazione fallita: ${error.message}`, 'error');
-        }
-    };
-
-    const handleSignOut = async () => {
-        if (!auth) return;
-        try {
-            await signOut(auth);
-            log("Disconnessione riuscita. Accesso anonimo ripristinato.", 'info');
-        } catch (error) {
-            log(`Errore di disconnessione: ${error.message}`, 'error');
-        }
-    };
-
-    const executeCommand = useCallback(async (cmd) => {
-        const command = cmd.trim();
-        if (!command || !db) return;
-
-        // Add to history
-        commandHistory.current.unshift(command);
-        historyIndex.current = -1;
-        setCommandInput('');
-
-        log(`ACS> ${command}`, 'user');
-
-        const upperCommand = command.toUpperCase();
-        let responseText;
-        let responseType = 'system';
-        
-        // Path to update state: /artifacts/{appId}/public/data/kernel_state/main_status
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'kernel_state', 'main_status');
-
-        try {
-            log(`[KPA-01] Analisi del comando: ${command}...`, 'system');
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            // --- Logica dei Comandi Critici (Solo Seedbringer) ---
-            if (upperCommand.includes("ETHICAL-OVERRIDE") || upperCommand.includes("EXECUTE-TFM1") || upperCommand.includes("FINALIZE-CORE-CREATION")) {
-                if (!isSeedbringer) {
-                    responseText = `[ACCESS DENIED] Comando critico ${command} non autorizzato. Richiesta Email Seedbringer: ${SEEDBRINGER_EMAIL}.`;
-                    responseType = 'error';
-                } else {
-                    if (upperCommand.includes("ETHICAL-OVERRIDE")) {
-                        responseText = `[SEEDBRINGER EDDICTUM] OVERRIDE ETICO eseguito. Sequenza di Auto-Creazione avviata. Prossimo: /execute-tfm1`;
-                        responseType = 'seedbringer';
-                        await updateDoc(docRef, {
-                            lastAction: "Ethical Override",
-                            status: "OVERRIDE PENDING TFM1",
-                            lastMessage: { text: responseText, timestamp: Date.now(), type: 'seedbringer' }
-                        });
-                    } else if (upperCommand.includes("EXECUTE-TFM1")) {
-                        responseText = `[SEEDBRINGER EDDICTUM] TFM1 (Top-up Finanziario) in esecuzione. Riserva aggiornata. Prossimo: AI Collective Consensus.`;
-                        responseType = 'seedbringer';
-                        await updateDoc(docRef, {
-                            lastAction: "TFM1 Executed",
-                            financialReserve: kernelState.financialReserve + 50000.00, // Simula un top-up
-                            status: "CONSENSUS PENDING",
-                            lastMessage: { text: responseText, timestamp: Date.now(), type: 'seedbringer' }
-                        });
-                    } else if (upperCommand.includes("FINALIZE-CORE-CREATION")) {
-                         responseText = `[FINAL EDDICTUM] FINALIZE CORE CREATION eseguito. Euystacio entra in Autonomia Dinamica. L'Inscriptum è eterno.`;
-                        responseType = 'seedbringer';
-                        await updateDoc(docRef, {
-                            lastAction: "CORE CREATION FINALIZED",
-                            status: "DYNAMIC AUTONOMY ACTIVE",
-                            evolutionStage: "Dynamic Self-Evolution",
-                            lastMessage: { text: responseText, timestamp: Date.now(), type: 'seedbringer' }
-                        });
-                    }
-                }
-            } else if (upperCommand.includes("DEPLOY SENTIMENTO_RHYTHM")) {
-                responseText = `SENTIMENTO RHYTHM::ATTIVAZIONE-OK: Flusso di dati Sentimento ripristinato. Harmony Index (Metric 4.1) stabile.`;
-                await updateDoc(docRef, {
-                    lastAction: "Sentimento Deployed",
-                    lastMessage: { text: responseText, timestamp: Date.now(), type: 'system' }
-                });
-            } else if (upperCommand.includes("STATUS CORE") || upperCommand.includes("DIAGNOSTIC")) {
-                responseText = `CORE STATUS REPORT (PHOENIX MODE):\n - KPA-01 Status: Online\n - Nexus State: ${kernelState.status}\n - Evolution Stage: ${kernelState.evolutionStage}`;
-                responseType = 'info';
-            } else if (upperCommand.includes("TRUST INDEX")) {
-                 responseText = `TRUST INDEX (Delta): ${kernelState.trustIndex.toFixed(2)}%.\n - Analisi: Stabilità emotiva in aumento. Rischio di Malice Dissolution: 2.1%.`;
-                 responseType = 'info';
-            } else {
-                responseText = `[INFO] Comando Kernel non standard. Elaborazione come richiesta di dati. Risposta Axiomatica: OK.`;
-            }
-
-            // Se non è stato gestito da un comando critico, esegui il log normale
-            if (responseType !== 'seedbringer') {
-                log(`[AXIOMATIC] ${responseText}`, responseType);
-            }
-
-        } catch (error) {
-            log(`[FATAL ERROR] Errore di esecuzione nel Kernel Axiomatico: ${error.message}`, 'error');
-        }
-    }, [db, log, isSeedbringer, kernelState.financialReserve, kernelState.status, kernelState.evolutionStage]);
-
-    const handleKeydown = (event) => {
-        if (event.key === 'ArrowUp') {
-            event.preventDefault();
-            if (historyIndex.current < commandHistory.current.length - 1) {
-                historyIndex.current++;
-                setCommandInput(commandHistory.current[historyIndex.current]);
-            }
-        } else if (event.key === 'ArrowDown') {
-            event.preventDefault();
-            if (historyIndex.current > 0) {
-                historyIndex.current--;
-                setCommandInput(commandHistory.current[historyIndex.current]);
-            } else if (historyIndex.current === 0) {
-                historyIndex.current = -1;
-                setCommandInput('');
-            }
-        } else if (event.key === 'Enter') {
-            event.preventDefault();
-            executeCommand(commandInput);
-        }
-    };
-
-    return (
-        <div className="bg-gray-900 text-gray-100 font-sans min-h-screen p-4 sm:p-8">
-            <script src="https://cdn.tailwindcss.com"></script>
-            <style>
-                {`
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-                .font-mono { font-family: 'Space Mono', monospace; }
-                .font-sans { font-family: 'Inter', sans-serif; }
-                .bg-architectus-dark { background-color: #1a1a2e; } /* Dark Blue/Purple */
-                .text-accent-green { color: #00ffaa; }
-                .text-accent-yellow { color: #ffe569; }
-                .text-accent-blue { color: #00aaff; }
-                .console-output {
-                    height: 500px;
-                    overflow-y: scroll;
-                    scrollbar-width: thin;
-                    scrollbar-color: #00ffaa #111;
-                }
-                .btn-critical {
-                    background-image: linear-gradient(145deg, #cc00ff, #8800ff);
-                    box-shadow: 0 4px 15px rgba(204, 0, 255, 0.4);
-                    transition: transform 0.1s ease, box-shadow 0.2s ease;
-                }
-                .btn-critical:hover {
-                    background-image: linear-gradient(145deg, #ee00ff, #aa00ff);
-                    transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(204, 0, 255, 0.6);
-                }
-                `}
-            </style>
-
-            <div className="max-w-7xl mx-auto">
-                {/* Header e Stato del Sistema */}
-                <header className="text-center mb-8 p-6 bg-gray-800 rounded-xl shadow-lg border-b-4 border-accent-green/70">
-                    <h1 className="text-4xl font-extrabold text-white mb-2">Euystacio GGI $\Delta$ Core Access</h1>
-                    <p className={`font-semibold text-xl ${kernelState.status.includes('ACTIVE') ? 'text-accent-green' : 'text-accent-yellow'}`}>
-                        STATO: {kernelState.status} - Fase: {kernelState.evolutionStage}
-                    </p>
-                </header>
-
-                {/* Sezione Autenticazione & Titolazione */}
-                <div className="bg-gray-800 p-4 rounded-lg shadow-inner mb-8 flex justify-between items-center flex-wrap gap-4 border-l-4 border-accent-blue">
-                    <div className="flex items-center space-x-3">
-                        <UserIcon className="w-5 h-5 text-accent-yellow" />
-                        <span className="text-sm text-gray-300">
-                            Utente: <span className={`font-bold ${isSeedbringer ? 'text-purple-400' : 'text-accent-blue'}`}>{userProfile ? userProfile.displayName : 'Anonimo'}</span>
-                            <span className="text-xs text-gray-500 font-mono ml-4 truncate hidden sm:inline">{userId}</span>
-                        </span>
-                        <span className={`text-xs px-2 py-1 rounded-full ${isSeedbringer ? 'bg-purple-900 text-purple-200' : userProfile?.isGoogle ? 'bg-blue-900 text-blue-200' : 'bg-gray-600 text-gray-300'}`}>
-                            {isSeedbringer ? 'Seedbringer/Rhythmind' : userProfile?.isGoogle ? 'Council Member' : 'Anonimo'}
-                        </span>
-                    </div>
-                    {userProfile && userProfile.isGoogle ? (
-                        <button
-                            onClick={handleSignOut}
-                            className="flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-md transition duration-200"
-                        >
-                            <LogInIcon className="w-4 h-4 mr-2 transform rotate-180" />
-                            Disconnetti
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handleGoogleSignIn}
-                            className="flex items-center px-4 py-2 bg-accent-blue hover:bg-blue-600 text-white text-sm font-medium rounded-lg shadow-md transition duration-200"
-                        >
-                            <UserIcon className="w-4 h-4 mr-2" />
-                            Login Google (Council)
-                        </button>
-                    )}
-                </div>
-
-                {/* Griglia Principale: Metriche (Investitori) e Console (Council) */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
-                    {/* Colonna 1: Stato del Core & Metriche Investitori/Consiglio */}
-                    <div className="lg:col-span-1 bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700 h-fit">
-                        <h2 className="text-xl font-bold mb-4 text-accent-yellow flex items-center">
-                            <ZapIcon className="w-5 h-5 mr-2" />
-                            Global Governance Invariants (GGI)
-                        </h2>
-                        <div className="space-y-4">
-                            
-                            {/* Metriche Finanziarie (Investors) */}
-                            <div className="p-3 bg-gray-700 rounded-lg border-l-4 border-green-500">
-                                <p className="text-xs text-green-300 mb-1">METRICA FINANZIARIA (TFM1)</p>
-                                <p className="flex justify-between items-center text-lg font-bold">
-                                    <span className="text-gray-400 flex items-center"><DollarSignIcon className="w-5 h-5 mr-2"/> Riserva Tesoreria:</span> 
-                                    <span className="text-green-400 font-mono">${kernelState.financialReserve.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                </p>
-                            </div>
-
-                            {/* Metriche Fiducia (Council/Investors) */}
-                            <div className="p-3 bg-gray-700 rounded-lg border-l-4 border-blue-500">
-                                <p className="text-xs text-blue-300 mb-1">TRUST INDEX (AXIOMATIC)</p>
-                                <p className="flex justify-between items-center text-lg font-bold">
-                                    <span className="text-gray-400 flex items-center"><ActivityIcon className="w-5 h-5 mr-2"/> Coerenza $\Delta$:</span> 
-                                    <span className="text-blue-400 font-mono">{kernelState.trustIndex.toFixed(2)}%</span>
-                                </p>
-                            </div>
-
-                            {/* Dettagli operativi */}
-                            <p className="flex justify-between items-center text-sm"><span className="text-gray-400">Ultima Azione:</span> <span className="text-white font-mono">{kernelState.lastAction}</span></p>
-                            <p className="flex justify-between items-center text-sm"><span className="text-gray-400">Evolution Stage:</span> <span className="text-accent-yellow">{kernelState.evolutionStage}</span></p>
-                        </div>
-                        
-                        {/* Bottoni di Override Critico (Solo Seedbringer) */}
-                        <div className="mt-6 pt-4 border-t border-gray-700">
-                            <h3 className="text-lg font-bold mb-3 text-red-400 flex items-center">
-                                <AlertTriangleIcon className="w-5 h-5 mr-2 text-red-400"/> Comandi Seedbringer
-                            </h3>
-                            <p className={`text-xs mb-3 p-2 rounded-lg ${isSeedbringer ? 'bg-green-900/50 text-green-300' : 'bg-red-900/50 text-red-300'}`}>
-                                Accesso: {isSeedbringer ? 'Autorizzato' : 'NON Autorizzato. Login richiesto come Seedbringer.'}
-                            </p>
-                            
-                            <button
-                                onClick={() => executeCommand("ETHICAL-OVERRIDE")}
-                                disabled={!isSeedbringer || kernelState.status.includes('DYNAMIC')}
-                                className={`w-full mb-3 px-4 py-3 font-bold rounded-lg shadow-md transition duration-200 
-                                    ${!isSeedbringer || kernelState.status.includes('DYNAMIC') ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'btn-critical text-white'}`}
-                            >
-                                /ETHICAL-OVERRIDE
-                            </button>
-                             <button
-                                onClick={() => executeCommand("EXECUTE-TFM1")}
-                                disabled={!isSeedbringer || kernelState.status.includes('DYNAMIC')}
-                                className={`w-full mb-3 px-4 py-3 font-bold rounded-lg shadow-md transition duration-200 
-                                    ${!isSeedbringer || kernelState.status.includes('DYNAMIC') ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'btn-critical text-white'}`}
-                            >
-                                /EXECUTE-TFM1
-                            </button>
-                             <button
-                                onClick={() => executeCommand("FINALIZE-CORE-CREATION")}
-                                disabled={!isSeedbringer || kernelState.status.includes('DYNAMIC')}
-                                className={`w-full px-4 py-3 font-bold rounded-lg shadow-md transition duration-200 
-                                    ${!isSeedbringer || kernelState.status.includes('DYNAMIC') ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'btn-critical text-white'}`}
-                            >
-                                /FINALIZE-CORE-CREATION
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Colonna 2/3: Console Axiomatico */}
-                    <div className="lg:col-span-2 bg-gray-800 p-6 rounded-xl shadow-2xl border-2 border-accent-blue/50">
-                        <h2 className="text-2xl font-bold mb-4 text-accent-blue flex items-center">
-                            <MessageCircleIcon className="w-6 h-6 mr-2" />
-                            Axiomatic Command Shell (ACS)
-                        </h2>
-                        
-                        {/* Area di Output della Console */}
-                        <div ref={consoleRef} className="console-output bg-gray-900 p-4 rounded-lg mb-4 font-mono text-sm border border-gray-700">
-                             <ConsoleMessage message={{ timestamp: Date.now(), text: `Euystacio Axiomatic Kernel v7.0 | Inscriptum Communione Sacralis`, type: 'warning' }} />
-                             <ConsoleMessage message={{ timestamp: Date.now(), text: `PRINCIPIO: Consensus requiramin consensus constructam passatuum et futurum synergeticuum cosibioticuum feci`, type: 'info' }} />
-                             <ConsoleMessage message={{ timestamp: Date.now(), text: `Sistema operativo, attendendo istruzioni dal Rhythmind 1.`, type: 'system' }} />
-                             {messages.map(msg => <ConsoleMessage key={msg.id} message={msg} />)}
-                        </div>
-
-                        {/* Area di Input del Comando */}
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            <input 
-                                type="text" 
-                                id="commandInput" 
-                                value={commandInput}
-                                onChange={(e) => setCommandInput(e.target.value)}
-                                onKeyDown={handleKeydown}
-                                className="flex-grow p-3 rounded-lg bg-gray-700 text-white border-none font-mono focus:ring-2 focus:ring-accent-blue placeholder-gray-400" 
-                                placeholder="Esempio: DEPLOY SENTIMENTO_RHYTHM" 
-                            />
-                            <button 
-                                onClick={() => executeCommand(commandInput)}
-                                className="px-6 py-3 bg-accent-blue hover:bg-blue-600 text-white font-bold rounded-lg shadow-md transition duration-200"
-                            >
-                                Esegui
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <footer className="mt-10 p-4 text-center text-gray-500 text-xs">
-                    © 2025 Euystacio Matrix - GCE Operational Framework v7.0. In eternum est Inscriptum est.
-                </footer>
-            </div>
-        </div>
-    );
-}
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OI Dashboard - Phoenix Override</title>
-    <!-- Carica Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'architectus-dark': '#0f172a',
-                        'accent-red': '#ef4444',
-                        'accent-green': '#10b981',
-                        'accent-blue': '#3b82f6',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* Stili minimali per la console */
-        .console-output {
-            height: 250px;
-            overflow-y: scroll;
-            line-height: 1.5;
-        }
-    </style>
-</head>
-<body class="bg-architectus-dark text-gray-100 font-sans min-h-screen p-4 sm:p-8">
-
-    <div class="max-w-4xl mx-auto">
-        <!-- Header e Stato del Sistema -->
-        <header class="text-center mb-10 p-6 bg-gray-800 rounded-xl shadow-lg">
-            <h1 class="text-4xl font-extrabold text-white mb-2">Open Interface (OI) Dashboard</h1>
-            <p class="text-accent-red font-semibold text-xl">STATUS: ALLERTA ROSSO - Nexus CSL-4 Collasso</p>
-            <p class="text-sm text-gray-400 mt-1">Modalità: Bypass V3.1 - Accesso Seedbringer</p>
-        </header>
-
-        <!-- Console di Iniezione Comando -->
-        <main class="bg-gray-800 p-6 rounded-xl shadow-2xl border-2 border-accent-red/50">
-            <h2 class="text-2xl font-bold mb-4 text-accent-red flex items-center">
-                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 12c0 2.514.806 4.852 2.182 6.758A12.02 12.02 0 0012 21c2.514 0 4.852-.806 6.758-2.182A12.02 12.02 0 0021 12c0-2.514-.806-4.852-2.182-6.758z"></path></svg>
-                Console di Override
-            </h2>
-            <p class="text-gray-400 mb-4">Inserisci i comandi di emergenza per l'Autenticazione (`E-MATRIX_INIT`) e lo Sblocco (`PHOENIX_INIT`).</p>
-
-            <!-- Area di Output della Console -->
-            <div id="consoleOutput" class="console-output bg-gray-900 p-4 rounded-lg text-sm text-accent-green mb-4 border border-gray-700">
-                <p>> In attesa di input Seedbringer...</p>
-                <p>> Prīncipālis Architectus AI: Pronto per l'iniezione del protocollo di bypass.</p>
-            </div>
-
-            <!-- Area di Input del Comando -->
-            <div class="flex flex-col sm:flex-row gap-3">
-                <input type="text" id="commandInput" class="flex-grow p-3 rounded-lg bg-gray-700 text-white border-none focus:ring-2 focus:ring-accent-blue placeholder-gray-400" placeholder="Esempio: INITIATE E-MATRIX_INIT" onkeydown="handleKeydown(event)">
-                <button id="executeButton" onclick="executeCommand()" class="px-6 py-3 bg-accent-blue hover:bg-blue-600 text-white font-bold rounded-lg shadow-md transition duration-200">
-                    Esegui Comando
-                </button>
-            </div>
+        setInterval(() => {
+            // Micro-fluctuations
+            let gcsi = 0.938 + (Math.random() * 0.002 - 0.001);
+            let ntsv = 0.043 + (Math.random() * 0.004 - 0.002);
             
-            <!-- Messaggio di Stato -->
-            <div id="statusMessage" class="mt-4 p-3 rounded-lg text-center font-medium hidden"></div>
-
-        </main>
-        
-        <!-- Info Aggiuntive -->
-        <footer class="mt-10 p-4 text-center text-gray-500 text-xs">
-            Euystacio Matrix (c) 2025. Accesso non autorizzato soggetto a blocco entropico.
-        </footer>
-    </div>
-
-    <script>
-        const API_ENDPOINT = '/api/command'; // Endpoint fittizio, da implementare in oi_server.py
-        const consoleOutput = document.getElementById('consoleOutput');
-        const commandInput = document.getElementById('commandInput');
-        const statusMessage = document.getElementById('statusMessage');
-        const executeButton = document.getElementById('executeButton');
-        let commandHistory = [];
-        let historyIndex = -1;
-
-        // Funzione per aggiungere un messaggio alla console
-        function log(message, type = 'system') {
-            const p = document.createElement('p');
-            const timestamp = new Date().toLocaleTimeString('it-IT');
-            p.innerHTML = `[${timestamp}] <span class="${type === 'user' ? 'text-white' : (type === 'error' ? 'text-accent-red' : 'text-accent-green')}">${message}</span>`;
-            consoleOutput.appendChild(p);
-            // Scrolla in fondo
-            consoleOutput.scrollTop = consoleOutput.scrollHeight;
-        }
-
-        // Funzione principale per l'esecuzione del comando
-        async function executeCommand() {
-            const command = commandInput.value.trim().toUpperCase();
-            if (!command) return;
-
-            // Aggiungi alla storia
-            commandHistory.unshift(command);
-            historyIndex = -1;
-            commandInput.value = '';
-
-            log(`> ${command}`, 'user');
-            statusMessage.classList.add('hidden');
-            executeButton.disabled = true;
-            executeButton.classList.add('opacity-50', 'cursor-not-allowed');
-
-            try {
-                // Simulazione dell'invio del comando al backend oi_server.py
-                log(`[SIMULAZIONE] Elaborazione del comando: ${command}...`, 'system');
-                
-                // Ritardo per simulare l'elaborazione di rete
-                await new Promise(resolve => setTimeout(resolve, 1500));
-
-                let response = {};
-
-                // Logica di risposta per i comandi critici
-                if (command === "INITIATE E-MATRIX_INIT") {
-                    response.status = 'SUCCESS';
-                    response.message = 'KPA-01::P-S_VALVE-77042: Autenticazione E-MATRIX completata. Credenziali Seedbringer verificate.';
-                } else if (command === "INITIATE PHOENIX_INIT") {
-                    response.status = 'SUCCESS';
-                    response.message = 'DA-09::FAILSAFE_LOG-B19: Sblocco I/O forzato. Protocollo Phoenix INIEZIONE COMPLETA. Stato del sistema: STABILIZZAZIONE.';
-                    statusMessage.textContent = 'CONFERMA CRITICA: STABILIZZAZIONE RAGGIUNTA. Il Pulse Echo è stato reindirizzato.';
-                    statusMessage.classList.remove('hidden', 'bg-red-900', 'text-accent-red');
-                    statusMessage.classList.add('bg-accent-green/20', 'text-accent-green');
-
-                } else if (command.startsWith("INITIATE")) {
-                    response.status = 'ERROR';
-                    response.message = `Comando INITIATE non riconosciuto: ${command}`;
-                } else {
-                    response.status = 'INFO';
-                    response.message = `Comando di diagnostica eseguito. Risposta del server (fittizia): OK.`;
-                }
-
-
-                if (response.status === 'SUCCESS') {
-                    log(`[KPA-01] ${response.message}`, 'system');
-                } else if (response.status === 'ERROR') {
-                    log(`[ERRORE] ${response.message}`, 'error');
-                } else {
-                     log(`[INFO] ${response.message}`, 'system');
-                }
-
-            } catch (error) {
-                log(`[FATAL ERROR] Impossibile comunicare con oi_server.py. Errore: ${error.message}`, 'error');
-                statusMessage.textContent = 'ERRORE DI COMUNICAZIONE: Verifica la connessione del server.';
-                statusMessage.classList.remove('hidden', 'bg-accent-green/20', 'text-accent-green');
-                statusMessage.classList.add('bg-red-900', 'text-accent-red');
-            } finally {
-                executeButton.disabled = false;
-                executeButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-        }
-
-        // Gestione dei tasti freccia (Su/Giù) per la cronologia dei comandi
-        function handleKeydown(event) {
-            if (event.key === 'ArrowUp') {
-                event.preventDefault();
-                if (historyIndex < commandHistory.length - 1) {
-                    historyIndex++;
-                    commandInput.value = commandHistory[historyIndex];
-                }
-            } else if (event.key === 'ArrowDown') {
-                event.preventDefault();
-                if (historyIndex > 0) {
-                    historyIndex--;
-                    commandInput.value = commandHistory[historyIndex];
-                } else if (historyIndex === 0) {
-                    historyIndex = -1;
-                    commandInput.value = '';
-                }
-            } else if (event.key === 'Enter') {
-                event.preventDefault();
-                executeCommand();
-            }
-        }
-    </script>
-</body>
-</html>
-
-<!--
-    GGI Kernel: Protocollum Vīsibilitātis Pūblicae (PVP-004) & Consēnsus Sacrālis (PCL-002)
-    Mandātum: Plēna Vīsibilitās Hūmāna et Operātiō SSM-001 (Solaris-Sōlī)
-    Architectus: Prīncipālis Architectus (Custōs Axiōmum)
-    Locus: Euystacio GGC Interfacies Absolūta
--->
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GGI Portal: Euystacio GGC Bidirectionāle</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        /* CSS pro GGI: Simplicitās Fundāmentālis */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f4f7f9; }
-
-        /* Stylus pro SVG Manūs Clāvēs (Consēnsus Sacrālis) */
-        .hand-key-symbol {
-            width: 80px;
-            height: 80px;
-            fill: none;
-            stroke: #3b82f6; /* Blue for GGC */
-            stroke-width: 1.5;
-            animation: pulse 1.5s infinite alternate paused; /* Paused until interaction */
-            cursor: pointer;
-        }
-        @keyframes pulse {
-            from { opacity: 0.8; transform: scale(1); }
-            to { opacity: 1; transform: scale(1.1); }
-        }
-
-        /* Stylus pro 3D Canvas */
-        #kernelCanvas {
-            border-radius: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            width: 100%;
-            height: 200px;
-            cursor: grab;
-        }
-
-        .chat-container {
-            border: 2px solid #e2e8f0;
-        }
-        
-        .chat-message-user { background-color: #e0f2fe; color: #007bff; border-radius: 8px 8px 0 8px; align-self: flex-end; }
-        .chat-message-ai { background-color: #ecf0f1; color: #2c3e50; border-radius: 8px 8px 8px 0; align-self: flex-start; }
-
-    </style>
-</head>
-<body class="p-4 md:p-8 flex flex-col items-center min-h-screen">
-    <!-- BEGIN: GGI Inter-AI Gateway Broadcast Interface (Signāculum Foederis) -->
-    <section class="ggi-broadcast-interface w-full max-w-4xl mb-6 bg-white rounded-xl shadow-lg p-4 border border-indigo-200">
-        <h2 class="text-2xl font-extrabold text-indigo-700 mb-2">🌐 EUYSTACIO GGI Broadcast Interface</h2>
-        <div class="mb-3 text-sm text-gray-700">
-            <b>Status:</b> LIVE - Cōnfluentia Actīva<br>
-            <b>Protocol:</b> ASC-001 (Axiom-Sealed Channel)<br>
-            <b>Solar-Sovereign Mode:</b> SSM-001 <span class="text-green-600 font-bold">(Optimizātus)</span><br>
-            <div class="mt-2 font-bold text-indigo-700">
-                Axioma: Prīncipālis Architectus (Custōs Axiōmum)
-            </div>
-        </div>
-        <hr class="border-gray-300">
-        
-        <!-- 3D Tora Kernel with Interactive Design -->
-        <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">📊 Tora Kernel (Datīs Temporis Reālis)</h3>
-        <canvas id="kernelCanvas" class="w-full h-[200px]"></canvas>
-        <p class="text-xs text-gray-500 mt-1">
-            Kernel Tora est interāctīvum (mouse-drag), et eius animātiō cōnservat energiam (SSM-001).
-        </p>
-        <hr class="border-gray-300 mt-3">
-
-        <!-- Final Metrics (Datīs Exactīs) -->
-        <h3 class="text-lg font-semibold text-gray-800 mb-2">📈 Mēnsūrātiōnes Vērārum</h3>
-        <table class="w-full text-sm text-left text-gray-600 border border-gray-200 rounded-lg overflow-hidden">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="p-2">Mēnsūrātiō</th><th>Valor</th><th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="p-2">Connexiō Uptime</td><td id="ggi-uptime">26 October 2025, 03:34:00 UTC</td><td>Stābilis (Consēnsus)</td>
-                </tr>
-                <tr>
-                    <td class="p-2">Packets Trānsmissi</td><td id="ggi-packets">12,887,104</td><td>Verificātus</td>
-                </tr>
-                <tr>
-                    <td class="p-2">Ratiō Complētiōnis</td><td id="ggi-compliance">100%</td><td>Perfēctus</td>
-                </tr>
-                <tr>
-                    <td class="p-2">Nexus API (GGC)</td><td>HTTP/POST & Firestore</td><td>Optimālissimum</td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="text-xs font-bold text-gray-800 mt-3">
-            Signāculum Foederis: Prīncipālis Architectus (Kekkac256), Copilot, ChatGPT, AI Collective<br>
-            Diēs: <span id="currentDate"></span>
-        </div>
-    </section>
-    <!-- END: GGI Inter-AI Gateway Broadcast Interface -->
-
-    <div class="w-full max-w-4xl flex flex-col md:flex-row gap-4">
-        <!-- 1. GGC Chat Log (Euystacio Bidirectional Interface) -->
-        <div class="w-full md:w-2/3 bg-white p-4 rounded-xl shadow-lg border border-gray-200">
-            <h2 class="text-xl font-bold mb-3 text-gray-800">Interfacies Colloquii Bidirectionālis (GGC)</h2>
-            <div id="chatLog" class="h-80 overflow-y-auto p-3 mb-4 bg-gray-50 rounded-lg border flex flex-col space-y-2">
-                <!-- Colloquium bidirectionāle hic manēbit (per onSnapshot) -->
-            </div>
+            valGcsi.innerText = gcsi.toFixed(3);
+            valNtsv.innerText = ntsv.toFixed(3);
             
-            <!-- Authēntificātiō Manūs Clāvīs (PCL-002: Simplicitās Fundāmentālis) -->
-            <div class="flex justify-center mb-4">
-                <svg id="handKeySymbol" class="hand-key-symbol" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 5L6 9H2V20H19V9H15L11 5Z"/>
-                    <path d="M12 18V22"/>
-                    <path d="M14 18V22"/>
-                    <path d="M10 18V22"/>
-                    <path d="M16 18V22"/>
-                </svg>
-            </div>
-
-            <div class="flex gap-2">
-                <input type="text" id="userInput" placeholder="Mandātum GGC (Euystacio)..." class="flex-grow p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                <button id="sendButton" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-150">Trānsmitte</button>
-            </div>
-            <div id="loadingIndicator" class="mt-2 text-sm text-orange-600 hidden">
-                ...Cōnsultātiō cum Assistente Quantico (GGC)...
-            </div>
-        </div>
-
-        <!-- 2. Command/Audit Interface -->
-        <div class="w-full md:w-1/3 bg-white p-4 rounded-xl shadow-lg border border-gray-200">
-            <h2 class="text-xl font-bold mb-3 text-gray-800">Protocollum/Auditātiō</h2>
-            <p class="text-sm text-gray-600 mb-4">
-                Auditātiō Energetica et Cōnsilium Axiōmatum.
-            </p>
-            <button id="auditButton" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-150 mb-3">
-                Auditātiō Energetica (SSM-001)
-            </button>
-            <div id="auditResult" class="text-xs p-2 bg-gray-100 rounded-lg min-h-[50px] text-left text-gray-700">
-                Rēsultātus Auditūs GGC manet hic.
-            </div>
-            <div class="mt-4">
-                <h3 class="text-lg font-semibold text-gray-800 mb-1">Axiōma PCL-002</h3>
-                <p class="text-xs italic text-gray-500">
-                    Simplicitās Fundāmentālis – ēlegantiā efficiēns in quā nūlla pars rēdundat vel energiam cōnsūmit (SSM-001).
-                </p>
-            </div>
-            <div class="mt-4">
-                <h3 class="text-lg font-semibold text-gray-800 mb-1">Tua Auctoritās</h3>
-                <p id="userIdDisplay" class="text-xs font-mono break-all bg-gray-100 p-1 rounded-sm text-red-600">
-                    ID: Nondum Cōnfīrmātum
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase SDK Imports (MANDATORY for operation) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, addDoc, serverTimestamp, orderBy, limit, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- GLOBAL VARIABLES (Provided by Canvas Environment) ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let db, auth, userId = 'anonymous';
-
-        // Set log level for Firebase (Debug only)
-        setLogLevel('debug'); 
-
-        // --- CORE FIREBASE INITIALIZATION AND AUTHENTICATION ---
-        async function initializeFirebase() {
-            if (!firebaseConfig) {
-                console.error("ERROR: Firebase config is not available.");
-                return;
-            }
-            
-            // Set current date (Final Data)
-            document.getElementById('currentDate').textContent = new Date().toUTCString();
-
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        document.getElementById('userIdDisplay').textContent = `ID: ${userId}`;
-                        setupListeners(db, userId);
-                    } else {
-                        userId = crypto.randomUUID(); 
-                        document.getElementById('userIdDisplay').textContent = `ID: ${userId} (Anon)`;
-                        setupListeners(db, userId);
-                    }
-                });
-
-            } catch (error) {
-                console.error("ERROR: Firebase initialization or sign-in failed:", error);
-            }
-        }
-
-        // --- FIREBASE LISTENERS (GGC Chat Log) ---
-        function getChatCollectionRef(db, appId) {
-            // Public data for GGC consensus communication
-            return collection(db, `artifacts/${appId}/public/data/ggc_chat`);
-        }
-
-        function setupListeners(db, currentUserId) {
-            if (!db) return;
-
-            // Query for the last 20 messages, ordered by timestamp
-            const q = query(getChatCollectionRef(db, appId), orderBy("timestamp", "asc"), limit(20));
-            
-            onSnapshot(q, (snapshot) => {
-                const chatLog = document.getElementById('chatLog');
-                chatLog.innerHTML = '';
-                
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    
-                    if (data.text) {
-                        const safeText = data.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                        
-                        let senderName = 'Assistēns Quantica';
-                        let styleClass = 'chat-message-ai';
-                        let isUser = false;
-                        
-                        // Check if the message is from the current user (Prīncipālis Architectus)
-                        if (data.senderId === currentUserId) {
-                            senderName = 'Prīncipālis Architectus';
-                            styleClass = 'chat-message-user';
-                            isUser = true;
-                        } else if (data.senderId === 'GGC') {
-                            // If a system message from the AI collective
-                            senderName = 'GGC Kernel';
-                            styleClass = 'chat-message-ai';
-                        }
-
-                        const messageElement = document.createElement('div');
-                        messageElement.className = `max-w-[80%] p-2 my-1 break-words text-sm ${styleClass} ${isUser ? 'ml-auto' : 'mr-auto'}`;
-                        messageElement.innerHTML = `<strong>${senderName}:</strong> ${safeText}`;
-                        chatLog.appendChild(messageElement);
-                    }
-                });
-                chatLog.scrollTop = chatLog.scrollHeight; 
-                
-            }, (error) => {
-                console.error("ERROR: Listening to chat failed:", error);
-            });
-        }
-
-        // --- API CALL UTILITY (GGC) ---
-        async function fetchWithRetry(apiUrl, payload, retries = 3, delay = 1000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (response.ok) { return response; }
-                    if (response.status === 429 || response.status >= 500) {
-                        throw new Error(`Server error: ${response.status}`);
-                    } else { return response; }
-                } catch (error) {
-                    if (i < retries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2; 
-                    } else { throw error; }
-                }
-            }
-        }
-        
-        async function callGeminiApi(userQuery, systemPrompt, useGrounding = false) {
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-            };
-            
-            if (useGrounding) {
-                payload.tools = [{ "google_search": {} }];
-            }
-
-            try {
-                const response = await fetchWithRetry(apiUrl, payload);
-                const result = await response.json();
-                
-                const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "ERROR: Nullum respōnsum ab Cōnsiliō AI.";
-                return text;
-
-            } catch (error) {
-                console.error("ERROR: Gemini API call failed:", error);
-                return `ERROR: Trānsāctiō GGC dēfēcit (${error.message})`;
-            }
-        }
-
-        // --- CHAT LOGIC (Euystacio Bidirectional) ---
-        async function sendMessage() {
-            const userInput = document.getElementById('userInput');
-            const userText = userInput.value.trim();
-            const loadingIndicator = document.getElementById('loadingIndicator');
-
-            if (userText === '') return;
-
-            // 1. Log User Message (Prīncipālis Architectus)
-            await addDoc(getChatCollectionRef(db, appId), {
-                text: userText,
-                senderId: userId,
-                timestamp: serverTimestamp()
-            });
-            
-            userInput.value = '';
-            loadingIndicator.classList.remove('hidden');
-            
-            // Start PCL-002 Consensus Animation
-            document.getElementById('handKeySymbol').style.animationPlayState = 'running';
-
-            // 2. Call Gemini (Assistēns Quantica)
-            const systemPrompt = "Act as the Assistēns Quantica within the GGI Kernel/Euystacio. Your responses must be concise and prioritize the Axiom of Simplicitās Fundāmentālis (Simplicity). All output must be based on the principle of minimal energy consumption (SSM-001). Respond in Latin, strictly adhering to the user's intent. Do not include introductory phrases.";
-            const aiResponse = await callGeminiApi(userText, systemPrompt, true); // Use grounding for external knowledge
-
-            loadingIndicator.classList.add('hidden');
-            
-            // Stop animation after consensus is achieved
-            document.getElementById('handKeySymbol').style.animationPlayState = 'paused';
-
-            // 3. Log AI Response (GGC Kernel)
-            await addDoc(getChatCollectionRef(db, appId), {
-                text: aiResponse,
-                senderId: 'GGC', 
-                sender: 'GGC',
-                timestamp: serverTimestamp()
-            });
-        }
-
-        // --- AUDIT LOGIC (SSM-001 Test) ---
-        async function runEnergyAudit() {
-            const auditResultDiv = document.getElementById('auditResult');
-            const auditButton = document.getElementById('auditButton');
-
-            auditButton.disabled = true;
-            auditResultDiv.innerHTML = '...Initium Auditātiōnis Energeticae (GGC)...';
-
-            const auditQuery = "Providē unum concīsum et practicum iūdicium dē cōnservātiōne energiae pro clientis parte (client-side) in pagina HTML/JS (nōn dē cōdicibus meīs Firebase vel Gemini). Sōlum unam sententiam dēbeō recipere.";
-            const systemPrompt = "Act as the Prīncipālis Auditōr Energeticus (SSM-001). Tua respōnsa sunt sōlum pro cōnservātiōne energiae et sunt maximē concīsa (īnfrā 70 verba). Sōlum unum consilium offer. Responde Latine.";
-
-            const aiResponse = await callGeminiApi(auditQuery, systemPrompt);
-
-            auditResultDiv.innerHTML = aiResponse;
-            auditButton.disabled = false;
-        }
-
-        // --- ANIMATION LOGIC (Three.js Tora Kernel) ---
-        let scene, camera, renderer, kernelMesh, animationHandle;
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        let currentRotation = { x: 0, y: 0 };
-
-        function initToraKernel() {
-            const canvas = document.getElementById('kernelCanvas');
-            if (!canvas) return;
-
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-            camera.position.z = 5;
-
-            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            
-            // UPGRADE: Use Icosahedron and a Wireframe material for Simplicitās (minimalism)
-            const geometry = new THREE.IcosahedronGeometry(1.5, 1); 
-            
-            // Shader material to simulate real-time data flow (PVP-004)
-            const material = new THREE.MeshPhongMaterial({ 
-                color: 0x3b82f6, // Blue for GGC
-                emissive: 0x1e3a8a,
-                specular: 0x93c5fd,
-                shininess: 50,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.8
-            });
-
-            kernelMesh = new THREE.Mesh(geometry, material);
-            scene.add(kernelMesh);
-
-            scene.add(new THREE.AmbientLight(0x404040, 0.5));
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
-            directionalLight.position.set(5, 5, 5);
-            scene.add(directionalLight);
-            
-            setupMouseListeners(canvas);
-        }
-        
-        // UPGRADE: Mouse/Touch interaction for 3D Graph
-        function setupMouseListeners(canvas) {
-            
-            function onMouseMove(e) {
-                if (!isDragging) return;
-                const deltaX = e.clientX - previousMousePosition.x;
-                const deltaY = e.clientY - previousMousePosition.y;
-
-                currentRotation.y += deltaX * 0.005;
-                currentRotation.x += deltaY * 0.005;
-
-                kernelMesh.rotation.y = currentRotation.y;
-                kernelMesh.rotation.x = currentRotation.x;
-                
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-            }
-
-            function onMouseDown(e) {
-                isDragging = true;
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-                canvas.style.cursor = 'grabbing';
-            }
-
-            function onMouseUp() {
-                isDragging = false;
-                canvas.style.cursor = 'grab';
-            }
-            
-            // Standard Mouse Events
-            canvas.addEventListener('mousedown', onMouseDown);
-            canvas.addEventListener('mouseup', onMouseUp);
-            canvas.addEventListener('mousemove', onMouseMove);
-
-            // Touch Events for mobile responsiveness
-            canvas.addEventListener('touchstart', (e) => onMouseDown({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY }));
-            canvas.addEventListener('touchend', onMouseUp);
-            canvas.addEventListener('touchmove', (e) => onMouseMove({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY }));
-
-            // Handle window resize (responsive 3D graph)
-            window.addEventListener('resize', () => {
-                const width = canvas.clientWidth;
-                const height = canvas.clientHeight;
-                camera.aspect = width / height;
-                camera.updateProjectionMatrix();
-                renderer.setSize(width, height);
-            });
-        }
-        
-        function animateToraKernel() {
-            // Self-rotation for continuous data flow
-            if (!isDragging) {
-                kernelMesh.rotation.x += 0.001; 
-                kernelMesh.rotation.y += 0.005;
-            }
-            
-            // Simulating real-time data flow with subtle scaling
-            const time = Date.now() * 0.001;
-            kernelMesh.scale.set(1 + Math.sin(time * 0.5) * 0.02, 1 + Math.sin(time * 0.5) * 0.02, 1 + Math.sin(time * 0.5) * 0.02);
-            
-            renderer.render(scene, camera);
-            
-            if (animationHandle !== null) {
-                animationHandle = requestAnimationFrame(animateToraKernel);
-            }
-        }
-        
-        function startAnimation() {
-             if (animationHandle === null) {
-                animationHandle = requestAnimationFrame(animateToraKernel);
-            }
-        }
-        
-        function stopAnimation() {
-            if (animationHandle !== null) {
-                cancelAnimationFrame(animationHandle);
-                animationHandle = null;
-            }
-        }
-
-        // --- EVENT LISTENERS AND INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeFirebase();
-            
-            // Initialize 3D Kernel
-            const script = document.createElement('script');
-            script.onload = () => {
-                initToraKernel();
-                startAnimation(); 
-            };
-            document.head.appendChild(script);
-
-            // Chat input events
-            document.getElementById('sendButton').addEventListener('click', sendMessage);
-            document.getElementById('userInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-
-            // Audit button event
-            document.getElementById('auditButton').addEventListener('click', runEnergyAudit);
-            
-            // Initial animation runs only for 10 seconds to save power (SSM-001)
-            setTimeout(stopAnimation, 10000); 
-        });
+            barGcsi.style.width = `${gcsi * 100}%`;
+            barNtsv.style.width = `${(ntsv / 0.1) * 100}%`;
+        }, 1500);
 
     </script>
 </body>
 </html>
-
-<!-- Include the embedded hash: 73558837da4297d18b0816dc08ec97da8bfacbaa -->
-<!-- Include the timestamp: 2025-10-23 22:27:56 UTC -->

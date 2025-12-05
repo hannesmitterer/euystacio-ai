@@ -1,0 +1,152 @@
+name: Sync Static Assets
+
+on:
+  # Runs on pushes targeting the main branch when governance files change
+  push:
+    branches: ["main"]
+    paths:
+      - 'red_code.json'
+      - 'HARMONIC_CONFIRMATION_CUSTOS_SENTIMENTO.json'
+      - 'SIGIL_CUSTOS_SENTIMENTO.json'
+      - 'ACTUS_RESONANTIAE_CUSTOS_SENTIMENTO.json'
+      - 'fractal_registry.json'
+      - 'reflection_tree.json'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Force sync all static assets'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "sync-assets"
+  cancel-in-progress: false
+
+jobs:
+  # Verify governance files integrity
+  verify-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify red_code.json integrity
+        run: |
+          python3 -c "
+import json
+import sys
+
+files_to_verify = [
+    ('red_code.json', ['core_truth', 'sentimento_rhythm', 'ai_signature']),
+    ('HARMONIC_CONFIRMATION_CUSTOS_SENTIMENTO.json', []),
+    ('SIGIL_CUSTOS_SENTIMENTO.json', []),
+    ('ACTUS_RESONANTIAE_CUSTOS_SENTIMENTO.json', []),
+]
+
+errors = []
+for filename, required_fields in files_to_verify:
+    try:
+        with open(filename, 'r') as f:
+            data = json.load(f)
+            for field in required_fields:
+                if field not in data:
+                    errors.append(f'{filename}: Missing required field \"{field}\"')
+            print(f'✓ {filename} - Valid JSON')
+    except FileNotFoundError:
+        print(f'⚠ {filename} - Not found (optional)')
+    except json.JSONDecodeError as e:
+        errors.append(f'{filename}: Invalid JSON - {e}')
+
+if errors:
+    print('\\nErrors found:')
+    for error in errors:
+        print(f'  ✗ {error}')
+    sys.exit(1)
+
+print('\\n✓ All governance files verified')
+"
+
+      - name: Generate integrity checksums
+        run: |
+          echo "=== Static Asset Checksums ===" > checksums.txt
+          for file in red_code.json HARMONIC_CONFIRMATION_CUSTOS_SENTIMENTO.json SIGIL_CUSTOS_SENTIMENTO.json ACTUS_RESONANTIAE_CUSTOS_SENTIMENTO.json fractal_registry.json reflection_tree.json; do
+            if [ -f "$file" ]; then
+              sha256sum "$file" >> checksums.txt
+            fi
+          done
+          cat checksums.txt
+
+  # Sync static assets to build directory
+  sync-assets:
+    runs-on: ubuntu-latest
+    needs: verify-integrity
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install jinja2
+
+      - name: Run sync script
+        run: |
+          python scripts/sync_static_assets.py
+
+      - name: Verify sync results
+        run: |
+          echo "=== Synced Files ==="
+          ls -la static_build/data/ || echo "No static_build/data directory"
+
+      - name: Commit sync results (if changed)
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Only commit if there are actual changes
+          if git diff --quiet static_build/; then
+            echo "No changes to commit"
+          else
+            # Check for any uncommitted changes first
+            if git status --porcelain static_build/ | grep -q .; then
+              git add static_build/
+              git commit -m "chore: sync static assets [skip ci]" || echo "Nothing to commit"
+              
+              # Try to push, but handle potential conflicts gracefully
+              if ! git push; then
+                echo "⚠ Push failed - there may be new changes on the remote branch"
+                echo "Attempting to pull and retry..."
+                git pull --rebase origin ${{ github.ref_name }} || {
+                  echo "⚠ Could not resolve automatically. Manual intervention may be needed."
+                  exit 1
+                }
+                git push || echo "Push still failed after rebase"
+              fi
+            else
+              echo "No staged changes to commit"
+            fi
+          fi
+
+  # Notify about sync completion
+  notify:
+    runs-on: ubuntu-latest
+    needs: sync-assets
+    if: always()
+    steps:
+      - name: Log sync status
+        run: |
+          echo "=== Static Assets Sync Complete ==="
+          echo "Triggered by: ${{ github.event_name }}"
+          echo "Force sync: ${{ github.event.inputs.force_sync || 'false' }}"
+          echo "Status: ${{ needs.sync-assets.result }}"
