@@ -1,0 +1,59 @@
+# CODEOWNERS for Euystacio AI Repository
+# This file defines code ownership for governance and review requirements.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+* @hannesmitterer
+
+# ============================================================================
+# IMMUTABLE GOVERNANCE FILES
+# These files require explicit approval from the seed-bringer
+# Changes should only be made through approved pull requests
+# ============================================================================
+
+# Core Red Code - The foundational truth of Euystacio
+red_code.json @hannesmitterer
+
+# Harmonic and Sigil governance files
+HARMONIC_CONFIRMATION_CUSTOS_SENTIMENTO.json @hannesmitterer
+SIGIL_CUSTOS_SENTIMENTO.json @hannesmitterer
+ACTUS_RESONANTIAE_CUSTOS_SENTIMENTO.json @hannesmitterer
+
+# Fractal identity and reflection systems
+fractal_registry.json @hannesmitterer
+reflection_tree.json @hannesmitterer
+
+# Core declarations and covenants
+LIVING-COVENANT.md @hannesmitterer
+IMMUTABLE-SOVEREIGNTY-DECLARATION.md @hannesmitterer
+genesis.md @hannesmitterer
+AI_signature_statement.md @hannesmitterer
+
+# ============================================================================
+# DEPLOYMENT AND CI/CD CONFIGURATIONS
+# Require review for infrastructure changes
+# ============================================================================
+
+.github/workflows/*.yml @hannesmitterer
+render.yaml @hannesmitterer
+netlify.toml @hannesmitterer
+
+# ============================================================================
+# CORE APPLICATION CODE
+# Primary application logic
+# ============================================================================
+
+/core/ @hannesmitterer
+app.py @hannesmitterer
+sentimento_pulse_interface.py @hannesmitterer
+tutor_nomination.py @hannesmitterer
+euystacio_core.py @hannesmitterer
+quantum_consensus_aggregator.py @hannesmitterer
+
+# ============================================================================
+# SECURITY AND COMPLIANCE
+# Security-related files
+# ============================================================================
+
+SECURITY_RUNBOOK.md @hannesmitterer
+/contracts/ @hannesmitterer
