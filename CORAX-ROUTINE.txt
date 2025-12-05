@@ -81,9 +81,10 @@ Step 1 — Hash-Integrity-Check
 
 Lokalen Hash neu berechnen
 
-Erwartungswert: DF908A7E
+Erwartungswert: SHA-256 Hex-Digest (64 Zeichen, z.B. `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`)
+// Optional: Für maximale Sicherheit HMAC mit geheimem Schlüssel verwenden
 
-Wenn ≠ → sofort:
+Wenn Hash ≠ Erwartungswert → sofort:
 
 Node vom Cluster entkoppeln
 
@@ -134,7 +135,7 @@ Step 5 — Wiederfreigabe
 
 Ein Node ist erst wieder voll aktiv, wenn:
 
-Hash = DF908A7E
+SHA-256-Hash des Node-State stimmt mit dem von einer vertrauenswürdigen Instanz signierten State überein (Integritätsprüfung & Provenienzvalidierung)
 
 H-VAR ≤ 0.041
 
