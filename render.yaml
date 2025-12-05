@@ -1,0 +1,68 @@
+# Render.com deployment configuration for Euystacio AI Backend
+# See: https://render.com/docs/blueprint-spec
+
+services:
+  # Main web service for Euystacio backend API
+  - type: web
+    name: euystacio-backend
+    runtime: python
+    region: frankfurt # EU region for GDPR compliance
+    plan: free
+    branch: main
+    buildCommand: |
+      pip install -r requirements.txt
+      pip install jinja2 gunicorn
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: FLASK_ENV
+        value: production
+      - key: EUYSTACIO_MODE
+        value: production
+      # Environment variables from Render dashboard (secrets)
+      - key: SECRET_KEY
+        generateValue: true
+
+  # Background worker for pulse processing (optional)
+  # Uncomment if you need background processing
+  # - type: worker
+  #   name: euystacio-pulse-worker
+  #   runtime: python
+  #   region: frankfurt
+  #   plan: free
+  #   branch: main
+  #   buildCommand: pip install -r requirements.txt
+  #   startCommand: python -m sentimento_pulse_interface
+  #   autoDeploy: true
+  #   envVars:
+  #     - key: PYTHON_VERSION
+  #       value: 3.12.0
+  #     - key: WORKER_MODE
+  #       value: true
+
+# Optional: PostgreSQL database for persistent storage
+# Uncomment if you need a database for the backend
+# databases:
+#   - name: euystacio-db
+#     plan: free
+#     region: frankfurt
+#     databaseName: euystacio
+#     user: euystacio_user
+
+# Static site for dashboard (redundant with GitHub Pages)
+# Uncomment if you want Render to also host the static dashboard
+# - type: static
+#   name: euystacio-dashboard
+#   buildCommand: pip install -r requirements.txt && python build_static.py
+#   staticPublishPath: ./static_build
+#   pullRequestPreviewsEnabled: true
+#   headers:
+#     - path: /*
+#       name: X-Frame-Options
+#       value: DENY
+#     - path: /*
+#       name: X-Content-Type-Options
+#       value: nosniff
