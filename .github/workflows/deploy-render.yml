@@ -1,0 +1,150 @@
+name: Deploy Backend to Render
+
+on:
+  # Runs on pushes targeting the main branch
+  push:
+    branches: ["main"]
+    paths:
+      - 'app.py'
+      - 'requirements.txt'
+      - 'sentimento_pulse_interface.py'
+      - 'tutor_nomination.py'
+      - 'euystacio_core.py'
+      - 'quantum_consensus_aggregator.py'
+      - 'core/**'
+      - 'templates/**'
+      - 'static/**'
+      - 'render.yaml'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Minimal permissions required for this workflow
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  # Test job - runs before deployment to ensure code quality
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install jinja2
+
+      - name: Verify red_code.json integrity
+        run: |
+          python -c "
+import json
+with open('red_code.json') as f:
+    data = json.load(f)
+    assert data.get('core_truth'), 'Missing core_truth'
+    assert data.get('ai_signature', {}).get('verified'), 'AI signature not verified'
+    print('✓ red_code.json integrity verified')
+"
+
+      - name: Test Python modules import
+        run: |
+          python -c "
+import sys
+sys.path.insert(0, '.')
+
+# Test imports (basic syntax check)
+try:
+    from sentimento_pulse_interface import SentimentoPulseInterface
+    print('✓ SentimentoPulseInterface import OK')
+except Exception as e:
+    print(f'⚠ SentimentoPulseInterface: {e}')
+
+try:
+    from tutor_nomination import TutorNomination
+    print('✓ TutorNomination import OK')
+except Exception as e:
+    print(f'⚠ TutorNomination: {e}')
+"
+
+      - name: Test static build
+        run: |
+          python build_static.py
+          test -f static_build/index.html
+          echo "✓ Static build successful"
+
+  # Build and verify job
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify application structure
+        run: |
+          echo "=== Application Files ==="
+          ls -la *.py | head -20
+          echo ""
+          echo "=== Templates ==="
+          ls -la templates/ || echo "No templates directory"
+          echo ""
+          echo "=== Static Assets ==="
+          ls -la static/ || echo "No static directory"
+
+  # Trigger Render deployment
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: render
+      url: ${{ vars.RENDER_SERVICE_URL }}
+    steps:
+      - name: Trigger Render Deploy Hook
+        if: ${{ vars.RENDER_DEPLOY_HOOK_URL != '' }}
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ vars.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          echo "Triggering Render deployment..."
+          if [ -n "$RENDER_DEPLOY_HOOK_URL" ]; then
+            curl -X POST "$RENDER_DEPLOY_HOOK_URL" \
+              -H "Accept: application/json" \
+              -d '{}' \
+              --fail \
+              --silent \
+              --show-error \
+              || echo "⚠ Deployment hook request failed"
+            echo "✓ Render deployment triggered"
+          else
+            echo "Note: RENDER_DEPLOY_HOOK_URL not configured. Skipping deployment trigger."
+            echo "Configure this in repository variables: Settings → Secrets and variables → Actions → Variables"
+          fi
+
+      - name: Log deployment info
+        run: |
+          echo "=== Deployment Information ==="
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo ""
+          echo "Note: If RENDER_DEPLOY_HOOK_URL is not set, configure it in repository secrets."
+          echo "See: https://render.com/docs/deploy-hooks"

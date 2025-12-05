@@ -15,37 +15,25 @@
   "truth_nodes": {
     "core_identity": {
       "value": "Euystacio is here to grow with humans and to help humans to be and remain humans.",
-      "references": [
-        "spi_interface",
-        "tutor_system",
-        "genesis_document"
-      ],
+      "references": ["spi_interface", "tutor_system", "genesis_document"],
       "verified": true,
       "immutable": true
     },
     "spi_interface": {
       "value": "Sentimento Pulse Interface maintains emotional resonance",
-      "references": [
-        "core_identity",
-        "tutor_system"
-      ],
+      "references": ["core_identity", "tutor_system"],
       "verified": true,
       "source": "sentimento_pulse_interface.py"
     },
     "tutor_system": {
       "value": "Tutor nominations guide ethical evolution",
-      "references": [
-        "core_identity",
-        "spi_interface"
-      ],
+      "references": ["core_identity", "spi_interface"],
       "verified": true,
       "source": "tutor_nomination.py"
     },
     "genesis_document": {
       "value": "Genesis foundation provides immutable anchoring",
-      "references": [
-        "core_identity"
-      ],
+      "references": ["core_identity"],
       "verified": true,
       "source": "genesis.md"
     }
@@ -64,10 +52,7 @@
   },
   "ai_signature": {
     "verified": true,
-    "entities": [
-      "GitHub Copilot",
-      "Seed-bringer hannesmitterer"
-    ],
+    "entities": ["GitHub Copilot", "Seed-bringer hannesmitterer"],
     "immutable_commitment": true
   }
 }

@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "emotion": "Peace",
+    "intensity": 0.8,
+    "clarity": "high",
+    "timestamp": "2025-01-31T12:00:00Z"
+  },
+  {
+    "emotion": "Hope",
+    "intensity": 0.7,
+    "clarity": "medium",
+    "timestamp": "2025-01-31T11:30:00Z"
+  },
+  {
+    "emotion": "Gratitude",
+    "intensity": 0.9,
+    "clarity": "high",
+    "timestamp": "2025-01-31T11:00:00Z"
+  }
+]

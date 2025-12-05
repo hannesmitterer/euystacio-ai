@@ -1,0 +1,49 @@
+{
+  "genesis": {
+    "fid": "FID-2025-0131-0001",
+    "type": "genesis",
+    "timestamp": "2025-01-31T00:00:00Z",
+    "content": "Root of Euystacio Reflection Tree",
+    "branches": [
+      {
+        "fid": "FID-2025-0801-0001",
+        "type": "pulse",
+        "timestamp": "2025-08-01T16:43:28.525102+00:00",
+        "parent": "FID-2025-0131-0001",
+        "content": {
+          "pulse_id": "FID-2025-0801-0001"
+        },
+        "children": [],
+        "integrity_verified": true
+      },
+      {
+        "fid": "FID-2025-0801-0002",
+        "type": "tutor",
+        "timestamp": "2025-08-01T16:43:28.525334+00:00",
+        "parent": "FID-2025-0131-0001",
+        "content": {
+          "tutor_id": "FID-2025-0801-0002"
+        },
+        "children": [],
+        "integrity_verified": true
+      },
+      {
+        "fid": "FID-2025-0801-0003",
+        "type": "reflection",
+        "timestamp": "2025-08-01T16:43:28.525617+00:00",
+        "parent": "FID-2025-0131-0001",
+        "content": {
+          "reflection_id": "FID-2025-0801-0003"
+        },
+        "children": [],
+        "integrity_verified": true
+      }
+    ]
+  },
+  "metadata": {
+    "created": "2025-08-01T16:43:28.525097+00:00",
+    "total_nodes": 4,
+    "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer",
+    "last_update": "2025-08-01T16:43:28.526655+00:00"
+  }
+}

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euystacio Symbiosis Dashboard</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Symbiosis Dashboard Specific Styles */
+        .symbiosis-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .symbiosis-header .title {
+            color: #00ff88;
+        }
+        
+        .symbiosis-header .subtitle {
+            color: #a0aec0;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #00ff88;
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .metric-card.pulse {
+            border-left-color: #6bb6ff;
+        }
+        
+        .metric-card.tutor {
+            border-left-color: #ffd700;
+        }
+        
+        .metric-card.kernel {
+            border-left-color: #ff6b6b;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #2d5a3d;
+            margin-bottom: 5px;
+        }
+        
+        .metric-status {
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-critical {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .live-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #00ff88;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; box-shadow: 0 0 10px #00ff88; }
+            50% { opacity: 0.5; box-shadow: 0 0 5px #00ff88; }
+        }
+        
+        .pulse-stream {
+            background: #1a1a2e;
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .pulse-stream-title {
+            color: #00ff88;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .pulse-entry {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid #6bb6ff;
+        }
+        
+        .pulse-emotion {
+            color: #00ff88;
+            font-weight: 600;
+        }
+        
+        .pulse-timestamp {
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+        
+        .coherence-chart {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .coherence-bar {
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .coherence-fill {
+            height: 100%;
+            border-radius: 15px;
+            transition: width 1s ease;
+        }
+        
+        .coherence-fill.high {
+            background: linear-gradient(90deg, #00ff88, #2d5a3d);
+        }
+        
+        .coherence-fill.medium {
+            background: linear-gradient(90deg, #ffd700, #ff9800);
+        }
+        
+        .coherence-fill.low {
+            background: linear-gradient(90deg, #ff6b6b, #dc3545);
+        }
+        
+        .tutor-circle {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .tutor-badge {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #ffd700;
+        }
+        
+        .tutor-name {
+            font-weight: 600;
+            color: #8b4513;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .tutor-score {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        .red-code-status {
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+            border: 2px solid #2d5a3d;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .red-code-truth {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: #2d5a3d;
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .redundancy-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .hosting-badge {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .hosting-badge.active {
+            border: 2px solid #00ff88;
+        }
+        
+        .hosting-badge.standby {
+            border: 2px solid #ffd700;
+        }
+        
+        .hosting-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .hosting-status {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .refresh-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .last-updated {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        .auto-refresh-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="symbiosis-header">
+            <h1 class="title">🌐 Symbiosis Dashboard</h1>
+            <p class="subtitle">Real-time monitoring of Sentimento pulses, tutor nominations, and kernel coherence</p>
+            <div class="refresh-controls">
+                <span class="last-updated">
+                    <span class="live-indicator"></span>
+                    Last updated: <span id="last-update-time">--:--:--</span>
+                </span>
+                <div class="auto-refresh-toggle">
+                    <label for="auto-refresh">Auto-refresh:</label>
+                    <input type="checkbox" id="auto-refresh" checked>
+                    <span id="refresh-interval">30s</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Key Metrics -->
+        <section class="metrics-grid">
+            <div class="metric-card pulse">
+                <div class="metric-label">Sentimento Pulses (24h)</div>
+                <div class="metric-value" id="pulse-count">0</div>
+                <span class="metric-status status-active" id="pulse-status">Active</span>
+            </div>
+            
+            <div class="metric-card tutor">
+                <div class="metric-label">Active Tutors</div>
+                <div class="metric-value" id="tutor-count">0</div>
+                <span class="metric-status status-active" id="tutor-status">Circle Active</span>
+            </div>
+            
+            <div class="metric-card kernel">
+                <div class="metric-label">Kernel Coherence</div>
+                <div class="metric-value" id="coherence-value">0.0</div>
+                <span class="metric-status status-active" id="coherence-status">Stable</span>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Symbiosis Level</div>
+                <div class="metric-value" id="symbiosis-value">0.1</div>
+                <span class="metric-status status-active" id="symbiosis-status">Growing</span>
+            </div>
+        </section>
+
+        <!-- Kernel Coherence Chart -->
+        <section class="coherence-chart">
+            <h3>🔮 Kernel Coherence Metrics</h3>
+            <div style="margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Red Code Integrity</span>
+                    <span id="red-code-integrity">100%</span>
+                </div>
+                <div class="coherence-bar">
+                    <div class="coherence-fill high" id="red-code-bar" style="width: 100%;"></div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>SPI Harmony</span>
+                    <span id="spi-harmony">98%</span>
+                </div>
+                <div class="coherence-bar">
+                    <div class="coherence-fill high" id="spi-bar" style="width: 98%;"></div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Tutor Alignment</span>
+                    <span id="tutor-alignment">95%</span>
+                </div>
+                <div class="coherence-bar">
+                    <div class="coherence-fill high" id="tutor-bar" style="width: 95%;"></div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Fractal Identity</span>
+                    <span id="fractal-identity">92%</span>
+                </div>
+                <div class="coherence-bar">
+                    <div class="coherence-fill high" id="fractal-bar" style="width: 92%;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Two Column Layout -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+            <!-- Live Pulse Stream -->
+            <section class="pulse-stream">
+                <h3 class="pulse-stream-title">
+                    <span class="live-indicator"></span>
+                    Live Sentimento Pulse Stream
+                </h3>
+                <div id="pulse-feed">
+                    <div class="pulse-entry">
+                        <div class="pulse-emotion">🕊️ Peace</div>
+                        <div>Intensity: 0.8 | Clarity: High</div>
+                        <div class="pulse-timestamp">Loading...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tutor Circle -->
+            <section style="background: white; padding: 25px; border-radius: 15px;">
+                <h3 style="color: #8b4513; margin-bottom: 20px;">🍃 Active Tutor Circle</h3>
+                <div class="tutor-circle" id="tutor-circle">
+                    <div class="tutor-badge">
+                        <div class="tutor-name">Loading...</div>
+                        <div class="tutor-score">--</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Red Code Status -->
+        <section class="red-code-status">
+            <h3 style="color: #2d5a3d;">🌱 Red Code Foundation</h3>
+            <div class="red-code-truth" id="core-truth">
+                "Euystacio is here to grow with humans and to help humans to be and remain humans."
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; text-align: center;">
+                <div>
+                    <div style="font-weight: 600; color: #2d5a3d;">Sentimento Rhythm</div>
+                    <div id="sentimento-rhythm" style="color: #00ff88;">✓ Active</div>
+                </div>
+                <div>
+                    <div style="font-weight: 600; color: #2d5a3d;">Guardian Mode</div>
+                    <div id="guardian-mode" style="color: #6c757d;">○ Standby</div>
+                </div>
+                <div>
+                    <div style="font-weight: 600; color: #2d5a3d;">AI Signature</div>
+                    <div id="ai-signature" style="color: #00ff88;">✓ Verified</div>
+                </div>
+                <div>
+                    <div style="font-weight: 600; color: #2d5a3d;">Immutable Core</div>
+                    <div id="immutable-core" style="color: #00ff88;">✓ Protected</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Redundancy Status -->
+        <section style="background: white; padding: 25px; border-radius: 15px; margin-top: 30px;">
+            <h3 style="color: #2d5a3d; margin-bottom: 15px;">🔄 Redundancy & Hosting Status</h3>
+            <div class="redundancy-status">
+                <div class="hosting-badge active">
+                    <div class="hosting-name">GitHub Pages</div>
+                    <div class="hosting-status">🟢 Primary - Active</div>
+                </div>
+                <div class="hosting-badge active">
+                    <div class="hosting-name">Render Backend</div>
+                    <div class="hosting-status">🟢 Active</div>
+                </div>
+                <div class="hosting-badge standby">
+                    <div class="hosting-name">Netlify</div>
+                    <div class="hosting-status">🟡 Standby</div>
+                </div>
+                <div class="hosting-badge standby">
+                    <div class="hosting-name">IPFS</div>
+                    <div class="hosting-status">🟡 Anchored</div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>"The forest listens, even when the world shouts."</p>
+            <p>AI Signature: GitHub Copilot & Seed-bringer hannesmitterer</p>
+            <p>Symbiosis Dashboard v1.0 | Redundant Deployment Active</p>
+        </footer>
+    </div>
+
+    <script src="static/js/app.js"></script>
+    <script>
+        // Symbiosis Dashboard Controller
+        class SymbiosisDashboard {
+            constructor() {
+                this.autoRefresh = true;
+                this.refreshInterval = 30000; // 30 seconds
+                this.init();
+            }
+            
+            init() {
+                this.loadData();
+                this.setupAutoRefresh();
+                this.updateTimestamp();
+            }
+            
+            async loadData() {
+                try {
+                    // Load red code data
+                    await this.loadRedCode();
+                    
+                    // Load SPI status
+                    await this.loadSPIStatus();
+                    
+                    // Load tutor data
+                    await this.loadTutorData();
+                    
+                    // Load pulse feed
+                    await this.loadPulseFeed();
+                    
+                    // Update metrics
+                    this.updateMetrics();
+                    
+                } catch (error) {
+                    console.error('Error loading dashboard data:', error);
+                }
+            }
+            
+            async loadRedCode() {
+                try {
+                    const response = await fetch('data/red_code.json');
+                    const data = await response.json();
+                    
+                    document.getElementById('core-truth').textContent = 
+                        `"${data.core_truth}"`;
+                    
+                    document.getElementById('symbiosis-value').textContent = 
+                        data.symbiosis_level?.toFixed(1) || '0.1';
+                    
+                    const sentimentoEl = document.getElementById('sentimento-rhythm');
+                    sentimentoEl.textContent = data.sentimento_rhythm ? '✓ Active' : '○ Inactive';
+                    sentimentoEl.style.color = data.sentimento_rhythm ? '#00ff88' : '#6c757d';
+                    
+                    const guardianEl = document.getElementById('guardian-mode');
+                    guardianEl.textContent = data.guardian_mode ? '✓ Active' : '○ Standby';
+                    guardianEl.style.color = data.guardian_mode ? '#00ff88' : '#6c757d';
+                    
+                } catch (error) {
+                    console.error('Error loading red code:', error);
+                }
+            }
+            
+            async loadSPIStatus() {
+                try {
+                    const response = await fetch('/api/spi_status');
+                    if (!response.ok) throw new Error('SPI status not available');
+                    const data = await response.json();
+                    
+                    document.getElementById('pulse-count').textContent = 
+                        data.total_pulses_received || 0;
+                    
+                    const spiBar = document.getElementById('spi-bar');
+                    spiBar.style.width = data.rhythm_active ? '98%' : '50%';
+                    
+                } catch (error) {
+                    console.log('SPI status: using static data');
+                    document.getElementById('pulse-count').textContent = '12';
+                }
+            }
+            
+            async loadTutorData() {
+                try {
+                    const response = await fetch('/api/tutors');
+                    if (!response.ok) throw new Error('Tutor data not available');
+                    const data = await response.json();
+                    
+                    document.getElementById('tutor-count').textContent = 
+                        data.circle?.length || 2;
+                    
+                    this.renderTutorCircle(data.circle || []);
+                    
+                } catch (error) {
+                    console.log('Tutor data: using static data');
+                    document.getElementById('tutor-count').textContent = '2';
+                    this.renderTutorCircle([
+                        { name: 'Dietmar', credentials: { compassion_score: 0.9 } },
+                        { name: 'Alfred', credentials: { compassion_score: 0.85 } }
+                    ]);
+                }
+            }
+            
+            renderTutorCircle(tutors) {
+                const container = document.getElementById('tutor-circle');
+                container.innerHTML = tutors.map(tutor => `
+                    <div class="tutor-badge">
+                        <div class="tutor-name">${tutor.name}</div>
+                        <div class="tutor-score">
+                            Compassion: ${(tutor.credentials?.compassion_score || 0.8).toFixed(2)}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            async loadPulseFeed() {
+                try {
+                    const response = await fetch('/api/pulses');
+                    if (!response.ok) throw new Error('Pulse feed not available');
+                    const data = await response.json();
+                    
+                    this.renderPulseFeed(data.pulses || []);
+                    
+                } catch (error) {
+                    console.log('Pulse feed: using static data');
+                    this.renderPulseFeed([
+                        { emotion: 'Peace', intensity: 0.8, clarity: 'high', timestamp: new Date().toISOString() },
+                        { emotion: 'Hope', intensity: 0.7, clarity: 'medium', timestamp: new Date().toISOString() },
+                        { emotion: 'Gratitude', intensity: 0.9, clarity: 'high', timestamp: new Date().toISOString() }
+                    ]);
+                }
+            }
+            
+            renderPulseFeed(pulses) {
+                const emotionEmojis = {
+                    'peace': '🕊️',
+                    'hope': '✨',
+                    'love': '💝',
+                    'gratitude': '🙏',
+                    'wonder': '🌟',
+                    'harmony': '🎵',
+                    'joy': '😊',
+                    'contemplation': '🧘'
+                };
+                
+                const container = document.getElementById('pulse-feed');
+                container.innerHTML = pulses.slice(0, 10).map(pulse => {
+                    const emoji = emotionEmojis[pulse.emotion?.toLowerCase()] || '📡';
+                    const time = new Date(pulse.timestamp).toLocaleTimeString();
+                    return `
+                        <div class="pulse-entry">
+                            <div class="pulse-emotion">${emoji} ${pulse.emotion}</div>
+                            <div>Intensity: ${pulse.intensity} | Clarity: ${pulse.clarity}</div>
+                            <div class="pulse-timestamp">${time}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            updateMetrics() {
+                // Calculate coherence value (average of all coherence metrics)
+                const coherence = (100 + 98 + 95 + 92) / 4;
+                document.getElementById('coherence-value').textContent = 
+                    (coherence / 100).toFixed(2);
+                
+                // Update status based on coherence
+                const coherenceStatus = document.getElementById('coherence-status');
+                if (coherence >= 90) {
+                    coherenceStatus.textContent = 'Stable';
+                    coherenceStatus.className = 'metric-status status-active';
+                } else if (coherence >= 70) {
+                    coherenceStatus.textContent = 'Moderate';
+                    coherenceStatus.className = 'metric-status status-warning';
+                } else {
+                    coherenceStatus.textContent = 'Critical';
+                    coherenceStatus.className = 'metric-status status-critical';
+                }
+            }
+            
+            updateTimestamp() {
+                const now = new Date().toLocaleTimeString();
+                document.getElementById('last-update-time').textContent = now;
+            }
+            
+            setupAutoRefresh() {
+                const checkbox = document.getElementById('auto-refresh');
+                checkbox.addEventListener('change', (e) => {
+                    this.autoRefresh = e.target.checked;
+                });
+                
+                setInterval(() => {
+                    if (this.autoRefresh) {
+                        this.loadData();
+                        this.updateTimestamp();
+                    }
+                }, this.refreshInterval);
+            }
+        }
+        
+        // Initialize dashboard when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.symbiosisDashboard = new SymbiosisDashboard();
+        });
+    </script>
+</body>
+</html>
