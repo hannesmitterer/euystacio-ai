@@ -150,6 +150,9 @@ class QuantumSolutions:
             "sustainability": 0.20
         }
         
+        # Constants for impact calculation
+        self.LOG10_ONE_MILLION = 6  # log10(1,000,000) for beneficiary normalization
+        
         self._log_event("quantum_solutions_initialized", {
             "automation_threshold": self.automation_threshold,
             "max_decision_time_ms": self.max_decision_time_ms
@@ -493,7 +496,7 @@ class QuantumSolutions:
         """Calculate impact score for a point"""
         # Normalize beneficiaries (log scale for fairness)
         beneficiaries = point_data.get("beneficiaries_count", 0)
-        beneficiaries_score = min(1.0, math.log10(beneficiaries + 1) / 6)  # log10(1M) ≈ 6
+        beneficiaries_score = min(1.0, math.log10(beneficiaries + 1) / self.LOG10_ONE_MILLION)
         
         # Urgency score
         urgency = point_data.get("urgency", 0.5)

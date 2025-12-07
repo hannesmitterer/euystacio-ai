@@ -143,6 +143,10 @@ class EthicsGapCalculator:
         self.performance_buffer: List[float] = []
         self.max_buffer_size = 100
         
+        # Constants for trend detection
+        self.TREND_INCREASE_THRESHOLD = 1.05  # 5% increase threshold
+        self.TREND_DECREASE_THRESHOLD = 0.95  # 5% decrease threshold
+        
         self._log_event("ethics_gap_calculator_initialized", {
             "ethical_ideal_target": self.ethical_ideal_target,
             "hvar_threshold": self.hvar_threshold
@@ -265,9 +269,9 @@ class EthicsGapCalculator:
                 recent_mean = statistics.mean(data[-5:])
                 earlier_mean = statistics.mean(data[-10:-5]) if len(data) >= 10 else mean_val
                 
-                if recent_mean > earlier_mean * 1.05:
+                if recent_mean > earlier_mean * self.TREND_INCREASE_THRESHOLD:
                     trend = "increasing"
-                elif recent_mean < earlier_mean * 0.95:
+                elif recent_mean < earlier_mean * self.TREND_DECREASE_THRESHOLD:
                     trend = "decreasing"
                 else:
                     trend = "stable"
