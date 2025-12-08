@@ -33,13 +33,6 @@ scrape_configs:
     static_configs:
       - targets: ['euystacio-api:8000']
     metrics_path: '/metrics'
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: instance
-      - source_labels: [__address__]
-        target_label: __param_target
-      - target_label: __address__
-        replacement: euystacio-api:8000
 
   # Symbiosis Score Metrics
   - job_name: 'symbiosis-metrics'

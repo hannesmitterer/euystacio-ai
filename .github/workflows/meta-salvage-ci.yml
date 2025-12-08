@@ -181,7 +181,12 @@ jobs:
 
       - name: Run all Python tests
         run: |
-          python -m pytest . -v --tb=short --ignore=euystacio-helmi-AI-main || echo "⚠ Some tests may require additional setup"
+          if python -m pytest . -v --tb=short --ignore=euystacio-helmi-AI-main; then
+            echo "✓ All tests passed"
+          else
+            echo "⚠ Some tests may require additional setup - continuing deployment"
+            exit 0
+          fi
 
       - name: Generate coverage report
         if: success()

@@ -103,10 +103,6 @@ resource "helm_release" "prometheus_operator" {
   namespace  = kubernetes_namespace.monitoring.metadata[0].name
   version    = "52.0.0"
 
-  values = [
-    file("${path.module}/helm-values/prometheus-operator-values.yaml")
-  ]
-
   set {
     name  = "prometheus.prometheusSpec.retention"
     value = "30d"
@@ -126,9 +122,15 @@ resource "helm_release" "grafana" {
   namespace  = kubernetes_namespace.monitoring.metadata[0].name
   version    = "7.0.0"
 
-  values = [
-    file("${path.module}/helm-values/grafana-values.yaml")
-  ]
+  set {
+    name  = "persistence.enabled"
+    value = "true"
+  }
+
+  set {
+    name  = "persistence.size"
+    value = "10Gi"
+  }
 
   depends_on = [helm_release.prometheus_operator]
 }
