@@ -1,0 +1,423 @@
+# Automation Workflow for Protocollo Meta Salvage
+# This workflow defines the automation layer using Terraform, Kubernetes, and Argo Workflows
+# for dynamic resource provisioning and Peace Bond enforcement.
+
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: meta-salvage-automation
+  namespace: euystacio-ai
+  labels:
+    component: protocollo-meta-salvage
+    layer: automation
+
+spec:
+  description: >
+    Automation workflow for dynamic resource provisioning and operational
+    constraint enforcement on CaaS providers. Uses Terraform for infrastructure
+    changes and Kubernetes for runtime enforcement.
+
+  # Argo Workflows Configuration
+  entrypoint: meta-salvage-orchestrator
+  
+  serviceAccountName: meta-salvage-automation
+  
+  # Volume Claims for State Management
+  volumeClaimTemplates:
+    - metadata:
+        name: terraform-state
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+
+  # Workflow Templates
+  templates:
+    # Main Orchestrator Template
+    - name: meta-salvage-orchestrator
+      steps:
+        - - name: check-decisions
+            template: check-new-decisions
+        
+        - - name: process-decision
+            template: process-peace-bond-decision
+            arguments:
+              parameters:
+                - name: decision-id
+                  value: "{{item.decision_id}}"
+                - name: provider-id
+                  value: "{{item.provider_id}}"
+                - name: decision-type
+                  value: "{{item.decision_type}}"
+            withParam: "{{steps.check-decisions.outputs.result}}"
+        
+        - - name: verify-enforcement
+            template: verify-constraint-enforcement
+    
+    # Check for New Decisions
+    - name: check-new-decisions
+      script:
+        image: python:3.11-slim
+        command: [python]
+        source: |
+          import json
+          import requests
+          
+          # Query decision engine for pending decisions
+          response = requests.get(
+              "http://decision-engine-service:8080/api/v1/decisions/pending"
+          )
+          
+          decisions = response.json()
+          print(json.dumps(decisions))
+    
+    # Process Peace Bond Decision
+    - name: process-peace-bond-decision
+      inputs:
+        parameters:
+          - name: decision-id
+          - name: provider-id
+          - name: decision-type
+      
+      dag:
+        tasks:
+          - name: validate-decision
+            template: validate-decision-schema
+            arguments:
+              parameters:
+                - name: decision-id
+                  value: "{{inputs.parameters.decision-id}}"
+          
+          - name: provision-infrastructure
+            template: terraform-apply
+            dependencies: [validate-decision]
+            arguments:
+              parameters:
+                - name: provider-id
+                  value: "{{inputs.parameters.provider-id}}"
+          
+          - name: enforce-constraints
+            template: kubernetes-enforce
+            dependencies: [provision-infrastructure]
+            arguments:
+              parameters:
+                - name: provider-id
+                  value: "{{inputs.parameters.provider-id}}"
+                - name: decision-id
+                  value: "{{inputs.parameters.decision-id}}"
+          
+          - name: notify-completion
+            template: send-notification
+            dependencies: [enforce-constraints]
+    
+    # Terraform Infrastructure Provisioning
+    - name: terraform-apply
+      inputs:
+        parameters:
+          - name: provider-id
+      
+      volumes:
+        - name: terraform-state
+          persistentVolumeClaim:
+            claimName: terraform-state
+      
+      container:
+        image: hashicorp/terraform:1.5
+        command: [sh, -c]
+        args:
+          - |
+            cd /workspace
+            
+            # Initialize Terraform
+            terraform init -backend-config="bucket=meta-salvage-state"
+            
+            # Get provider configuration
+            PROVIDER_ID={{inputs.parameters.provider-id}}
+            
+            # Apply infrastructure changes
+            terraform apply -auto-approve \
+              -var="provider_id=${PROVIDER_ID}" \
+              -target=module.peace_bond_enforcement
+        
+        volumeMounts:
+          - name: terraform-state
+            mountPath: /workspace
+        
+        env:
+          - name: TF_LOG
+            value: "INFO"
+
+  # Terraform Module Definitions
+  terraform:
+    modules:
+      # Peace Bond Enforcement Module
+      - name: peace_bond_enforcement
+        source: "./modules/peace-bonds"
+        
+        variables:
+          provider_id:
+            type: string
+            description: "CaaS Provider identifier"
+          
+          throughput_limit:
+            type: number
+            description: "Maximum throughput in ops/sec"
+            default: null
+          
+          latency_ceiling:
+            type: number
+            description: "Maximum latency in ms"
+            default: null
+          
+          enable_audit:
+            type: bool
+            description: "Enable audit mode"
+            default: false
+        
+        resources:
+          # Network Policy for Traffic Shaping
+          - type: kubernetes_network_policy
+            name: "provider-throughput-limit"
+            spec:
+              podSelector:
+                matchLabels:
+                  provider: "${var.provider_id}"
+              policyTypes:
+                - Ingress
+                - Egress
+              ingress:
+                - from:
+                  - podSelector:
+                      matchLabels:
+                        app: euystacio-ai
+                  ports:
+                    - protocol: TCP
+                      port: 8080
+          
+          # Service Mesh Configuration (Istio)
+          - type: istio_virtual_service
+            name: "provider-constraints"
+            spec:
+              hosts:
+                - "${var.provider_id}.caas.internal"
+              http:
+                - match:
+                  - headers:
+                      x-provider-id:
+                        exact: "${var.provider_id}"
+                  route:
+                    - destination:
+                        host: "${var.provider_id}.caas.internal"
+                      weight: 100
+                  timeout: "${var.latency_ceiling}ms"
+                  retries:
+                    attempts: 3
+                    perTryTimeout: "${var.latency_ceiling / 2}ms"
+          
+          # Rate Limiting (Envoy)
+          - type: envoy_rate_limit
+            name: "provider-rate-limit"
+            spec:
+              domain: "meta-salvage"
+              descriptors:
+                - key: "provider_id"
+                  value: "${var.provider_id}"
+                  rate_limit:
+                    requests_per_unit: "${var.throughput_limit}"
+                    unit: "SECOND"
+
+  # Kubernetes Enforcement Templates
+  kubernetes:
+    # Network Policies
+    network_policies:
+      - name: peace-bond-network-policy
+        spec:
+          podSelector:
+            matchLabels:
+              peace-bond: "active"
+          policyTypes:
+            - Ingress
+            - Egress
+          ingress:
+            - from:
+              - namespaceSelector:
+                  matchLabels:
+                    name: euystacio-ai
+              ports:
+                - protocol: TCP
+                  port: 8080
+    
+    # Resource Quotas
+    resource_quotas:
+      - name: peace-bond-quota
+        spec:
+          hard:
+            requests.cpu: "2"
+            requests.memory: "4Gi"
+            limits.cpu: "4"
+            limits.memory: "8Gi"
+    
+    # Custom Resources
+    custom_resources:
+      - apiVersion: meta-salvage.euystacio.ai/v1
+        kind: PeaceBond
+        metadata:
+          name: "bond-{{provider-id}}"
+        spec:
+          providerId: "{{provider-id}}"
+          status: "ACTIVE"
+          constraints:
+            - type: "THROUGHPUT_LIMIT"
+              value: "{{throughput-limit}}"
+            - type: "LATENCY_CEILING"
+              value: "{{latency-ceiling}}"
+          enforcement:
+            method: "network-policy"
+            strictMode: true
+
+  # Real-time Enforcement Templates
+  enforcement:
+    # Istio Service Mesh Configuration
+    istio:
+      virtual_services:
+        - name: provider-constraints
+          hosts:
+            - "*.caas.internal"
+          http:
+            - match:
+              - headers:
+                  x-peace-bond:
+                    exact: "active"
+              fault:
+                delay:
+                  percentage:
+                    value: 0
+                  fixedDelay: 0s
+              timeout: "{{latency-ceiling}}ms"
+              retries:
+                attempts: 2
+      
+      destination_rules:
+        - name: provider-circuit-breaker
+          host: "*.caas.internal"
+          trafficPolicy:
+            connectionPool:
+              tcp:
+                maxConnections: 100
+              http:
+                http1MaxPendingRequests: 50
+                http2MaxRequests: 100
+                maxRequestsPerConnection: 2
+            outlierDetection:
+              consecutiveErrors: 5
+              interval: 30s
+              baseEjectionTime: 60s
+              maxEjectionPercent: 50
+    
+    # Envoy Proxy Configuration
+    envoy:
+      rate_limits:
+        domain: "meta-salvage"
+        rate_limits:
+          - actions:
+            - request_headers:
+                header_name: "x-provider-id"
+                descriptor_key: "provider_id"
+          
+          descriptors:
+            - key: "provider_id"
+              rate_limit:
+                requests_per_unit: "{{throughput-limit}}"
+                unit: "SECOND"
+
+  # Automation Pipeline Stages
+  pipeline:
+    stages:
+      - name: decision-intake
+        input: "kafka://meta-salvage.decisions.output"
+        processing:
+          - parse_decision
+          - validate_constraints
+          - prepare_infrastructure_changes
+      
+      - name: infrastructure-provisioning
+        processing:
+          - generate_terraform_plan
+          - review_plan
+          - apply_terraform
+          - verify_resources
+      
+      - name: runtime-enforcement
+        processing:
+          - apply_network_policies
+          - configure_service_mesh
+          - enable_rate_limiting
+          - verify_enforcement
+      
+      - name: validation
+        processing:
+          - test_constraints
+          - verify_compliance
+          - update_bond_status
+        
+        output: "kafka://meta-salvage.enforcement.completed"
+
+  # Monitoring and Observability
+  monitoring:
+    prometheus:
+      metrics:
+        - name: "terraform_apply_duration_seconds"
+          type: "histogram"
+        
+        - name: "kubernetes_resources_created"
+          type: "counter"
+          labels: ["resource_type", "provider_id"]
+        
+        - name: "enforcement_success_rate"
+          type: "gauge"
+          labels: ["provider_id"]
+    
+    logging:
+      level: "INFO"
+      format: "json"
+      outputs:
+        - type: "elasticsearch"
+          index: "meta-salvage-automation"
+        - type: "console"
+
+  # Rollback Configuration
+  rollback:
+    enabled: true
+    
+    triggers:
+      - condition: "enforcement_failure"
+        action: "revert_infrastructure"
+      
+      - condition: "provider_unavailable"
+        action: "suspend_enforcement"
+    
+    retention:
+      keep_last_n_states: 10
+      cleanup_after_days: 30
+
+  # Security Configuration
+  security:
+    service_account: "meta-salvage-automation"
+    
+    rbac_rules:
+      - apiGroups: [""]
+        resources: ["networkpolicies", "resourcequotas"]
+        verbs: ["create", "update", "delete", "get", "list"]
+      
+      - apiGroups: ["networking.istio.io"]
+        resources: ["virtualservices", "destinationrules"]
+        verbs: ["create", "update", "delete", "get", "list"]
+      
+      - apiGroups: ["meta-salvage.euystacio.ai"]
+        resources: ["peacebonds"]
+        verbs: ["create", "update", "delete", "get", "list", "watch"]
+    
+    secrets:
+      terraform_credentials: "terraform-cloud-token"
+      provider_api_keys: "caas-provider-credentials"
