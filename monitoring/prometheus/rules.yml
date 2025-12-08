@@ -1,0 +1,123 @@
+# Prometheus Recording Rules for Protocollo Meta Salvage
+# Pre-compute frequently needed values and aggregations
+
+groups:
+  - name: symbiosis_recording_rules
+    interval: 30s
+    rules:
+      # Symbiosis Score aggregations
+      - record: symbiosis_score:avg_5m
+        expr: avg_over_time(symbiosis_score[5m])
+      
+      - record: symbiosis_score:max_1h
+        expr: max_over_time(symbiosis_score[1h])
+      
+      - record: symbiosis_score:min_1h
+        expr: min_over_time(symbiosis_score[1h])
+      
+      - record: symbiosis_score:rate_5m
+        expr: rate(symbiosis_score[5m])
+
+  - name: ethical_metrics_recording_rules
+    interval: 15s
+    rules:
+      # QEK (Quantum Ethical Kernel) metrics
+      - record: qek_value:current
+        expr: qek_value
+      
+      - record: qek_value:avg_5m
+        expr: avg_over_time(qek_value[5m])
+      
+      - record: qek_value:deviation_from_ideal
+        expr: abs(qek_value - 0.938)
+      
+      # H-VAR (Harmonic Volatility Ratio) metrics
+      - record: hvar_value:current
+        expr: hvar_value
+      
+      - record: hvar_value:avg_5m
+        expr: avg_over_time(hvar_value[5m])
+      
+      - record: hvar_value:max_1h
+        expr: max_over_time(hvar_value[1h])
+      
+      # Ethisches Ideal compliance
+      - record: ethisches_ideal_value:current
+        expr: ethisches_ideal_value
+      
+      - record: ethisches_ideal_value:avg_1h
+        expr: avg_over_time(ethisches_ideal_value[1h])
+
+  - name: risk_detection_recording_rules
+    interval: 20s
+    rules:
+      # Risk score aggregations
+      - record: risk_score:total
+        expr: sum(risk_score)
+      
+      - record: risk_score:by_severity
+        expr: sum by (severity) (risk_score)
+      
+      - record: risk_events:rate_5m
+        expr: rate(risk_events_total[5m])
+      
+      - record: risk_events:high_severity_rate
+        expr: rate(risk_events_total{severity="high"}[5m])
+
+  - name: peace_bonds_recording_rules
+    interval: 30s
+    rules:
+      # Peace Bonds policy evaluations
+      - record: peace_bonds:policy_evaluations_total
+        expr: sum(opa_policy_evaluations_total{policy=~"peace_bonds.*"})
+      
+      - record: peace_bonds:violations_rate
+        expr: rate(peace_bonds_violations_total[5m])
+      
+      - record: peace_bonds:enforcement_actions_total
+        expr: sum(peace_bonds_enforcement_actions_total)
+      
+      - record: peace_bonds:adaptive_adjustments_rate
+        expr: rate(peace_bonds_adaptive_adjustments_total[10m])
+
+  - name: system_health_recording_rules
+    interval: 15s
+    rules:
+      # System resource utilization
+      - record: cpu_usage:avg_5m
+        expr: avg_over_time(cpu_usage_percent[5m])
+      
+      - record: memory_usage:avg_5m
+        expr: avg_over_time(memory_usage_percent[5m])
+      
+      - record: disk_usage:current
+        expr: disk_usage_percent
+      
+      # API request rates
+      - record: http_requests:rate_1m
+        expr: rate(http_requests_total[1m])
+      
+      - record: http_errors:rate_1m
+        expr: rate(http_requests_total{status=~"5.."}[1m])
+      
+      # Service availability
+      - record: service_availability:1h
+        expr: avg_over_time(up[1h])
+
+  - name: tfm1_equilibrium_recording_rules
+    interval: 15s
+    rules:
+      # TFM-1 equilibrium metrics
+      - record: equilibrium_balance:current
+        expr: equilibrium_balance
+      
+      - record: equilibrium_balance:avg_5m
+        expr: avg_over_time(equilibrium_balance[5m])
+      
+      - record: tfm1_topup:success_rate_5m
+        expr: |
+          rate(tfm1_topup_success_total[5m]) / 
+          (rate(tfm1_topup_success_total[5m]) + rate(tfm1_topup_failures_total[5m]))
+      
+      - record: tfm1_health_check:success_rate_1h
+        expr: avg_over_time(tfm1_health_check_success[1h])

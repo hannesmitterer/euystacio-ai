@@ -1,0 +1,219 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opa-peace-bonds
+  namespace: euystacio-ai
+  labels:
+    app: opa-peace-bonds
+    component: policy-enforcement
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: opa-peace-bonds
+  template:
+    metadata:
+      labels:
+        app: opa-peace-bonds
+        component: policy-enforcement
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8181"
+    spec:
+      containers:
+      - name: opa
+        image: openpolicyagent/opa:latest
+        args:
+        - "run"
+        - "--server"
+        - "--addr=0.0.0.0:8181"
+        - "--log-level=info"
+        - "--log-format=json"
+        - "--set=decision_logs.console=true"
+        - "--set=status.console=true"
+        - "/policies"
+        ports:
+        - containerPort: 8181
+          name: http
+          protocol: TCP
+        env:
+        - name: OPA_LOG_LEVEL
+          value: "info"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8181
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health?bundle=true
+            port: 8181
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: policies
+          mountPath: /policies
+          readOnly: true
+      volumes:
+      - name: policies
+        configMap:
+          name: peace-bonds-policies
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opa-service
+  namespace: euystacio-ai
+  labels:
+    app: opa-peace-bonds
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8181
+    targetPort: 8181
+    protocol: TCP
+    name: http
+  selector:
+    app: opa-peace-bonds
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: peace-bonds-policies
+  namespace: euystacio-ai
+data:
+  peace-bonds.rego: |
+    package euystacio.peace_bonds
+    
+    # Peace Bonds Policy Enforcement
+    # Adaptive policy that adjusts based on provider risk attributes
+    
+    import future.keywords.if
+    import future.keywords.in
+    
+    # Risk thresholds
+    default risk_threshold_low = 0.3
+    default risk_threshold_medium = 0.6
+    default risk_threshold_high = 0.8
+    
+    # Calculate overall risk score
+    risk_score := score if {
+        provider := input.provider
+        score := (
+            provider.trust_weight * 0.4 +
+            provider.compliance_score * 0.3 +
+            provider.ethical_alignment * 0.3
+        )
+    }
+    
+    # Risk level determination
+    risk_level := "low" if risk_score < risk_threshold_low
+    risk_level := "medium" if {
+        risk_score >= risk_threshold_low
+        risk_score < risk_threshold_medium
+    }
+    risk_level := "high" if {
+        risk_score >= risk_threshold_medium
+        risk_score < risk_threshold_high
+    }
+    risk_level := "critical" if risk_score >= risk_threshold_high
+    
+    # Allow decision based on risk level
+    allow if {
+        risk_level in ["low", "medium"]
+        symbiosis_check_passed
+    }
+    
+    # Deny high and critical risk
+    deny contains msg if {
+        risk_level == "high"
+        msg := sprintf("High risk provider detected: risk_score=%v", [risk_score])
+    }
+    
+    deny contains msg if {
+        risk_level == "critical"
+        msg := sprintf("Critical risk provider blocked: risk_score=%v", [risk_score])
+    }
+    
+    # Symbiosis check
+    symbiosis_check_passed if {
+        input.symbiosis_score >= 0.5
+    }
+    
+    # Adaptive adjustment recommendations
+    adjustment_required := true if {
+        risk_score >= risk_threshold_medium
+        input.symbiosis_score < 0.7
+    }
+    
+    adjustment_factor := factor if {
+        adjustment_required
+        factor := (risk_threshold_high - risk_score) / risk_threshold_high
+    }
+    
+    # Policy decision output
+    decision := {
+        "allow": allow,
+        "deny": deny,
+        "risk_score": risk_score,
+        "risk_level": risk_level,
+        "adjustment_required": adjustment_required,
+        "adjustment_factor": adjustment_factor,
+        "timestamp": time.now_ns()
+    }
+  
+  adaptive-enforcement.rego: |
+    package euystacio.adaptive_enforcement
+    
+    # Adaptive Peace Bonds Enforcement
+    # Dynamically adjusts based on real-time metrics
+    
+    import future.keywords.if
+    import data.euystacio.peace_bonds
+    
+    # Get current system metrics
+    system_metrics := input.metrics
+    
+    # Adaptive threshold calculation
+    adaptive_threshold_low := base_threshold_low * adjustment_multiplier
+    adaptive_threshold_medium := base_threshold_medium * adjustment_multiplier
+    adaptive_threshold_high := base_threshold_high * adjustment_multiplier
+    
+    # Base thresholds
+    default base_threshold_low = 0.3
+    default base_threshold_medium = 0.6
+    default base_threshold_high = 0.8
+    
+    # Adjustment multiplier based on system load
+    adjustment_multiplier := multiplier if {
+        system_load := system_metrics.cpu_usage + system_metrics.memory_usage
+        multiplier := 1.0 + (system_load * 0.1)  # Increase thresholds when system under load
+    }
+    
+    # Enhanced enforcement decision
+    enforce if {
+        peace_bonds.allow
+        system_healthy
+    }
+    
+    system_healthy if {
+        system_metrics.qek_value >= 0.85
+        system_metrics.hvar_value <= 0.1
+        system_metrics.ethisches_ideal >= 0.95
+    }
+    
+    # Enforcement actions
+    enforcement_action := "allow" if enforce
+    enforcement_action := "deny" if not enforce
+    enforcement_action := "monitor" if {
+        peace_bonds.risk_level == "medium"
+        system_healthy
+    }

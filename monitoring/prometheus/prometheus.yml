@@ -1,0 +1,120 @@
+# Prometheus Configuration for Protocollo Meta Salvage
+# Monitors ethical metrics, symbiosis scores, and system health
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'euystacio-ai'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "/etc/prometheus/rules/*.yml"
+  - "/etc/prometheus/alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Euystacio AI Core Metrics
+  - job_name: 'euystacio-core'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['euystacio-api:8000']
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - source_labels: [__address__]
+        target_label: __param_target
+      - target_label: __address__
+        replacement: euystacio-api:8000
+
+  # Symbiosis Score Metrics
+  - job_name: 'symbiosis-metrics'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['euystacio-api:8000']
+    metrics_path: '/api/metrics/symbiosis'
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'symbiosis_.*'
+        action: keep
+
+  # Threshold Monitor Metrics
+  - job_name: 'threshold-monitor'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['euystacio-api:8000']
+    metrics_path: '/api/metrics/thresholds'
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: '(qek_value|hvar_value|ethisches_ideal_value).*'
+        action: keep
+
+  # Risk Detection Metrics
+  - job_name: 'risk-detection'
+    scrape_interval: 20s
+    static_configs:
+      - targets: ['euystacio-api:8000']
+    metrics_path: '/api/metrics/risk'
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'risk_.*'
+        action: keep
+
+  # Node Exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # TFM-1 Equilibrium Monitoring
+  - job_name: 'tfm1'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['tfm1-service:8080']
+    metrics_path: '/metrics'
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'tfm1_.*'
+        action: keep
+
+  # Peace Bonds Policy Enforcement
+  - job_name: 'peace-bonds'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['opa-service:8181']
+    metrics_path: '/metrics'
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'opa_.*'
+        action: keep
+
+  # LIQUIIUM ARENA Index
+  - job_name: 'liquiium-arena-index'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['liquiium-arena:8080']
+    metrics_path: '/health/metrics'
+
+# Remote write configuration for long-term storage (optional)
+# remote_write:
+#   - url: "https://prometheus-remote-storage/api/v1/write"
+#     basic_auth:
+#       username: prometheus
+#       password_file: /etc/prometheus/remote_write_password
+
+# Remote read configuration (optional)
+# remote_read:
+#   - url: "https://prometheus-remote-storage/api/v1/read"
