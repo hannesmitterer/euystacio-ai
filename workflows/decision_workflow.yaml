@@ -214,6 +214,30 @@ spec:
             rego: |
               package peacebond
               
+              # Helper function to validate throughput constraint
+              validate_throughput_constraint(constraint, obj) {
+                constraint.type == "THROUGHPUT_LIMIT"
+                throughput := to_number(obj.spec.throughput)
+                throughput <= constraint.value
+              }
+              
+              # Helper function to validate latency constraint
+              validate_latency_constraint(constraint, obj) {
+                constraint.type == "LATENCY_CEILING"
+                latency := to_number(obj.spec.latency)
+                latency <= constraint.value
+              }
+              
+              # Main validation function
+              validate_constraint(constraint, obj) {
+                validate_throughput_constraint(constraint, obj)
+              } {
+                validate_latency_constraint(constraint, obj)
+              } {
+                # Default: pass other constraint types (handled elsewhere)
+                not constraint.type in ["THROUGHPUT_LIMIT", "LATENCY_CEILING"]
+              }
+              
               violation[{"msg": msg}] {
                 input.review.object.metadata.labels["provider-id"]
                 provider_id := input.review.object.metadata.labels["provider-id"]
