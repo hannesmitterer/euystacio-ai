@@ -14,7 +14,7 @@ ethical risk periods to preserve systemic integrity.
 
 import json
 from datetime import datetime, timezone, timedelta
-from typing import Dict, List, Any, Optional, Set
+from typing import Dict, List, Any, Optional, Set, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 import hashlib
