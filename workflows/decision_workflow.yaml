@@ -1,0 +1,341 @@
+# Decision Workflow for Protocollo Meta Salvage
+# This workflow defines the autonomous decision-making process using Open Policy Agent (OPA)
+# and Gatekeeper for policy enforcement and Peace Bond determination.
+
+apiVersion: v1
+kind: Workflow
+metadata:
+  name: meta-salvage-decision
+  namespace: euystacio-ai
+  labels:
+    component: protocollo-meta-salvage
+    layer: decision-making
+
+spec:
+  description: >
+    Autonomous decision-making workflow for Peace Bond enforcement.
+    Evaluates risk events, applies policy rules, and determines appropriate
+    operational constraints for CaaS providers.
+
+  # Open Policy Agent (OPA) Configuration
+  opa:
+    replicas: 3
+    
+    resources:
+      cpu: "500m"
+      memory: "1Gi"
+    
+    # Policy Bundle Configuration
+    bundle:
+      service: "bundle-service"
+      resource: "bundles/meta-salvage-policies"
+      polling:
+        min_delay_seconds: 60
+        max_delay_seconds: 120
+    
+    # Decision Logs
+    decision_logs:
+      console: true
+      service:
+        name: "decision-log-service"
+        url: "http://audit-pipeline:8081/logs/decisions"
+    
+    # Status Updates
+    status:
+      console: false
+      prometheus:
+        enabled: true
+        port: 9095
+
+  # Policy Definitions
+  policies:
+    # Policy Package
+    package: "meta.salvage.decisions"
+    
+    # Import statements
+    imports:
+      - "data.meta.salvage.risk_levels"
+      - "data.meta.salvage.providers"
+      - "data.meta.salvage.constraints"
+    
+    # Policy Rules
+    rules:
+      # Rule 1: Critical Symbiosis Decline
+      - id: "RULE_001"
+        name: "critical_symbiosis_decline"
+        priority: 10
+        
+        condition: |
+          input.risk_type == "SYMBIOSIS_DECLINE"
+          input.risk_level in ["HIGH", "CRITICAL"]
+          input.metrics.symbiosis_score < 0.75
+        
+        decision:
+          action: "IMPOSE_BOND"
+          constraints:
+            - type: "THROUGHPUT_LIMIT"
+              value: "provider_throughput * 0.05"
+              unit: "ops/sec"
+              enforcement: "hard"
+            
+            - type: "AUDIT_REQUIREMENT"
+              value: 12
+              unit: "hours"
+              enforcement: "mandatory"
+        
+        metadata:
+          rationale: "Symbiosis Score below threshold indicates ethical risk"
+          documentation: "docs/policies/symbiosis-decline.md"
+      
+      # Rule 2: Latency Manipulation Detection
+      - id: "RULE_002"
+        name: "latency_manipulation"
+        priority: 8
+        
+        condition: |
+          input.risk_type == "LATENCY_MANIPULATION"
+          input.risk_level in ["MEDIUM", "HIGH"]
+          input.metrics.latency_increase_rate > 0.25
+        
+        decision:
+          action: "IMPOSE_BOND"
+          constraints:
+            - type: "LATENCY_CEILING"
+              value: 100
+              unit: "ms"
+              enforcement: "hard"
+            
+            - type: "METADATA_TRANSPARENCY"
+              fields:
+                - "latency_measurements"
+                - "network_topology"
+                - "routing_data"
+              enforcement: "audit"
+        
+        metadata:
+          rationale: "Latency manipulation can indicate lock-in attempts"
+      
+      # Rule 3: Lock-in Attempt (Critical)
+      - id: "RULE_005"
+        name: "lock_in_attempt"
+        priority: 15
+        
+        condition: |
+          input.risk_type == "LOCK_IN_ATTEMPT"
+          input.risk_level == "CRITICAL"
+        
+        decision:
+          action: "SUSPEND_PROVIDER"
+          constraints:
+            - type: "THROUGHPUT_LIMIT"
+              value: 1
+              unit: "ops/sec"
+              enforcement: "hard"
+        
+        metadata:
+          rationale: "Lock-in attempts are severe ethical breaches"
+          escalation: "immediate"
+      
+      # Rule 4: Ethical Breach
+      - id: "RULE_006"
+        name: "ethical_breach"
+        priority: 12
+        
+        condition: |
+          input.risk_type == "ETHICAL_BREACH"
+          input.risk_level in ["HIGH", "CRITICAL"]
+        
+        decision:
+          action: "IMPOSE_BOND"
+          constraints:
+            - type: "THROUGHPUT_LIMIT"
+              value: "provider_throughput * 0.01"
+              unit: "ops/sec"
+              enforcement: "hard"
+            
+            - type: "AUDIT_REQUIREMENT"
+              value: 4
+              unit: "hours"
+              enforcement: "mandatory"
+            
+            - type: "METADATA_TRANSPARENCY"
+              fields:
+                - "all_operations"
+                - "data_access_logs"
+                - "decision_logs"
+              enforcement: "mandatory"
+        
+        metadata:
+          rationale: "Ethical breaches require severe restrictions and transparency"
+      
+      # Default Rule: Monitor Only
+      - id: "DEFAULT"
+        name: "default_monitor"
+        priority: 0
+        
+        condition: |
+          true  # Catch-all
+        
+        decision:
+          action: "MONITOR_ONLY"
+          constraints: []
+        
+        metadata:
+          rationale: "No specific rule matched, continue monitoring"
+
+  # Gatekeeper Configuration (Policy Enforcement on Kubernetes)
+  gatekeeper:
+    replicas: 2
+    
+    audit:
+      interval: 60
+      logLevel: "INFO"
+    
+    # Constraint Templates
+    constraint_templates:
+      # Peace Bond Enforcement Template
+      - name: "PeaceBondEnforcement"
+        crd:
+          spec:
+            names:
+              kind: "PeaceBondEnforcement"
+            validation:
+              openAPIV3Schema:
+                properties:
+                  providerId:
+                    type: string
+                  constraints:
+                    type: array
+                    items:
+                      type: object
+        
+        targets:
+          - target: "admission.k8s.gatekeeper.sh"
+            rego: |
+              package peacebond
+              
+              violation[{"msg": msg}] {
+                input.review.object.metadata.labels["provider-id"]
+                provider_id := input.review.object.metadata.labels["provider-id"]
+                
+                # Check if provider has active Peace Bond
+                bond := data.peace_bonds[provider_id]
+                bond.status == "ACTIVE"
+                
+                # Validate constraints
+                constraint := bond.constraints[_]
+                not validate_constraint(constraint, input.review.object)
+                
+                msg := sprintf("Peace Bond constraint violated: %v", [constraint])
+              }
+
+  # Decision Engine Integration
+  integration:
+    decision_engine:
+      endpoint: "http://decision-engine-service:8080"
+      api_version: "v1"
+      
+      request_routing:
+        - pattern: "/api/v1/evaluate"
+          method: "POST"
+          opa_query: "data.meta.salvage.decisions.evaluate"
+      
+      callbacks:
+        on_decision_made: "/api/v1/decisions/callback"
+        on_policy_update: "/api/v1/policies/updated"
+    
+    peace_bonds_manager:
+      endpoint: "http://peace-bonds-service:8080"
+      api_version: "v1"
+      
+      auto_enforcement: true
+      
+      callbacks:
+        on_bond_imposed: "/api/v1/bonds/imposed"
+        on_bond_violated: "/api/v1/bonds/violated"
+
+  # Decision Pipeline Stages
+  pipeline:
+    stages:
+      # Stage 1: Risk Event Ingestion
+      - name: "ingest"
+        input_source: "kafka://meta-salvage.risk.events"
+        processing:
+          - validate_event_schema
+          - enrich_provider_context
+          - extract_metrics
+      
+      # Stage 2: Policy Evaluation
+      - name: "evaluate"
+        processing:
+          - load_applicable_policies
+          - execute_opa_query
+          - calculate_confidence_score
+          - generate_reasoning
+      
+      # Stage 3: Decision Making
+      - name: "decide"
+        processing:
+          - select_constraints
+          - determine_duration
+          - create_decision_record
+      
+      # Stage 4: Enforcement
+      - name: "enforce"
+        processing:
+          - impose_peace_bond
+          - schedule_audit
+          - send_notifications
+        
+        output_sink: "kafka://meta-salvage.decisions.output"
+
+  # Decision Transparency
+  transparency:
+    logging:
+      level: "INFO"
+      format: "json"
+      
+      include_fields:
+        - "decision_id"
+        - "risk_event_id"
+        - "provider_id"
+        - "applied_rule"
+        - "confidence_score"
+        - "reasoning"
+        - "constraints"
+    
+    audit_trail:
+      enabled: true
+      storage: "audit-pipeline"
+      retention_days: 365
+
+  # Performance Configuration
+  performance:
+    max_concurrent_evaluations: 100
+    evaluation_timeout: "5s"
+    cache_ttl: "300s"
+    
+    circuit_breaker:
+      enabled: true
+      failure_threshold: 5
+      success_threshold: 2
+      timeout: "30s"
+
+  # Monitoring and Metrics
+  monitoring:
+    metrics:
+      - name: "decisions_total"
+        type: "counter"
+        labels: ["decision_type", "provider_id"]
+      
+      - name: "evaluation_duration_seconds"
+        type: "histogram"
+        buckets: [0.1, 0.5, 1.0, 2.0, 5.0]
+      
+      - name: "policy_rules_evaluated"
+        type: "counter"
+        labels: ["rule_id", "matched"]
+      
+      - name: "confidence_score"
+        type: "gauge"
+        labels: ["decision_id"]
