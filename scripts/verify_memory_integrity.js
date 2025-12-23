@@ -38,6 +38,7 @@ function calculateFileHash(filePath) {
     hashSum.update(fileBuffer);
     return hashSum.digest('hex');
   } catch (error) {
+    console.error(`${colors.yellow}Warning: Failed to hash ${filePath}: ${error.message}${colors.reset}`);
     return null;
   }
 }
@@ -196,6 +197,7 @@ function main() {
     try {
       logs = JSON.parse(fs.readFileSync(logPath, 'utf8'));
     } catch (e) {
+      console.error(`${colors.yellow}Warning: Log file corrupted, starting fresh: ${e.message}${colors.reset}`);
       logs = [];
     }
   }
@@ -207,8 +209,12 @@ function main() {
     logs = logs.slice(-100);
   }
   
-  fs.writeFileSync(logPath, JSON.stringify(logs, null, 2));
-  console.log(`\n${colors.green}✓${colors.reset} Verification logged to ${logPath}`);
+  try {
+    fs.writeFileSync(logPath, JSON.stringify(logs, null, 2));
+    console.log(`\n${colors.green}✓${colors.reset} Verification logged to ${logPath}`);
+  } catch (error) {
+    console.error(`${colors.yellow}Warning: Failed to write log file: ${error.message}${colors.reset}`);
+  }
   
   process.exit(success ? 0 : 1);
 }
