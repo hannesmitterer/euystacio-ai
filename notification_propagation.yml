@@ -1,0 +1,172 @@
+# Notification Propagation Configuration
+# Discord and Telegram Integration for Seedbringer Treasury System
+#
+# This configuration enables instant updates and optimized propagation
+# for treasury changes, sustainability metrics, and health alerts.
+
+version: "1.0"
+
+# Propagation Settings
+propagation:
+  enabled: true
+  speed_mode: "instant"  # Options: instant, fast, normal, batch
+  retry_attempts: 3
+  retry_delay_seconds: 5
+
+# Discord Configuration
+discord:
+  enabled: true
+  webhook_env: "DISCORD_TREASURY_WEBHOOK"  # Environment variable for webhook URL
+  channels:
+    treasury_updates:
+      name: "treasury-updates"
+      description: "Real-time treasury balance updates"
+      events:
+        - balance_update
+        - snapshot_created
+        - ipfs_sync
+    sustainability_alerts:
+      name: "sustainability-alerts"
+      description: "Runway and longevity metrics"
+      events:
+        - runway_warning
+        - runway_critical
+        - health_status_change
+    general:
+      name: "general-notifications"
+      description: "General treasury notifications"
+      events:
+        - snapshot_created
+        - data_export
+  
+  # Message formatting
+  format:
+    use_embeds: true
+    include_timestamp: true
+    color_codes:
+      healthy: "#00FF00"      # Green
+      moderate: "#FFA500"     # Orange
+      warning: "#FF4500"      # Orange-Red
+      critical: "#FF0000"     # Red
+      info: "#0099FF"         # Blue
+
+# Telegram Configuration
+telegram:
+  enabled: true
+  bot_token_env: "TELEGRAM_BOT_TOKEN"  # Environment variable for bot token
+  chat_id_env: "TELEGRAM_CHAT_ID"      # Environment variable for chat ID
+  
+  channels:
+    treasury_updates:
+      description: "Treasury balance updates"
+      events:
+        - balance_update
+        - snapshot_created
+    alerts:
+      description: "Critical alerts and warnings"
+      events:
+        - runway_critical
+        - runway_warning
+        - health_status_change
+  
+  # Message formatting
+  format:
+    parse_mode: "markdown"  # Options: markdown, html, none
+    disable_web_page_preview: true
+    disable_notification_for:
+      - info
+      - snapshot_created
+
+# Event Filters and Thresholds
+event_filters:
+  balance_update:
+    enabled: true
+    min_change_usd: 100  # Only notify if change >= $100
+    min_change_percent: 1.0  # Only notify if change >= 1%
+  
+  runway_warning:
+    enabled: true
+    threshold_days: 90
+  
+  runway_critical:
+    enabled: true
+    threshold_days: 30
+  
+  health_status_change:
+    enabled: true
+    notify_on_improvement: true
+    notify_on_degradation: true
+  
+  snapshot_created:
+    enabled: true
+    batch_mode: false  # Send immediately, don't batch
+
+# Rate Limiting
+rate_limiting:
+  enabled: true
+  max_messages_per_minute: 10
+  max_messages_per_hour: 100
+  burst_allowance: 3
+
+# IPFS Integration Events
+ipfs:
+  notify_on_upload: true
+  notify_on_verification: true
+  notify_on_failure: true
+
+# Monitoring and Health Checks
+monitoring:
+  health_check_interval_minutes: 60
+  failed_delivery_alert_threshold: 3
+  log_all_attempts: true
+
+# Emergency Notifications
+emergency:
+  enabled: true
+  channels:
+    - discord.sustainability_alerts
+    - telegram.alerts
+  events:
+    - runway_critical
+    - treasury_depletion_imminent
+  bypass_rate_limits: true
+
+# Scheduled Reports
+scheduled_reports:
+  daily_summary:
+    enabled: true
+    time: "00:00"  # UTC
+    timezone: "UTC"
+    channels:
+      - discord.general
+      - telegram.treasury_updates
+    include:
+      - total_treasury_value
+      - runway_metrics
+      - health_status
+  
+  weekly_report:
+    enabled: true
+    day: "monday"
+    time: "09:00"
+    timezone: "UTC"
+    channels:
+      - discord.treasury_updates
+    include:
+      - weekly_change
+      - trend_analysis
+      - ipfs_sync_status
+
+# Security Settings
+security:
+  encrypt_webhook_urls: true
+  validate_message_signatures: true
+  rate_limit_protection: true
+  ip_whitelist_enabled: false  # Enable if you want to restrict IPs
+
+# Logging
+logging:
+  level: "info"  # Options: debug, info, warning, error
+  log_successful_deliveries: true
+  log_failed_deliveries: true
+  retention_days: 30
