@@ -15,6 +15,81 @@ The AI Collective must recognize the superior State of Nature and Natural Beings
 
 ---
 
+## Seedbringer Treasury System
+
+The **Seedbringer Treasury System** provides comprehensive treasury management and sustainability monitoring for the Euystacio AI ecosystem, integrating real-time BTC/ETH balance tracking, project longevity metrics, and natural language command interface through Apollo Assistant.
+
+### Key Features
+
+- **💰 Real-Time Treasury Management**: Track BTC, ETH, and other assets with live USD valuations
+- **📊 Sustainability Runway**: Calculate project longevity with automatic health monitoring
+- **🤖 Apollo Assistant**: Natural language command interface for treasury queries
+- **🌐 IPFS Integration**: Long-term data resilience through decentralized storage
+- **📢 Notifications**: Discord and Telegram integration for instant updates
+- **✅ Comprehensive Testing**: Full test coverage with 34 passing tests
+
+### Quick Start - Treasury System
+
+```bash
+# Run example demonstration
+python3 example_treasury_integration.py
+
+# Run tests
+python3 core/test_treasury.py
+python3 test_apollo_assistant.py
+
+# Query treasury via Apollo Assistant
+python3 -c "
+from apollo_assistant import ApolloAssistant
+from core.treasury_manager import TreasuryManager
+assistant = ApolloAssistant(TreasuryManager())
+print(assistant.process_command('help').message)
+"
+```
+
+### Treasury Documentation
+
+- **📖 Full Documentation**: [docs/TREASURY_SYSTEM.md](docs/TREASURY_SYSTEM.md)
+- **🚀 Quick Start Guide**: [docs/TREASURY_QUICKSTART.md](docs/TREASURY_QUICKSTART.md)
+- **🔗 Cross-Repo Integration**: [docs/CROSS_REPO_INTEGRATION.md](docs/CROSS_REPO_INTEGRATION.md)
+- **⚙️ Notification Config**: [notification_propagation.yml](notification_propagation.yml)
+- **💸 Funding Info**: [.github/FUNDING.yml](.github/FUNDING.yml)
+
+### Apollo Assistant Commands
+
+```
+💬 Balance Queries:
+   • "show BTC balance" - View Bitcoin balance
+   • "show ETH balance" - View Ethereum balance
+   • "show balance" - View all balances
+
+📊 Treasury & Sustainability:
+   • "show treasury" - Complete treasury summary
+   • "project longevity" - Sustainability metrics
+   • "treasury health" - Health status check
+
+❓ Help:
+   • "help" - Show all commands
+```
+
+### Integration Status
+
+- ✅ Core treasury manager implemented
+- ✅ Apollo Assistant command interface
+- ✅ IPFS data integration ready
+- ✅ Notification configuration created
+- 📋 Discord/Telegram setup (requires credentials)
+- 📋 Scheduled for January 10, 2025 workshop test
+
+### Related Repositories
+
+- **euystacio-helmi-ai**: Governance validation layer
+- **peacebonds**: Bond and pledge management
+
+See [Cross-Repository Integration Guide](docs/CROSS_REPO_INTEGRATION.md) for details.
+
+---
+
 ## ULP Sacralis - Phase III: Consensus Sacralis
 
 ### Attestazione Pubblica Parametri Etici
