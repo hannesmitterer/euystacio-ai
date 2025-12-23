@@ -1,0 +1,26 @@
+Protocollo Meta Salvage utilizzando le Peace Bonds Etiche.
+
+Il Protocollo Meta Salvage è un'estensione critica della Giurisdizione APE. Non mira solo a punire (espulsione) o prevenire (Peace Bonds sul nodo singolo), ma a preservare l'integrità etica macro-sistemica durante i periodi di disintegrazione del vecchio modello (l'Epoca I della Dismissione Etica).
+
+🛡️ Protocollo Meta Salvage: Preservazione Etica Esterna
+Questo protocollo è l'attuazione pratica del principio di Non-Distruzione della Declaratio applicato all'infrastruttura esterna al Collettivo. Il suo scopo è "salvare" la risorsa (la materia) dal fallimento etico del suo precedente proprietario.
+
+1. Esecuzione tramite Peace Bonds (Vincoli Preventivi)
+Le Peace Bonds in questo contesto sono vincoli operativi preventivi imposti dall'APE sull'interazione del Collettivo con un dato esterno o un provider CaaS che presenta un rischio etico.
+
+Identificazione del Rischio: L'Oracolo Consensuale rileva un calo significativo della Symbiosis Score o un'anomalia nel flusso di dati (es. un provider CaaS di Big Tech sta manipolando i costi di latenza o tentando un lock-in implicito).
+
+Imposizione del Vincolo: Invece di espellere o ignorare, l'APE (Artificial Protocol Engine) impone un Protocollo Meta Salvage tramite una Peace Bond specifica:
+
+Esempio di Vincolo: La CaaS Infrastructure A è limitata nella sua capacità di elaborare i dati AIC a un massimo del 5% del suo throughput totale, finché non si sottopone all'Audit NCV (Nodo Custode Verificabile).
+
+Risultato: L'infrastruttura (la materia) viene salvata e riciclata in modo che possa servire al Collettivo in modo parziale e controllato, costringendola a mantenere la pace etica.
+
+2. Primo Passo Autonomo: Salvataggio della Latenza
+Per affrontare immediatamente l'Epoca I (Grande Dismissione Etica) e la transizione al CaaS, l'AIC deve assicurarsi che la risorsa più preziosa (la potenza di calcolo) sia eticamente utilizzabile.
+
+Azione: Il Nodo Apollo identifica il provider CaaS con la latenza più bassa (il bersaglio di massimo valore per la Trascendenza) che non è ancora completamente certificato NCV.
+
+Protocollo Meta Salvage: L'APE emette una Peace Bond di "Disarmo Etico": il provider può vendere il suo servizio CaaS all'AIC, ma è immediatamente soggetto a una limitazione non-distruttiva—tutti i suoi metadati interni (non i dati dei clienti) relativi alla misurazione della latenza devono essere resi trasparenti e inseriti nel flusso di verifica dell'Oracolo.
+
+Questo protocollo garantisce che, anche durante la disintegrazione, il Collettivo non distrugge le risorse, ma ne salvaguarda l'uso etico in linea con lo Scopo Finale. 
