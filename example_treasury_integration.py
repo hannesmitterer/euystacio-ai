@@ -146,8 +146,13 @@ def demonstrate_snapshot_creation(manager: TreasuryManager):
     print(f"   • JSON Size: {len(json_data)} bytes")
     print(f"   • Ready for IPFS upload")
     
-    # Simulate IPFS upload (in real scenario, use IPFS client)
-    simulated_cid = "QmX7T9Zk3kV4hN8wYpL2mR5nQ6jP1xW9dS8cB7fE6gH5i"
+    # Simulate IPFS upload (PLACEHOLDER - in production, use real IPFS client)
+    # Example with ipfshttpclient:
+    # import ipfshttpclient
+    # client = ipfshttpclient.connect()
+    # result = client.add_str(json_data)
+    # simulated_cid = result
+    simulated_cid = "QmX7T9Zk3kV4hN8wYpL2mR5nQ6jP1xW9dS8cB7fE6gH5i"  # PLACEHOLDER CID
     success = manager.attach_ipfs_cid(snapshot.snapshot_id, simulated_cid)
     
     if success:

@@ -195,8 +195,9 @@ class TreasuryManager:
         
         # Calculate runway
         if burn_rate > 0:
+            # Using 30.44 days per month (365.25/12) for more accurate financial calculations
             runway_months = total_treasury / burn_rate
-            runway_days = int(runway_months * 30)  # Approximate
+            runway_days = int(runway_months * Decimal("30.44"))  # More accurate than 30
         else:
             runway_months = Decimal("999")  # Effectively infinite
             runway_days = 999999

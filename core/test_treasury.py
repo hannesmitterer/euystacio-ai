@@ -146,7 +146,7 @@ class TestTreasuryManager:
         assert runway.total_treasury_usd == Decimal("200000")
         assert runway.monthly_burn_rate_usd == Decimal("5000")
         assert runway.runway_months == Decimal("40")  # 200000 / 5000
-        assert runway.runway_days == 1200  # 40 * 30
+        assert runway.runway_days == 1217  # 40 * 30.44 (more accurate)
         assert runway.health_status == TreasuryHealthStatus.HEALTHY
         assert runway.projected_depletion_date is not None
         
@@ -167,8 +167,8 @@ class TestTreasuryManager:
         
         assert runway.monthly_burn_rate_usd == Decimal("10000")
         assert runway.runway_months == Decimal("10")  # 100000 / 10000
-        assert runway.runway_days == 300  # 10 * 30
-        assert runway.health_status == TreasuryHealthStatus.HEALTHY  # 300 days is still healthy
+        assert runway.runway_days == 304  # 10 * 30.44 (more accurate)
+        assert runway.health_status == TreasuryHealthStatus.HEALTHY  # 304 days is still healthy
         
         print("✅ test_calculate_sustainability_runway_critical passed")
     
@@ -179,16 +179,16 @@ class TestTreasuryManager:
             health_thresholds={"critical": 30, "warning": 90, "moderate": 180}
         )
         
-        # 60 days runway = WARNING status
+        # 60 days runway = WARNING status (approximately 2 months * 30.44)
         manager.update_balance(
             TreasuryAssetType.BTC,
             Decimal("1.0"),
-            Decimal("10000")
+            Decimal("9868")  # Approximately 2 months at $5000/month
         )
         
         runway = manager.calculate_sustainability_runway()
         
-        assert runway.runway_days == 60  # (10000 / 5000) * 30
+        assert runway.runway_days == 60  # (9868 / 5000) * 30.44 ≈ 60
         assert runway.health_status == TreasuryHealthStatus.WARNING
         
         print("✅ test_calculate_sustainability_runway_warning passed")

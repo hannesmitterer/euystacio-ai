@@ -26,7 +26,7 @@ def run_test_file(test_file: str, description: str) -> dict:
     
     try:
         result = subprocess.run(
-            ["python3", test_file],
+            [sys.executable, test_file],
             capture_output=True,
             text=True,
             timeout=30
