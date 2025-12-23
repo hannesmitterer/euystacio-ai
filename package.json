@@ -5,7 +5,8 @@
   "main": "scripts/generate_params_root.js",
   "scripts": {
     "generate-params": "node scripts/generate_params_root.js",
-    "test": "node scripts/test_params_generator.js"
+    "test": "node scripts/test_params_generator.js",
+    "verify-memory": "node scripts/verify_memory_integrity.js"
   },
   "keywords": [
     "ethereum",
