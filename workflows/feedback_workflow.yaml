@@ -1,0 +1,534 @@
+# Feedback Workflow for Protocollo Meta Salvage
+# This workflow defines the continuous learning and improvement pipeline
+# using ML model retraining based on real-time audit data and effectiveness metrics.
+
+apiVersion: v1
+kind: Workflow
+metadata:
+  name: meta-salvage-feedback
+  namespace: euystacio-ai
+  labels:
+    component: protocollo-meta-salvage
+    layer: feedback-learning
+
+spec:
+  description: >
+    Feedback and continuous learning workflow for Protocollo Meta Salvage.
+    Collects effectiveness data, retrains ML models, and adapts system
+    parameters based on real-world performance.
+
+  # ML Pipeline Configuration
+  ml_pipeline:
+    platform: "kubeflow"
+    
+    components:
+      - name: "data-collection"
+        type: "data_ingestion"
+        image: "python:3.11-slim"
+      
+      - name: "feature-engineering"
+        type: "preprocessing"
+        image: "tensorflow/tensorflow:2.13.0"
+      
+      - name: "model-training"
+        type: "training"
+        image: "pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime"
+      
+      - name: "model-evaluation"
+        type: "evaluation"
+        image: "python:3.11-slim"
+      
+      - name: "model-deployment"
+        type: "deployment"
+        image: "tensorflow/serving:2.13.0"
+
+  # Data Collection Pipeline
+  data_collection:
+    sources:
+      # Audit Results
+      - name: "audit_results"
+        type: "database"
+        connection: "postgresql://audit-db"
+        query: |
+          SELECT 
+            audit_id,
+            provider_id,
+            timestamp,
+            audit_type,
+            score,
+            compliance_level,
+            findings
+          FROM audit_records
+          WHERE timestamp > NOW() - INTERVAL '30 days'
+      
+      # Risk Events
+      - name: "risk_events"
+        type: "kafka"
+        topic: "meta-salvage.risk.events"
+        consumer_group: "ml-feedback-group"
+        time_range: "30d"
+      
+      # Decisions
+      - name: "decisions"
+        type: "api"
+        endpoint: "http://decision-engine:8080/api/v1/decisions/history"
+        params:
+          hours: 720  # 30 days
+      
+      # Peace Bond Outcomes
+      - name: "peace_bond_outcomes"
+        type: "api"
+        endpoint: "http://peace-bonds-service:8080/api/v1/bonds/history"
+        params:
+          include_violations: true
+          hours: 720
+      
+      # Provider Metrics
+      - name: "provider_metrics"
+        type: "prometheus"
+        queries:
+          - metric: "provider_latency_ms"
+            range: "30d"
+          - metric: "provider_throughput_ops_sec"
+            range: "30d"
+          - metric: "provider_symbiosis_score"
+            range: "30d"
+    
+    preprocessing:
+      - action: "normalize_timestamps"
+      - action: "handle_missing_values"
+        method: "forward_fill"
+      - action: "remove_duplicates"
+      - action: "join_datasets"
+        key: ["provider_id", "timestamp"]
+
+  # Feature Engineering
+  feature_engineering:
+    features:
+      # Risk Pattern Features
+      - name: "risk_frequency"
+        type: "aggregation"
+        source: "risk_events"
+        aggregation: "count"
+        window: "7d"
+        group_by: ["provider_id", "risk_type"]
+      
+      - name: "risk_severity_trend"
+        type: "time_series"
+        source: "risk_events"
+        field: "risk_level"
+        operation: "moving_average"
+        window: "14d"
+      
+      # Decision Effectiveness Features
+      - name: "decision_accuracy"
+        type: "calculated"
+        formula: |
+          (correct_decisions / total_decisions) * 100
+        dependencies:
+          - "decisions"
+          - "audit_results"
+      
+      - name: "constraint_effectiveness"
+        type: "calculated"
+        formula: |
+          1 - (violations_after_bond / total_operations)
+        dependencies:
+          - "peace_bond_outcomes"
+      
+      # Provider Behavior Features
+      - name: "provider_response_time"
+        type: "statistical"
+        source: "audit_results"
+        field: "metadata_submission_time"
+        operations: ["mean", "std", "median"]
+      
+      - name: "compliance_history"
+        type: "time_series"
+        source: "audit_results"
+        field: "score"
+        window: "90d"
+      
+      # Symbiosis Features
+      - name: "symbiosis_volatility"
+        type: "statistical"
+        source: "provider_metrics"
+        field: "symbiosis_score"
+        operations: ["std", "range"]
+        window: "30d"
+      
+      - name: "symbiosis_recovery_rate"
+        type: "calculated"
+        formula: |
+          (score_after_intervention - score_before) / days_elapsed
+        dependencies:
+          - "peace_bond_outcomes"
+          - "provider_metrics"
+    
+    transformations:
+      - type: "standardization"
+        method: "z-score"
+        features: ["risk_frequency", "provider_response_time"]
+      
+      - type: "encoding"
+        method: "one-hot"
+        features: ["risk_type", "decision_type"]
+      
+      - type: "dimensionality_reduction"
+        method: "pca"
+        n_components: 20
+
+  # ML Models
+  models:
+    # Model 1: Risk Prediction Model
+    - name: "risk_predictor"
+      type: "classification"
+      framework: "tensorflow"
+      
+      architecture:
+        - layer: "dense"
+          units: 128
+          activation: "relu"
+        - layer: "dropout"
+          rate: 0.3
+        - layer: "dense"
+          units: 64
+          activation: "relu"
+        - layer: "dense"
+          units: 32
+          activation: "relu"
+        - layer: "dense"
+          units: 7  # Number of risk types
+          activation: "softmax"
+      
+      training:
+        optimizer: "adam"
+        loss: "categorical_crossentropy"
+        metrics: ["accuracy", "precision", "recall"]
+        epochs: 50
+        batch_size: 32
+        validation_split: 0.2
+      
+      hyperparameters:
+        learning_rate: 0.001
+        early_stopping_patience: 10
+      
+      target: "risk_type"
+    
+    # Model 2: Constraint Optimization Model
+    - name: "constraint_optimizer"
+      type: "regression"
+      framework: "pytorch"
+      
+      architecture:
+        input_size: "auto"
+        hidden_layers: [256, 128, 64]
+        output_size: 3  # throughput_limit, latency_ceiling, audit_frequency
+        
+        activation: "relu"
+        dropout_rate: 0.2
+      
+      training:
+        optimizer: "adamw"
+        loss: "mse"
+        lr_scheduler: "cosine_annealing"
+        epochs: 100
+        batch_size: 64
+      
+      target: ["optimal_throughput_limit", "optimal_latency_ceiling", "optimal_audit_frequency"]
+    
+    # Model 3: Effectiveness Predictor
+    - name: "effectiveness_predictor"
+      type: "regression"
+      framework: "sklearn"
+      algorithm: "gradient_boosting"
+      
+      parameters:
+        n_estimators: 200
+        max_depth: 6
+        learning_rate: 0.1
+        subsample: 0.8
+      
+      target: "decision_effectiveness_score"
+    
+    # Model 4: Anomaly Detector
+    - name: "anomaly_detector"
+      type: "unsupervised"
+      framework: "sklearn"
+      algorithm: "isolation_forest"
+      
+      parameters:
+        n_estimators: 100
+        contamination: 0.05
+        max_samples: "auto"
+      
+      purpose: "Detect unusual provider behavior patterns"
+
+  # Training Pipeline
+  training_pipeline:
+    schedule: "0 2 * * 0"  # Weekly on Sundays at 2 AM
+    
+    stages:
+      - name: "data_validation"
+        checks:
+          - sufficient_data: "min_samples >= 1000"
+          - data_quality: "missing_values < 0.05"
+          - data_freshness: "latest_timestamp < 24h"
+      
+      - name: "model_training"
+        parallel: true
+        models: ["risk_predictor", "constraint_optimizer", "effectiveness_predictor"]
+        
+        resources:
+          gpu: 1
+          cpu: 4
+          memory: "16Gi"
+      
+      - name: "model_evaluation"
+        metrics:
+          - metric: "accuracy"
+            threshold: 0.85
+          
+          - metric: "precision"
+            threshold: 0.80
+          
+          - metric: "recall"
+            threshold: 0.75
+          
+          - metric: "f1_score"
+            threshold: 0.80
+        
+        validation:
+          method: "k-fold"
+          folds: 5
+      
+      - name: "model_comparison"
+        compare_with: "production_model"
+        
+        criteria:
+          - metric: "accuracy"
+            improvement_threshold: 0.02
+          
+          - metric: "inference_latency"
+            max_degradation: 0.10
+      
+      - name: "model_deployment"
+        strategy: "blue-green"
+        
+        rollout:
+          canary_percentage: 10
+          canary_duration: "24h"
+          full_rollout_duration: "72h"
+        
+        rollback_triggers:
+          - condition: "error_rate > 0.05"
+          - condition: "accuracy < production_accuracy * 0.95"
+
+  # Feedback Loop Integration
+  feedback_loop:
+    # Real-time Feedback
+    realtime:
+      source: "kafka://meta-salvage.execution.feedback"
+      
+      processing:
+        - action: "calculate_effectiveness_score"
+          inputs:
+            - "decision_outcome"
+            - "audit_results"
+            - "violation_events"
+          
+          formula: |
+            effectiveness = (
+              0.4 * compliance_improvement +
+              0.3 * risk_reduction +
+              0.2 * cost_efficiency +
+              0.1 * provider_satisfaction
+            )
+        
+        - action: "update_online_learning"
+          model: "effectiveness_predictor"
+          method: "incremental_learning"
+    
+    # Batch Feedback
+    batch:
+      schedule: "0 */6 * * *"  # Every 6 hours
+      
+      processing:
+        - action: "aggregate_feedback_data"
+          window: "6h"
+        
+        - action: "retrain_lightweight_models"
+          models: ["anomaly_detector"]
+        
+        - action: "update_policy_rules"
+          based_on: "effectiveness_trends"
+
+  # Parameter Adaptation
+  adaptation:
+    # Threshold Adjustment
+    thresholds:
+      - parameter: "symbiosis_min"
+        adaptation_rule: |
+          if avg_effectiveness < 0.70:
+              symbiosis_min += 0.05  # Be more aggressive
+          elif avg_effectiveness > 0.90:
+              symbiosis_min -= 0.02  # Be more lenient
+        
+        bounds: [0.65, 0.85]
+      
+      - parameter: "latency_max_ms"
+        adaptation_rule: |
+          latency_max_ms = percentile(provider_latencies, 95) * 1.2
+        
+        bounds: [50, 200]
+    
+    # Decision Rule Optimization
+    decision_rules:
+      optimization_method: "genetic_algorithm"
+      
+      population_size: 50
+      generations: 100
+      
+      fitness_function: |
+        fitness = (
+          effectiveness_score * 0.5 +
+          (1 - false_positive_rate) * 0.3 +
+          (1 - false_negative_rate) * 0.2
+        )
+      
+      mutation_rate: 0.1
+      crossover_rate: 0.7
+
+  # Experiment Tracking
+  experiment_tracking:
+    platform: "mlflow"
+    
+    tracking_uri: "http://mlflow-server:5000"
+    
+    logged_metrics:
+      - "training_loss"
+      - "validation_loss"
+      - "accuracy"
+      - "precision"
+      - "recall"
+      - "f1_score"
+      - "inference_latency"
+    
+    logged_parameters:
+      - "model_architecture"
+      - "hyperparameters"
+      - "training_data_size"
+      - "feature_set"
+    
+    artifacts:
+      - "trained_model"
+      - "feature_importance"
+      - "confusion_matrix"
+      - "learning_curves"
+
+  # Model Registry
+  model_registry:
+    registry_uri: "http://mlflow-server:5000"
+    
+    stages:
+      - "Staging"
+      - "Production"
+      - "Archived"
+    
+    promotion_criteria:
+      to_staging:
+        - "evaluation_metrics_pass"
+        - "code_review_approved"
+      
+      to_production:
+        - "canary_test_passed"
+        - "performance_benchmark_passed"
+        - "security_scan_passed"
+    
+    retention_policy:
+      keep_production_models: 5
+      keep_staging_models: 3
+      archive_after_days: 90
+
+  # Monitoring and Observability
+  monitoring:
+    model_performance:
+      metrics:
+        - name: "prediction_accuracy"
+          type: "gauge"
+          labels: ["model_name", "version"]
+        
+        - name: "prediction_latency_ms"
+          type: "histogram"
+          buckets: [10, 50, 100, 500, 1000]
+        
+        - name: "model_drift_score"
+          type: "gauge"
+          labels: ["model_name"]
+      
+      alerts:
+        - name: "model_accuracy_degradation"
+          condition: "accuracy < baseline_accuracy * 0.90"
+          severity: "warning"
+        
+        - name: "high_prediction_latency"
+          condition: "p95_latency > 500ms"
+          severity: "warning"
+        
+        - name: "model_drift_detected"
+          condition: "drift_score > 0.3"
+          severity: "critical"
+    
+    data_quality:
+      checks:
+        - name: "feature_distribution_shift"
+          method: "ks_test"
+          threshold: 0.05
+        
+        - name: "missing_data_ratio"
+          threshold: 0.10
+        
+        - name: "data_freshness"
+          max_age: "6h"
+
+  # Integration with Decision Engine
+  integration:
+    decision_engine:
+      endpoint: "http://decision-engine:8080/api/v1/ml/predictions"
+      
+      model_serving:
+        protocol: "rest"
+        format: "json"
+        
+        endpoints:
+          predict_risk: "/predict/risk"
+          optimize_constraints: "/optimize/constraints"
+          predict_effectiveness: "/predict/effectiveness"
+      
+      fallback:
+        enabled: true
+        method: "rule-based"
+
+  # Continuous Improvement
+  continuous_improvement:
+    review_cycle: "monthly"
+    
+    metrics_to_review:
+      - "overall_effectiveness"
+      - "false_positive_rate"
+      - "false_negative_rate"
+      - "provider_satisfaction"
+      - "cost_efficiency"
+    
+    improvement_actions:
+      - action: "feature_selection_review"
+        trigger: "model_performance < target"
+      
+      - action: "hyperparameter_tuning"
+        trigger: "validation_loss > threshold"
+      
+      - action: "architecture_search"
+        trigger: "plateau_in_improvement"
+      
+      - action: "data_augmentation"
+        trigger: "insufficient_training_data"
