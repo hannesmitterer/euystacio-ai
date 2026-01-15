@@ -1,19 +1,20 @@
 # Security Runbook
 
-Comprehensive security guide for the Nexus API covering best practices, incident response, and operational procedures.
+Comprehensive security guide for the Nexus API and EUYSTACIO Framework covering best practices, incident response, blacklist management, and operational procedures.
 
 ## Table of Contents
 
 1. [Security Checklist](#security-checklist)
-2. [Authentication & Authorization](#authentication--authorization)
-3. [Secret Management](#secret-management)
-4. [Session Cleanup](#session-cleanup)
-5. [Rate Limiting](#rate-limiting)
-6. [Input Validation](#input-validation)
-7. [Encryption](#encryption)
-8. [Incident Response](#incident-response)
-9. [Compliance](#compliance)
-10. [Security Monitoring](#security-monitoring)
+2. [Permanent Blacklist System](#permanent-blacklist-system)
+3. [Authentication & Authorization](#authentication--authorization)
+4. [Secret Management](#secret-management)
+5. [Session Cleanup](#session-cleanup)
+6. [Rate Limiting](#rate-limiting)
+7. [Input Validation](#input-validation)
+8. [Encryption](#encryption)
+9. [Incident Response](#incident-response)
+10. [Compliance](#compliance)
+11. [Security Monitoring](#security-monitoring)
 
 ---
 
@@ -48,6 +49,211 @@ Comprehensive security guide for the Nexus API covering best practices, incident
 - [ ] Authorization rules enforced
 - [ ] Audit logs collecting properly
 - [ ] Monitoring alerts configured
+- [ ] Blacklist system initialized and operational
+- [ ] Known threats added to blacklist
+
+---
+
+## Permanent Blacklist System
+
+The EUYSTACIO framework includes a permanent blacklist management system to protect against malicious entities, suspicious nodes, and security threats.
+
+### Overview
+
+The Blacklist Manager provides:
+- **Persistent blocking** of suspicious entities, IP addresses, and API keys
+- **Integration** with the Red Code system for permanent storage
+- **Automated logging** of security events
+- **Backup integration** through the resilience system
+- **Threat level classification** (LOW, MEDIUM, HIGH, CRITICAL)
+
+### Using the Blacklist Manager
+
+#### Import and Initialize
+
+```python
+from core import get_blacklist_manager, ThreatLevel, BlockReason
+
+# Get the global blacklist manager instance
+blacklist_manager = get_blacklist_manager()
+```
+
+#### Block an Entity
+
+```python
+# Block a suspicious node
+result = blacklist_manager.add_entity(
+    entity_id="suspicious_node_001",
+    entity_type="node",
+    reason=BlockReason.SUSPICIOUS_ACTIVITY,
+    threat_level=ThreatLevel.HIGH,
+    metadata={
+        "detected_at": "2025-01-15T00:00:00Z",
+        "indicators": ["high_frequency_requests", "invalid_auth"]
+    }
+)
+
+# Block an IP address
+result = blacklist_manager.add_ip_address(
+    ip_address="192.168.1.100",
+    reason=BlockReason.ATTACK_ATTEMPT,
+    threat_level=ThreatLevel.CRITICAL
+)
+
+# Block an API key (provide the SHA-256 hash)
+import hashlib
+api_key_hash = hashlib.sha256("compromised_key".encode()).hexdigest()
+result = blacklist_manager.add_api_key(
+    api_key_hash=api_key_hash,
+    reason=BlockReason.DATA_THEFT,
+    threat_level=ThreatLevel.CRITICAL
+)
+```
+
+#### Check if Blocked
+
+```python
+# Check if entity is blocked
+if blacklist_manager.is_entity_blocked("suspicious_node_001"):
+    print("Entity is blacklisted - blocking request")
+
+# Check if IP is blocked
+if blacklist_manager.is_ip_blocked("192.168.1.100"):
+    print("IP address is blacklisted - blocking request")
+
+# Check if API key is blocked (provide the actual key, it will be hashed)
+if blacklist_manager.is_api_key_blocked("api_key_value"):
+    print("API key is blacklisted - blocking request")
+```
+
+#### Remove from Blacklist
+
+```python
+# Remove an entity (e.g., false positive)
+result = blacklist_manager.remove_entity("entity_id")
+
+# Remove an IP address
+result = blacklist_manager.remove_ip_address("192.168.1.100")
+```
+
+#### Get Statistics
+
+```python
+# Get blacklist statistics
+stats = blacklist_manager.get_blacklist_stats()
+print(f"Total entities blocked: {stats['total_entities_blocked']}")
+print(f"Total IPs blocked: {stats['total_ips_blocked']}")
+print(f"Threat distribution: {stats['threat_distribution']}")
+
+# Get list of blacklisted entities
+entities = blacklist_manager.get_blacklisted_entities()
+for entity in entities:
+    print(f"{entity['entity_id']}: {entity['threat_level']} - {entity['reason']}")
+```
+
+### Integration with API Endpoints
+
+Example middleware for request validation:
+
+```python
+def validate_request_middleware(req, res, next):
+    """Validate incoming request against blacklist"""
+    blacklist_manager = get_blacklist_manager()
+    
+    entity_id = req.get('entity_id')
+    ip_address = req.get('ip_address')
+    api_key = req.headers.get('Authorization', '').replace('Bearer ', '')
+    
+    # Check entity
+    if entity_id and blacklist_manager.is_entity_blocked(entity_id):
+        return res.status(403).json({
+            'error': 'Access denied - entity blacklisted'
+        })
+    
+    # Check IP
+    if ip_address and blacklist_manager.is_ip_blocked(ip_address):
+        return res.status(403).json({
+            'error': 'Access denied - IP address blacklisted'
+        })
+    
+    # Check API key
+    if api_key and blacklist_manager.is_api_key_blocked(api_key):
+        return res.status(403).json({
+            'error': 'Access denied - API key blacklisted'
+        })
+    
+    next()
+```
+
+### Threat Levels
+
+| Level | Usage | Response |
+|-------|-------|----------|
+| **LOW** | Minor policy violations, first-time suspicious behavior | Monitor, log |
+| **MEDIUM** | Repeated suspicious activity, potential threats | Block, alert team |
+| **HIGH** | Active attack attempts, data exfiltration | Block, immediate investigation |
+| **CRITICAL** | Confirmed malicious activity, system compromise | Block, emergency escalation |
+
+### Block Reasons
+
+- `SUSPICIOUS_ACTIVITY`: Unusual or potentially malicious behavior
+- `ATTACK_ATTEMPT`: Active attack on the system
+- `DATA_THEFT`: Attempted or successful data exfiltration
+- `POLICY_VIOLATION`: Violation of usage policies
+- `SECURITY_THREAT`: Identified security threat
+- `ECOSYSTEM_TESTING`: Unauthorized access during ecosystem testing phase
+
+### Blacklist Persistence
+
+The blacklist data is permanently stored in the Red Code system (`red_code.json`) and backed up through the resilience system:
+
+```python
+# Blacklist data is automatically saved in red_code.json
+{
+  "security_blacklist": {
+    "entities": { ... },
+    "ip_addresses": { ... },
+    "api_keys": { ... },
+    "metadata": {
+      "created": "2025-01-15T00:00:00Z",
+      "last_updated": "2025-01-15T12:00:00Z",
+      "total_blocked": 42
+    }
+  }
+}
+```
+
+### Security Audit
+
+Perform regular security audits:
+
+```python
+# Get integrity verification
+integrity = blacklist_manager.verify_blacklist_integrity()
+print(f"Integrity verified: {integrity['verified']}")
+print(f"Integrity hash: {integrity['integrity_hash']}")
+
+# Review statistics
+stats = blacklist_manager.get_blacklist_stats()
+print(f"Total block attempts: {stats['total_block_attempts']}")
+
+# Review high-threat entities
+entities = blacklist_manager.get_blacklisted_entities()
+high_threat = [e for e in entities if e['threat_level'] in ['high', 'critical']]
+print(f"High-threat entities: {len(high_threat)}")
+```
+
+### Best Practices
+
+1. ✅ **Regular audits**: Review blacklist entries weekly
+2. ✅ **Document reasons**: Always provide detailed metadata for blocks
+3. ✅ **Monitor block attempts**: Track entities attempting to access after blocking
+4. ✅ **Verify integrity**: Regularly verify blacklist integrity
+5. ✅ **Update threat levels**: Escalate threat levels based on behavior
+6. ✅ **Remove false positives**: Promptly remove incorrectly blocked entities
+7. ✅ **Backup integration**: Ensure blacklist is included in system backups
+
+
 - [ ] SSL/TLS certificate valid
 - [ ] Security headers present in responses
 - [ ] Backup procedures tested

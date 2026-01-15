@@ -164,6 +164,15 @@ class ResilienceSystem:
                 "truth_nodes": len(self.red_code.get_truth_nodes()),
                 "coherence_verified": self.red_code.verify_recursive_coherence()["overall_coherence"]
             }
+            
+            # Backup blacklist data if present
+            if "security_blacklist" in red_code_state:
+                manifest["system_state"]["blacklist"] = {
+                    "total_entities_blocked": len(red_code_state["security_blacklist"].get("entities", {})),
+                    "total_ips_blocked": len(red_code_state["security_blacklist"].get("ip_addresses", {})),
+                    "total_api_keys_blocked": len(red_code_state["security_blacklist"].get("api_keys", {})),
+                    "last_updated": red_code_state["security_blacklist"]["metadata"].get("last_updated")
+                }
         
         # Save manifest
         with open(os.path.join(snapshot_dir, "manifest.json"), 'w') as f:

@@ -395,6 +395,458 @@
         "source": "tutor_nomination"
       },
       "verified": true
+    },
+    "FID-2026-0115-0001": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.786006+00:00",
+      "integrity_hash": "e5b87453c9369c46",
+      "content": {
+        "event_type": "api_key_blacklisted",
+        "data": {
+          "api_key_hash": "eaabde08005b1dca...",
+          "reason": "data_theft",
+          "threat_level": "critical"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0002": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.787354+00:00",
+      "integrity_hash": "11b5465efbbac7ff",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "test_entity",
+          "entity_type": "node",
+          "reason": "attack_attempt",
+          "threat_level": "medium"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0003": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.788598+00:00",
+      "integrity_hash": "beb9f0dbb32f9f43",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "suspicious_node_001",
+          "entity_type": "node",
+          "reason": "suspicious_activity",
+          "threat_level": "high"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0004": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.789892+00:00",
+      "integrity_hash": "e3d56c9acc8696b9",
+      "content": {
+        "event_type": "ip_blacklisted",
+        "data": {
+          "ip_address": "192.168.1.100",
+          "reason": "attack_attempt",
+          "threat_level": "critical"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0005": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.791193+00:00",
+      "integrity_hash": "d525891369f842fa",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "test_entity",
+          "entity_type": "node",
+          "reason": "suspicious_activity",
+          "threat_level": "medium"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0006": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.792171+00:00",
+      "integrity_hash": "0dd2f850a471077b",
+      "content": {
+        "event_type": "blocked_entity_attempt",
+        "data": {
+          "entity_id": "test_entity",
+          "block_count": 1
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0007": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.793028+00:00",
+      "integrity_hash": "0a198b160706fac0",
+      "content": {
+        "event_type": "blocked_entity_attempt",
+        "data": {
+          "entity_id": "test_entity",
+          "block_count": 2
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0008": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.793937+00:00",
+      "integrity_hash": "f9f77480af9a6e3f",
+      "content": {
+        "event_type": "blocked_entity_attempt",
+        "data": {
+          "entity_id": "test_entity",
+          "block_count": 3
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0009": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.795297+00:00",
+      "integrity_hash": "61fd5b42577a465d",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "entity1",
+          "entity_type": "node",
+          "reason": "suspicious_activity",
+          "threat_level": "low"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0010": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.796271+00:00",
+      "integrity_hash": "2f756dd0496a6b98",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "entity2",
+          "entity_type": "service",
+          "reason": "attack_attempt",
+          "threat_level": "high"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0011": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.797237+00:00",
+      "integrity_hash": "35ab8aa1ca7c8062",
+      "content": {
+        "event_type": "ip_blacklisted",
+        "data": {
+          "ip_address": "192.168.1.1",
+          "reason": "attack_attempt",
+          "threat_level": "critical"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0012": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.801697+00:00",
+      "integrity_hash": "c6d9f5cd35c1408d",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "entity1",
+          "entity_type": "node",
+          "reason": "suspicious_activity",
+          "threat_level": "medium"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0013": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.802801+00:00",
+      "integrity_hash": "0239ce609df15ef6",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "entity2",
+          "entity_type": "service",
+          "reason": "attack_attempt",
+          "threat_level": "medium"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0014": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.804286+00:00",
+      "integrity_hash": "8ae93967d7c8fba8",
+      "content": {
+        "event_type": "api_key_blacklisted",
+        "data": {
+          "api_key_hash": "6f3d322808c0b2fe...",
+          "reason": "security_threat",
+          "threat_level": "high"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0015": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.805381+00:00",
+      "integrity_hash": "b149cd8a4a0c8701",
+      "content": {
+        "event_type": "blocked_api_key_attempt",
+        "data": {
+          "api_key_hash": "6f3d322808c0b2fe...",
+          "block_count": 1
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0016": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.806926+00:00",
+      "integrity_hash": "eb5c9442ab3c69b0",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "blocked_entity",
+          "entity_type": "service",
+          "reason": "policy_violation",
+          "threat_level": "medium"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0017": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.808021+00:00",
+      "integrity_hash": "0169770132bcb9ed",
+      "content": {
+        "event_type": "blocked_entity_attempt",
+        "data": {
+          "entity_id": "blocked_entity",
+          "block_count": 1
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0018": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.809558+00:00",
+      "integrity_hash": "c061a31e9f0f6ac0",
+      "content": {
+        "event_type": "ip_blacklisted",
+        "data": {
+          "ip_address": "10.0.0.1",
+          "reason": "attack_attempt",
+          "threat_level": "medium"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0019": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.810735+00:00",
+      "integrity_hash": "461f01c53583e417",
+      "content": {
+        "event_type": "blocked_ip_attempt",
+        "data": {
+          "ip_address": "10.0.0.1",
+          "block_count": 1
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0020": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.812423+00:00",
+      "integrity_hash": "0beab443e8f76399",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "entity1",
+          "entity_type": "node",
+          "reason": "suspicious_activity",
+          "threat_level": "medium"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0021": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.814046+00:00",
+      "integrity_hash": "5be2d4cc47a527fd",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "temp_entity",
+          "entity_type": "node",
+          "reason": "suspicious_activity",
+          "threat_level": "medium"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0022": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.815280+00:00",
+      "integrity_hash": "f4ff06084911bfb5",
+      "content": {
+        "event_type": "blocked_entity_attempt",
+        "data": {
+          "entity_id": "temp_entity",
+          "block_count": 1
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0023": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.816532+00:00",
+      "integrity_hash": "c1fffffcf25738d9",
+      "content": {
+        "event_type": "entity_removed_from_blacklist",
+        "data": {
+          "entity_id": "temp_entity"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0024": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.818209+00:00",
+      "integrity_hash": "28e6c2b048aa1e0d",
+      "content": {
+        "event_type": "ip_blacklisted",
+        "data": {
+          "ip_address": "172.16.0.1",
+          "reason": "attack_attempt",
+          "threat_level": "medium"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0025": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.819498+00:00",
+      "integrity_hash": "5295d4e5cf81726d",
+      "content": {
+        "event_type": "blocked_ip_attempt",
+        "data": {
+          "ip_address": "172.16.0.1",
+          "block_count": 1
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0026": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.820782+00:00",
+      "integrity_hash": "22e9def39d9caffc",
+      "content": {
+        "event_type": "ip_removed_from_blacklist",
+        "data": {
+          "ip_address": "172.16.0.1"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0027": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:11.822646+00:00",
+      "integrity_hash": "69a577e0471db40d",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "test_entity",
+          "entity_type": "node",
+          "reason": "suspicious_activity",
+          "threat_level": "medium"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0028": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:17.213140+00:00",
+      "integrity_hash": "2763e7701744e1d6",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "malicious_node_001",
+          "entity_type": "node",
+          "reason": "security_threat",
+          "threat_level": "critical"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0029": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:17.214749+00:00",
+      "integrity_hash": "c007eaf7cfd01e94",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "suspicious_service_002",
+          "entity_type": "service",
+          "reason": "ecosystem_testing",
+          "threat_level": "high"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
+    },
+    "FID-2026-0115-0030": {
+      "type": "kernel_event",
+      "timestamp": "2026-01-15T01:01:17.216597+00:00",
+      "integrity_hash": "c1012035a147871d",
+      "content": {
+        "event_type": "entity_blacklisted",
+        "data": {
+          "entity_id": "suspicious_bot",
+          "entity_type": "bot",
+          "reason": "suspicious_activity",
+          "threat_level": "medium"
+        },
+        "source": "symbolic_kernel"
+      },
+      "verified": true
     }
   },
   "counters": {
@@ -404,6 +856,8 @@
     "2025-0801-reflection": 1,
     "2025-0801-kernel_event": 10,
     "2025-0805-tutor": 2,
-    "2025-0805": 2
+    "2025-0805": 2,
+    "2026-0115-kernel_event": 30,
+    "2026-0115": 30
   }
 }
