@@ -225,7 +225,11 @@ class EuystacioNetwork:
         print(f"\n[BBMN Network]")
         print(f"  Total nodes: {bbmn['total_nodes']}")
         print(f"  Aligned nodes: {bbmn['aligned_nodes']}")
-        print(f"  DNS queries: {bbmn['dns_queries']} (must be 0!)")
+        print(f"  DNS queries: {bbmn['dns_queries']}", end="")
+        if bbmn['dns_queries'] > 0:
+            print(f" ⚠️  WARNING: DNS VIOLATION DETECTED!")
+        else:
+            print(f" ✓ (DNS-free verified)")
         print(f"  DNS-free: {bbmn['dns_free']}")
         print(f"  Decentralized: {bbmn['decentralized']}")
         

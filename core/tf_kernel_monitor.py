@@ -144,6 +144,8 @@ class TensorFlowAnomalyDetector:
             return
         
         try:
+            import tensorflow as tf
+            
             # Create simple neural network for anomaly detection
             self.model = tf.keras.Sequential([
                 tf.keras.layers.Dense(16, activation='relu', input_shape=(5,)),

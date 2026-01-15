@@ -167,9 +167,13 @@ class LexAmorisVerifier:
             except Exception as e:
                 print(f"[Stealth] Error calculating alignment: {e}")
         
-        # Fallback calculation
+        # Fallback calculation using more of the hash for better entropy
         signature_hash = hashlib.sha256(resonance_signature.encode()).digest()
-        return int.from_bytes(signature_hash[:4], 'big') / (2**32)
+        # Use 8 bytes for better distribution and entropy
+        hash_value = int.from_bytes(signature_hash[:8], 'big')
+        # Normalize to 0.0-1.0 range with better distribution
+        alignment = (hash_value % 10000) / 10000.0
+        return alignment
     
     def get_verification_stats(self) -> Dict[str, Any]:
         """Get verification statistics"""

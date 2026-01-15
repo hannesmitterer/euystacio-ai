@@ -431,7 +431,7 @@ class BBMNNetwork:
         self.stats["peers_discovered"] += new_peers
         
         # Verify DNS-free operation (critical security check)
-        if self.stats["dns_queries"] != 0:
+        if self.stats["dns_queries"] > 0:
             raise RuntimeError(
                 f"CRITICAL SECURITY VIOLATION: {self.stats['dns_queries']} DNS queries detected! "
                 "BBMN must operate without DNS. Network compromised."
