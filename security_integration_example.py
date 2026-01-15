@@ -6,6 +6,7 @@ This demonstrates how to integrate the blacklist manager into existing
 security workflows and API endpoints.
 """
 
+from typing import Dict, Any, List, Optional
 from core import get_blacklist_manager, ThreatLevel, BlockReason
 from datetime import datetime, timezone
 
@@ -72,7 +73,7 @@ def detect_and_block_suspicious_activity(entity_id: str, activity_data: dict):
         threat_level = ThreatLevel.HIGH
     
     # Check for ecosystem testing state violations
-    if activity_data.get("ecosystem_state") == "TESTING" and activity_data.get("unauthorized_access"):
+    if activity_data.get("ecosystem_state") == "TESTING" and activity_data.get("unauthorized_access") is not None:
         suspicious_indicators.append("ecosystem_testing_violation")
         threat_level = ThreatLevel.CRITICAL
     

@@ -296,7 +296,7 @@ class TestBlacklistManager(unittest.TestCase):
         
         # Check metadata
         metadata = self.manager.blacklist_data["metadata"]
-        self.assertEqual(metadata["total_blocked"], 1)
+        self.assertEqual(metadata["total_entities_blocked"], 1)
         self.assertIn("last_updated", metadata)
         self.assertIn("created", metadata)
         self.assertIn("ai_signature", metadata)

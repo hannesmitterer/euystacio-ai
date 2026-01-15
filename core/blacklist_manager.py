@@ -59,10 +59,11 @@ class BlacklistManager:
             "metadata": {
                 "created": datetime.now(timezone.utc).isoformat(),
                 "last_updated": datetime.now(timezone.utc).isoformat(),
-                "total_blocked": 0,
+                "total_entities_blocked": 0,
                 "ai_signature": "GitHub Copilot & Seed-bringer hannesmitterer"
             }
         }
+        self._integrity_hash_cache = None
         self._load_blacklist()
     
     def _load_blacklist(self):
@@ -78,6 +79,9 @@ class BlacklistManager:
     def _save_blacklist(self):
         """Save blacklist to red_code system"""
         self.blacklist_data["metadata"]["last_updated"] = datetime.now(timezone.utc).isoformat()
+        
+        # Invalidate integrity hash cache
+        self._integrity_hash_cache = None
         
         if self.red_code:
             red_code_data = self.red_code.get_red_code()
@@ -124,7 +128,7 @@ class BlacklistManager:
         }
         
         self.blacklist_data["entities"][entity_id] = entry
-        self.blacklist_data["metadata"]["total_blocked"] = len(self.blacklist_data["entities"])
+        self.blacklist_data["metadata"]["total_entities_blocked"] = len(self.blacklist_data["entities"])
         self._save_blacklist()
         
         # Log the event
@@ -220,7 +224,7 @@ class BlacklistManager:
             return {
                 "success": False,
                 "message": "API key is already blacklisted",
-                "api_key_hash": api_key_hash[:16] + "..."
+                "api_key_hash": api_key_hash[:8] + "..."
             }
         
         entry = {
@@ -239,7 +243,7 @@ class BlacklistManager:
         # Log the event
         if self.logger:
             self.logger.log_event("api_key_blacklisted", {
-                "api_key_hash": api_key_hash[:16] + "...",
+                "api_key_hash": api_key_hash[:8] + "...",
                 "reason": reason,
                 "threat_level": threat_level
             })
@@ -247,7 +251,7 @@ class BlacklistManager:
         return {
             "success": True,
             "message": "API key added to blacklist",
-            "api_key_hash": api_key_hash[:16] + "...",
+            "api_key_hash": api_key_hash[:8] + "...",
             "threat_level": threat_level
         }
     
@@ -327,7 +331,7 @@ class BlacklistManager:
             # Log the blocked attempt
             if self.logger:
                 self.logger.log_event("blocked_api_key_attempt", {
-                    "api_key_hash": api_key_hash[:16] + "...",
+                    "api_key_hash": api_key_hash[:8] + "...",
                     "block_count": self.blacklist_data["api_keys"][api_key_hash]["block_count"]
                 })
         
@@ -351,7 +355,7 @@ class BlacklistManager:
             }
         
         del self.blacklist_data["entities"][entity_id]
-        self.blacklist_data["metadata"]["total_blocked"] = len(self.blacklist_data["entities"])
+        self.blacklist_data["metadata"]["total_entities_blocked"] = len(self.blacklist_data["entities"])
         self._save_blacklist()
         
         # Log the event
@@ -467,13 +471,15 @@ class BlacklistManager:
         Returns:
             Dictionary with integrity verification results
         """
-        integrity_hash = hashlib.sha256(
-            json.dumps(self.blacklist_data, sort_keys=True).encode()
-        ).hexdigest()
+        # Use cached hash if available
+        if self._integrity_hash_cache is None:
+            self._integrity_hash_cache = hashlib.sha256(
+                json.dumps(self.blacklist_data, sort_keys=True).encode()
+            ).hexdigest()
         
         return {
             "verified": True,
-            "integrity_hash": integrity_hash,
+            "integrity_hash": self._integrity_hash_cache,
             "total_entries": (
                 len(self.blacklist_data["entities"]) +
                 len(self.blacklist_data["ip_addresses"]) +
