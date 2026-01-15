@@ -20,6 +20,12 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
+# Constants for sentiment scoring
+SENTIMENT_BASE_SCORE = 0.5
+SENTIMENT_COMPASSIONATE_BOOST = 0.1
+SENTIMENT_NEGATIVE_PENALTY = 0.15
+
+
 class RescueType(Enum):
     """Type of rescue operation"""
     FALSE_POSITIVE = "FALSE_POSITIVE"
@@ -94,7 +100,7 @@ class RescueMessage:
         return {
             "message_id": self.message_id,
             "rescue_request_id": self.rescue_request_id,
-            "sender": sender,
+            "sender": self.sender,
             "content": self.content,
             "timestamp": self.timestamp,
             "sentiment_score": self.sentiment_score,
@@ -179,7 +185,9 @@ class RescueChannel:
         negative_count = sum(1 for word in negative_words if word in content_lower)
         
         # Score from 0.0 to 1.0
-        score = 0.5 + (compassion_count * 0.1) - (negative_count * 0.15)
+        score = (SENTIMENT_BASE_SCORE + 
+                 (compassion_count * SENTIMENT_COMPASSIONATE_BOOST) - 
+                 (negative_count * SENTIMENT_NEGATIVE_PENALTY))
         return max(0.0, min(1.0, score))
     
     def submit_rescue_request(self, 

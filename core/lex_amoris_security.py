@@ -21,6 +21,17 @@ from enum import Enum
 import time
 
 
+# Constants for rhythm validation
+RHYTHM_HISTORY_MAX_SIZE = 1000
+RHYTHM_HISTORY_TRIM_SIZE = 500
+COMPASSION_BASE_SCORE = 0.5
+COMPASSION_POSITIVE_INCREMENT = 0.1
+COMPASSION_NEGATIVE_DECREMENT = 0.15
+
+# Constants for integrity verification
+MAX_BACKUPS_TO_CHECK = 50
+
+
 class RhythmStatus(Enum):
     """Status of rhythm validation"""
     VALID = "VALID"
@@ -172,8 +183,8 @@ class RhythmValidator:
                     self.rhythm_history.append((rhythm_sig, current_time))
                     
                     # Limit history size
-                    if len(self.rhythm_history) > 1000:
-                        self.rhythm_history = self.rhythm_history[-500:]
+                    if len(self.rhythm_history) > RHYTHM_HISTORY_MAX_SIZE:
+                        self.rhythm_history = self.rhythm_history[-RHYTHM_HISTORY_TRIM_SIZE:]
                     
                     return status, harmony_score
         

@@ -19,6 +19,10 @@ from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 
+# Constants for backup verification
+MAX_BACKUPS_TO_CHECK = 50
+POOR_REPLICATION_THRESHOLD = 0.2  # 20%
+
 # Import existing IPFS integrity system
 try:
     from core.ipfs_integrity import IPFSIntegrityManager, get_ipfs_manager
@@ -359,7 +363,7 @@ class IPFSPRBackupManager:
         
         # Check for integrity failures
         integrity_failures = 0
-        for backup_id in list(self.backup_records.keys())[:50]:  # Check last 50
+        for backup_id in list(self.backup_records.keys())[:MAX_BACKUPS_TO_CHECK]:
             is_valid, _ = self.verify_backup_integrity(backup_id)
             if not is_valid:
                 integrity_failures += 1
@@ -382,7 +386,7 @@ class IPFSPRBackupManager:
                 if len(record.nodes_replicated) < 2
             ]
             
-            if len(poorly_replicated) > len(self.backup_records) * 0.2:  # >20%
+            if len(poorly_replicated) > len(self.backup_records) * POOR_REPLICATION_THRESHOLD:
                 threat_indicators.append({
                     "type": "POOR_REPLICATION",
                     "count": len(poorly_replicated),
