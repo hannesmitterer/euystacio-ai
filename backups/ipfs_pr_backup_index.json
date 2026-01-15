@@ -1,0 +1,65 @@
+{
+  "last_updated": "2026-01-15T01:25:21.737755+00:00",
+  "total_backups": 3,
+  "backups": [
+    {
+      "backup_id": "DDECCDB008668BB2F263",
+      "pr_number": 123,
+      "trigger": "PR_CREATED",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmG5U6ANPNSSAUAVNOALQGU7KSOSOBFE52MAKQJYXUKO37",
+      "backup_timestamp": "2026-01-15T01:25:21.736663+00:00",
+      "verification_hash": "3769e035ed94814055ae02e06a7d52749c1293ba601504e2f453b7fae2a1ba4b",
+      "size_bytes": 420,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
+    },
+    {
+      "backup_id": "97FF8C1ECDF8932FB855",
+      "pr_number": 456,
+      "trigger": "MANUAL",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmY7LDEE6P6JBVZES6QTT7YW44WZ2P5ZDOFND2HLMXMISJ",
+      "backup_timestamp": "2026-01-15T01:25:21.737197+00:00",
+      "verification_hash": "c7d63213cff2435c925e84e7fc5b9cb674fee46e2b47a3ad9762249648abaefd",
+      "size_bytes": 281,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
+    },
+    {
+      "backup_id": "825EB34149D823BDB349",
+      "pr_number": 789,
+      "trigger": "MANUAL",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmISNTBE7WQHLB66AXU2RGQJ4PVEMIZV6MKTYU6WXRLG4D",
+      "backup_timestamp": "2026-01-15T01:25:21.737614+00:00",
+      "verification_hash": "449b3093f681d61f7817a6a268278fa9188cd7cc54f14f5af159b834ae21381f",
+      "size_bytes": 299,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
+    }
+  ],
+  "pr_history": {
+    "123": [
+      "DDECCDB008668BB2F263"
+    ],
+    "456": [
+      "97FF8C1ECDF8932FB855"
+    ],
+    "789": [
+      "825EB34149D823BDB349"
+    ]
+  }
+}
