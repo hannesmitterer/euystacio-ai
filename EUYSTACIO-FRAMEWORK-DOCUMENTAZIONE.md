@@ -475,6 +475,36 @@ Il `red_code.json` è protetto da:
 - Branch protection rules
 - Verifica hash ad ogni deployment
 
+### Sistema di Blacklist Permanente
+
+Il framework include un sistema di blacklist permanente per proteggere contro entità sospette:
+
+```python
+from core import get_blacklist_manager, ThreatLevel, BlockReason
+
+# Blocca un'entità sospetta
+blacklist = get_blacklist_manager()
+blacklist.add_entity(
+    entity_id="suspicious_node_001",
+    entity_type="node",
+    reason=BlockReason.SUSPICIOUS_ACTIVITY,
+    threat_level=ThreatLevel.HIGH
+)
+
+# Verifica se bloccato
+if blacklist.is_entity_blocked("suspicious_node_001"):
+    print("Accesso negato - entità in blacklist")
+```
+
+**Caratteristiche**:
+- Blocco permanente di nodi, IP e API key sospetti
+- Integrazione con Red Code per persistenza
+- Livelli di minaccia: LOW, MEDIUM, HIGH, CRITICAL
+- Backup automatico tramite resilience system
+- Logging completo di tutti gli eventi di sicurezza
+
+Documentazione completa: [`docs/BLACKLIST_SYSTEM.md`](docs/BLACKLIST_SYSTEM.md)
+
 ### Incident Response
 
 | Severità | Risposta | Escalation |

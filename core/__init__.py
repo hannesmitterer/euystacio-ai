@@ -7,6 +7,7 @@ This module contains the core components for:
 - Governance Signature Compliance Automation
 - IPFS Cross-Sync and Integrity Layer
 - Coronation Workshop Simulation
+- Permanent Blacklist Management System
 
 Prepared for Coronation Day (January 2026) and testing phases.
 """
@@ -39,6 +40,12 @@ from core.coronation_simulator import (
     LoadLevel,
     get_coronation_simulator
 )
+from core.blacklist_manager import (
+    BlacklistManager,
+    ThreatLevel,
+    BlockReason,
+    get_blacklist_manager
+)
 
 __all__ = [
     # Existing components
@@ -65,4 +72,9 @@ __all__ = [
     'SimulationMode',
     'LoadLevel',
     'get_coronation_simulator',
+    # Blacklist Manager
+    'BlacklistManager',
+    'ThreatLevel',
+    'BlockReason',
+    'get_blacklist_manager',
 ]
