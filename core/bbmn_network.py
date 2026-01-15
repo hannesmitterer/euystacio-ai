@@ -430,8 +430,12 @@ class BBMNNetwork:
         
         self.stats["peers_discovered"] += new_peers
         
-        # Note: DNS queries remain 0 - all discovery via IPFS DHT
-        assert self.stats["dns_queries"] == 0, "DNS should never be used in BBMN!"
+        # Verify DNS-free operation (critical security check)
+        if self.stats["dns_queries"] != 0:
+            raise RuntimeError(
+                f"CRITICAL SECURITY VIOLATION: {self.stats['dns_queries']} DNS queries detected! "
+                "BBMN must operate without DNS. Network compromised."
+            )
         
         return new_peers
     

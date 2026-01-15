@@ -122,6 +122,9 @@ class NTRUKeyGenerator:
         # Store original message length in first 4 bytes
         msg_len = len(message).to_bytes(4, 'big')
         
+        # Store public key hash (8 bytes) for verification during decryption
+        pub_key_hash = hashlib.sha256(public_key).digest()[:8]
+        
         # Create encryption key from public key
         encryption_key = hashlib.sha3_256(public_key).digest()
         
@@ -129,21 +132,27 @@ class NTRUKeyGenerator:
         encrypted = bytes(a ^ encryption_key[i % len(encryption_key)] 
                          for i, a in enumerate(message))
         
-        # Return: length + encrypted_data
-        return msg_len + encrypted
+        # Return: pub_key_hash + length + encrypted_data
+        return pub_key_hash + msg_len + encrypted
     
     def _simulate_decrypt(self, ciphertext: bytes, private_key: bytes, public_key: Optional[bytes] = None) -> bytes:
         """Simulate NTRU decryption (for demonstration only)"""
         # Extract components
-        msg_len = int.from_bytes(ciphertext[:4], 'big')
-        encrypted_data = ciphertext[4:]
+        stored_pub_key_hash = ciphertext[:8]
+        msg_len = int.from_bytes(ciphertext[8:12], 'big')
+        encrypted_data = ciphertext[12:]
         
-        # If public_key provided, use it; otherwise derive from private key
+        # Public key must be provided for secure decryption
         if public_key is None:
-            # Derive public key from private key using same master key approach
-            # Extract master key components from private key
-            master_key_hash = hashlib.sha3_512(private_key + b"REVERSE_MASTER").digest()
-            public_key = hashlib.sha3_512(master_key_hash + b"PUBLIC").digest() * 2
+            raise ValueError(
+                "Public key required for decryption. "
+                "Deriving from private key would compromise security."
+            )
+        
+        # Verify public key hash matches stored hash
+        pub_key_hash = hashlib.sha256(public_key).digest()[:8]
+        if pub_key_hash != stored_pub_key_hash:
+            raise ValueError("Public key does not match encrypted data")
         
         encryption_key = hashlib.sha3_256(public_key).digest()
         

@@ -342,7 +342,7 @@ class EncryptedBufferManager:
         
         # Decrypt
         if self.quantum_shield:
-            decrypted_data = self.quantum_shield.decrypt(buffer.encrypted_data)
+            decrypted_data = self.quantum_shield.decrypt(buffer.encrypted_data, buffer.quantum_key_id)
         else:
             # Fallback: Reverse obfuscation
             decrypted_data = bytes(b ^ 0xAA for b in buffer.encrypted_data)
