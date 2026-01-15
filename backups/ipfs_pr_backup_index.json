@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-01-15T01:25:21.737755+00:00",
-  "total_backups": 3,
+  "last_updated": "2026-01-15T01:28:21.648315+00:00",
+  "total_backups": 4,
   "backups": [
     {
       "backup_id": "DDECCDB008668BB2F263",
@@ -49,6 +49,20 @@
         "IPFS-TERTIARY-ASIA"
       ],
       "metadata": {}
+    },
+    {
+      "backup_id": "722DC36E81AA1A7FD692",
+      "pr_number": 42,
+      "trigger": "PR_CREATED",
+      "status": "COMPLETED",
+      "ipfs_cid": "local:backups/pr_configs/PR-42-722DC36E81AA1A7FD692.json",
+      "backup_timestamp": "2026-01-15T01:28:21.648123+00:00",
+      "verification_hash": "aa2c793a3e33f8e0a6a97ef4e23e448e3ceb3b6ce5785a86909ddb491638d98b",
+      "size_bytes": 658,
+      "nodes_replicated": [],
+      "metadata": {
+        "priority": "high"
+      }
     }
   ],
   "pr_history": {
@@ -60,6 +74,9 @@
     ],
     "789": [
       "825EB34149D823BDB349"
+    ],
+    "42": [
+      "722DC36E81AA1A7FD692"
     ]
   }
 }
