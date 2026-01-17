@@ -7,6 +7,10 @@ This module contains the core components for:
 - Governance Signature Compliance Automation
 - IPFS Cross-Sync and Integrity Layer
 - Coronation Workshop Simulation
+- Quantum-Shield Protection (NTRU lattice-based encryption)
+- BBMN - Blockchain-Based Mesh Network (DNS-free)
+- TensorFlow Predictive Kernel (Anomaly Detection)
+- Stealth Mode (Ponte Amoris & Resonance School Protection)
 
 Prepared for Coronation Day (January 2026) and testing phases.
 """
@@ -14,7 +18,7 @@ Prepared for Coronation Day (January 2026) and testing phases.
 from core.red_code import RedCodeSystem, red_code_system
 from core.reflector import reflect_and_suggest
 
-# Import new operational components
+# Import operational components
 from core.threshold_monitor import (
     ThresholdMonitor,
     MetricType,
@@ -38,6 +42,33 @@ from core.coronation_simulator import (
     SimulationMode,
     LoadLevel,
     get_coronation_simulator
+)
+
+# Import EUYSTACIO network protection components
+from core.quantum_shield import (
+    QuantumShield,
+    QuantumKey,
+    get_quantum_shield
+)
+from core.bbmn_network import (
+    BBMNNetwork,
+    MeshNode,
+    NodeRole,
+    NodeStatus,
+    get_bbmn_network
+)
+from core.tf_kernel_monitor import (
+    TFKernelMonitor,
+    Anomaly,
+    ThreatLevel,
+    AnomalyType,
+    get_tf_kernel_monitor
+)
+from core.stealth_mode import (
+    StealthMode,
+    StealthLevel,
+    AlignmentStatus,
+    get_stealth_mode
 )
 
 __all__ = [
@@ -65,4 +96,25 @@ __all__ = [
     'SimulationMode',
     'LoadLevel',
     'get_coronation_simulator',
+    # Quantum Shield Protection
+    'QuantumShield',
+    'QuantumKey',
+    'get_quantum_shield',
+    # BBMN Network
+    'BBMNNetwork',
+    'MeshNode',
+    'NodeRole',
+    'NodeStatus',
+    'get_bbmn_network',
+    # TensorFlow Kernel
+    'TFKernelMonitor',
+    'Anomaly',
+    'ThreatLevel',
+    'AnomalyType',
+    'get_tf_kernel_monitor',
+    # Stealth Mode
+    'StealthMode',
+    'StealthLevel',
+    'AlignmentStatus',
+    'get_stealth_mode',
 ]
