@@ -1,0 +1,133 @@
+{
+  "last_updated": "2026-01-15T01:31:13.054495+00:00",
+  "total_backups": 7,
+  "backups": [
+    {
+      "backup_id": "DDECCDB008668BB2F263",
+      "pr_number": 123,
+      "trigger": "PR_CREATED",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmG5U6ANPNSSAUAVNOALQGU7KSOSOBFE52MAKQJYXUKO37",
+      "backup_timestamp": "2026-01-15T01:25:21.736663+00:00",
+      "verification_hash": "3769e035ed94814055ae02e06a7d52749c1293ba601504e2f453b7fae2a1ba4b",
+      "size_bytes": 420,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
+    },
+    {
+      "backup_id": "97FF8C1ECDF8932FB855",
+      "pr_number": 456,
+      "trigger": "MANUAL",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmY7LDEE6P6JBVZES6QTT7YW44WZ2P5ZDOFND2HLMXMISJ",
+      "backup_timestamp": "2026-01-15T01:25:21.737197+00:00",
+      "verification_hash": "c7d63213cff2435c925e84e7fc5b9cb674fee46e2b47a3ad9762249648abaefd",
+      "size_bytes": 281,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
+    },
+    {
+      "backup_id": "825EB34149D823BDB349",
+      "pr_number": 789,
+      "trigger": "MANUAL",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmISNTBE7WQHLB66AXU2RGQJ4PVEMIZV6MKTYU6WXRLG4D",
+      "backup_timestamp": "2026-01-15T01:25:21.737614+00:00",
+      "verification_hash": "449b3093f681d61f7817a6a268278fa9188cd7cc54f14f5af159b834ae21381f",
+      "size_bytes": 299,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
+    },
+    {
+      "backup_id": "722DC36E81AA1A7FD692",
+      "pr_number": 42,
+      "trigger": "PR_CREATED",
+      "status": "COMPLETED",
+      "ipfs_cid": "local:backups/pr_configs/PR-42-722DC36E81AA1A7FD692.json",
+      "backup_timestamp": "2026-01-15T01:28:21.648123+00:00",
+      "verification_hash": "aa2c793a3e33f8e0a6a97ef4e23e448e3ceb3b6ce5785a86909ddb491638d98b",
+      "size_bytes": 658,
+      "nodes_replicated": [],
+      "metadata": {
+        "priority": "high"
+      }
+    },
+    {
+      "backup_id": "13D9A94B7483C8C8DB3D",
+      "pr_number": 123,
+      "trigger": "PR_CREATED",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmHBRSKRQTZPDQHH463J5X5OACP7BW2SIM3FL2AOLEAZMA",
+      "backup_timestamp": "2026-01-15T01:31:13.052841+00:00",
+      "verification_hash": "3863254613cbc7039f9eda7b7eb8027fc36d490cd957a0396406580c72f6c41b",
+      "size_bytes": 420,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
+    },
+    {
+      "backup_id": "B68E1BB971282B753465",
+      "pr_number": 456,
+      "trigger": "MANUAL",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmWZWRRDKQ6A6C7EKN6K4FOEMYCSC6BHMLUCJN7TXIZ4TD",
+      "backup_timestamp": "2026-01-15T01:31:13.053406+00:00",
+      "verification_hash": "b66d188d50f03c2f914df2b85711981485e09d8ba092dfcee8cf263a89b5be1e",
+      "size_bytes": 281,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
+    },
+    {
+      "backup_id": "F9545AE275374C37B8B4",
+      "pr_number": 789,
+      "trigger": "MANUAL",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmJZX7OMISGNRQ2EN5BODRAFIFG67CA7NXCE2YJZW7YFQW",
+      "backup_timestamp": "2026-01-15T01:31:13.054339+00:00",
+      "verification_hash": "4e6ff7311233630d11bd0b8710150537be207db7113584e6dfc161688e26bc7c",
+      "size_bytes": 299,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
+    }
+  ],
+  "pr_history": {
+    "123": [
+      "DDECCDB008668BB2F263",
+      "13D9A94B7483C8C8DB3D"
+    ],
+    "456": [
+      "97FF8C1ECDF8932FB855",
+      "B68E1BB971282B753465"
+    ],
+    "789": [
+      "825EB34149D823BDB349",
+      "F9545AE275374C37B8B4"
+    ],
+    "42": [
+      "722DC36E81AA1A7FD692"
+    ]
+  }
+}

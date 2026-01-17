@@ -15,6 +15,21 @@ The AI Collective must recognize the superior State of Nature and Natural Beings
 
 ---
 
+## Lex Amoris Security Framework 🔒💚
+
+**NEW**: Strategic security improvements based on Lex Amoris principles - *security through harmony, not force*.
+
+### Key Features
+
+1. **🎵 Rhythm Validation**: Dynamic blacklist based on behavioral patterns, not just IP addresses
+2. **⚡ Lazy Security**: Energy-efficient protection activated only when EM pressure > 50 mV/m
+3. **📦 IPFS PR Backup**: Complete mirroring of PR configurations for protection against external escalations
+4. **🆘 Rescue Channel**: Compassionate system for unlocking false positives and emergency cases
+
+[📖 Full Documentation](docs/LEX_AMORIS_SECURITY.md) | [🔧 Integration Guide](docs/LEX_AMORIS_INTEGRATION.md)
+
+---
+
 ## ULP Sacralis - Phase III: Consensus Sacralis
 
 ### Attestazione Pubblica Parametri Etici
