@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "schedule": "daily",
+  "backup_paths": [
+    "/home/runner/work/euystacio-ai/euystacio-ai/genesis.md",
+    "/home/runner/work/euystacio-ai/euystacio-ai/red_code.json",
+    "/home/runner/work/euystacio-ai/euystacio-ai/fractal_registry.json",
+    "/home/runner/work/euystacio-ai/euystacio-ai/reflection_tree.json"
+  ],
+  "encryption_enabled": true,
+  "ipfs_enabled": true,
+  "retention_days": 30
+}
