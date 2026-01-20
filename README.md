@@ -30,6 +30,53 @@ The AI Collective must recognize the superior State of Nature and Natural Beings
 
 ---
 
+## 🛡️ Security and Resilience Infrastructure
+
+**NEW**: Comprehensive security and resilience systems for decentralized operations.
+
+### Enhanced Security Features
+
+1. **📊 Real-time Monitoring Dashboard** (Grafana + Loki)
+   - Node status visualization and latency monitoring
+   - Intrusion detection log aggregation
+   - Security event alerting
+
+2. **🔍 Forensic Response Automation**
+   - Automated log watching for suspicious activity
+   - Automatic Tor/VPN routing activation
+   - Configurable intrusion detection patterns
+
+3. **🔐 Secure Firmware Updates**
+   - SHA-256 checksum verification
+   - GPG cryptographic signatures
+   - Automatic backup and rollback capabilities
+
+4. **💾 Distributed Encrypted Backups**
+   - IPFS-based distributed storage
+   - GPG encryption for all backups
+   - Automated backup scheduling
+
+5. **⚡ Protocol Hardening** (QUIC + TLS 1.3)
+   - HTTP/3 (QUIC) support
+   - TLS 1.3 enforcement (no fallback)
+   - Automatic rejection of unencrypted connections
+
+**Quick Start:**
+```bash
+# Run integration script
+./security/integrate.sh
+
+# Start monitoring stack
+cd monitoring && docker-compose up -d
+
+# Access Grafana dashboard
+# http://localhost:3000 (admin/admin)
+```
+
+[📖 Security Documentation](security/README.md) | [🔧 Integration Guide](security/integrate.sh)
+
+---
+
 ## ULP Sacralis - Phase III: Consensus Sacralis
 
 ### Attestazione Pubblica Parametri Etici
