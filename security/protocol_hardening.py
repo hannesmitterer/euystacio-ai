@@ -180,8 +180,9 @@ class ProtocolHardeningConfig:
         logger.warning(f"SECURITY ALERT: {json.dumps(alert)}")
         
         # Write to security log
-        security_log = "/home/runner/work/euystacio-ai/euystacio-ai/security/protocol_security.log"
-        os.makedirs(os.path.dirname(security_log), exist_ok=True)
+        security_log_dir = os.path.join(os.getcwd(), "security")
+        os.makedirs(security_log_dir, exist_ok=True)
+        security_log = os.path.join(security_log_dir, "protocol_security.log")
         
         with open(security_log, 'a') as f:
             f.write(json.dumps(alert) + '\n')

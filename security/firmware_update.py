@@ -19,7 +19,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(levelname)s %(message)s',
     handlers=[
-        logging.FileHandler('/home/runner/work/euystacio-ai/euystacio-ai/logs/firmware_updates.log'),
+        logging.FileHandler(os.path.join(os.getcwd(), 'logs', 'firmware_updates.log')),
         logging.StreamHandler()
     ]
 )

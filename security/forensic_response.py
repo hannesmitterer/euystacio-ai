@@ -21,7 +21,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(levelname)s %(message)s',
     handlers=[
-        logging.FileHandler('/home/runner/work/euystacio-ai/euystacio-ai/security/intrusion_detection.log'),
+        logging.FileHandler(os.path.join(os.getcwd(), 'logs', 'intrusion_detection.log')),
         logging.StreamHandler()
     ]
 )

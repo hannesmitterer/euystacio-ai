@@ -18,7 +18,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(levelname)s %(message)s',
     handlers=[
-        logging.FileHandler('/home/runner/work/euystacio-ai/euystacio-ai/logs/backup_system.log'),
+        logging.FileHandler(os.path.join(os.getcwd(), 'logs', 'backup_system.log')),
         logging.StreamHandler()
     ]
 )
@@ -125,8 +125,14 @@ class IPFSBackupSystem:
             return self._simulate_encryption(file_path, output_path)
     
     def _simulate_encryption(self, file_path: str, output_path: str) -> str:
-        """Simulate encryption for demo purposes"""
-        logger.info(f"Simulating encryption for {file_path}")
+        """
+        Simulate encryption for demo purposes ONLY
+        
+        WARNING: This is NOT secure encryption - it's only for demonstration
+        when GPG is not available. In production, GPG must be properly configured.
+        """
+        logger.warning("USING SIMULATED ENCRYPTION - NOT SECURE FOR PRODUCTION!")
+        logger.warning("Please configure GPG properly for actual security")
         
         import base64
         
@@ -138,10 +144,12 @@ class IPFSBackupSystem:
         
         with open(output_path, 'wb') as f:
             f.write(b"-----BEGIN SIMULATED ENCRYPTED MESSAGE-----\n")
+            f.write(b"WARNING: This is NOT real encryption - Demo mode only!\n")
             f.write(encrypted_data)
             f.write(b"\n-----END SIMULATED ENCRYPTED MESSAGE-----\n")
         
         logger.info(f"Simulated encryption created: {output_path}")
+        logger.warning("This file is NOT actually encrypted - configure GPG for real security")
         return output_path
     
     def decrypt_file(self, encrypted_path: str, output_path: Optional[str] = None) -> str:
@@ -178,8 +186,13 @@ class IPFSBackupSystem:
             return self._simulate_decryption(encrypted_path, output_path)
     
     def _simulate_decryption(self, encrypted_path: str, output_path: str) -> str:
-        """Simulate decryption for demo purposes"""
-        logger.info(f"Simulating decryption for {encrypted_path}")
+        """
+        Simulate decryption for demo purposes ONLY
+        
+        WARNING: This only decodes base64 - not real decryption.
+        In production, GPG must be properly configured.
+        """
+        logger.warning("USING SIMULATED DECRYPTION - Demo mode only!")
         
         import base64
         
@@ -188,7 +201,7 @@ class IPFSBackupSystem:
         
         # Extract base64 data
         lines = content.decode().split('\n')
-        encrypted_data = ''.join([l for l in lines if not l.startswith('-----')])
+        encrypted_data = ''.join([l for l in lines if not l.startswith('-----') and 'WARNING' not in l])
         
         # Decode
         try:
