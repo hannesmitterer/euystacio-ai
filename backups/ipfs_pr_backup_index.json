@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-01-15T01:31:13.054495+00:00",
-  "total_backups": 7,
+  "last_updated": "2026-01-22T16:51:06.534751+00:00",
+  "total_backups": 10,
   "backups": [
     {
       "backup_id": "DDECCDB008668BB2F263",
@@ -111,20 +111,71 @@
         "IPFS-TERTIARY-ASIA"
       ],
       "metadata": {}
+    },
+    {
+      "backup_id": "4E75E0F9D2340040FD1A",
+      "pr_number": 123,
+      "trigger": "PR_CREATED",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmVLJ27FTRZZOYGNRS4TZZ5S2ZHT3AIPNLOM7TZONSYCSF",
+      "backup_timestamp": "2026-01-22T16:51:06.533202+00:00",
+      "verification_hash": "aad3af9671ce5d833632e4f39ecb593cf6043dab733f3cb9b2c0a45005454775",
+      "size_bytes": 420,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
+    },
+    {
+      "backup_id": "1BD5586FCF6BEA07770B",
+      "pr_number": 456,
+      "trigger": "MANUAL",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmXESBGJXVM6L2A64QTTU57UVEPYFMUMEAPAZSX2O7DHRE",
+      "backup_timestamp": "2026-01-22T16:51:06.534016+00:00",
+      "verification_hash": "b9241326f56797a07b909ce9dfd2a47e0aca308078332be9df19e242b57fc39f",
+      "size_bytes": 281,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
+    },
+    {
+      "backup_id": "9801080533E7009B942D",
+      "pr_number": 789,
+      "trigger": "MANUAL",
+      "status": "VERIFIED",
+      "ipfs_cid": "QmZ6IHCZEQ2BQPJHAQZVCWV3TRHP3BU7JGFKQFROSFCL66",
+      "backup_timestamp": "2026-01-22T16:51:06.534603+00:00",
+      "verification_hash": "cf90716490d060f49c10cd456aee713bf61a7d262aa058ba4512fdec23b704bb",
+      "size_bytes": 299,
+      "nodes_replicated": [
+        "IPFS-PRIMARY-EU",
+        "IPFS-SECONDARY-US",
+        "IPFS-TERTIARY-ASIA"
+      ],
+      "metadata": {}
     }
   ],
   "pr_history": {
     "123": [
       "DDECCDB008668BB2F263",
-      "13D9A94B7483C8C8DB3D"
+      "13D9A94B7483C8C8DB3D",
+      "4E75E0F9D2340040FD1A"
     ],
     "456": [
       "97FF8C1ECDF8932FB855",
-      "B68E1BB971282B753465"
+      "B68E1BB971282B753465",
+      "1BD5586FCF6BEA07770B"
     ],
     "789": [
       "825EB34149D823BDB349",
-      "F9545AE275374C37B8B4"
+      "F9545AE275374C37B8B4",
+      "9801080533E7009B942D"
     ],
     "42": [
       "722DC36E81AA1A7FD692"

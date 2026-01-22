@@ -70,8 +70,8 @@ class EuystacioNetwork:
         print("      ✓ AI anomaly detection active")
         print("      ✓ Encrypted buffer protection enabled")
         
-        # Layer 5: Stealth Mode
-        print("\n[5/5] Initializing Stealth Mode...")
+        # Layer 5: Stealth Mode (Enhanced with Resonance Tracking)
+        print("\n[5/5] Initializing Enhanced Stealth Mode...")
         self.stealth = get_stealth_mode(
             red_code_system=self.red_code,
             quantum_shield=self.quantum_shield
@@ -79,6 +79,8 @@ class EuystacioNetwork:
         print("      ✓ Ponte Amoris ready")
         print("      ✓ Resonance School protection active")
         print("      ✓ Lex Amoris verification online")
+        print("      ✓ Resonance tracking enabled")
+        print("      ✓ Stealth cooldown protection active")
         
         # Network state
         self.initialized_at = time.time()
@@ -249,6 +251,15 @@ class EuystacioNetwork:
         print(f"  Ponte Amoris: {'CLOSED' if not stealth['ponte_amoris']['is_open'] else 'OPEN'}")
         print(f"  Resonance School: {'INVISIBLE' if not stealth['resonance_school']['is_visible'] else 'VISIBLE'}")
         print(f"  Obfuscation: {'ACTIVE' if stealth['obfuscation_active'] else 'INACTIVE'}")
+        
+        # Resonance Status
+        if 'resonance_status' in stealth:
+            res = stealth['resonance_status']
+            print(f"\n[Resonance Tracking]")
+            print(f"  Current Resonance: {res.get('current_resonance', 'N/A')}")
+            print(f"  State: {res.get('current_state', 'N/A')}")
+            print(f"  Total Readings: {res.get('total_readings', 0)}")
+            print(f"  State Changes: {res.get('total_state_changes', 0)}")
         
         # Red Code
         rc = status["red_code"]
