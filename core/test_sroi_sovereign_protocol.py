@@ -14,6 +14,7 @@ import os
 import json
 import tempfile
 import shutil
+import logging
 from datetime import datetime
 
 from core.sroi_sovereign_protocol import (
@@ -163,7 +164,6 @@ class TestNotificationSystem(unittest.TestCase):
     
     def setUp(self):
         """Set up test notification system"""
-        import logging
         self.logger = logging.getLogger("test")
         self.notifier = NotificationSystem(self.logger)
     

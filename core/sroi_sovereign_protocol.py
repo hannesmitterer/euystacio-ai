@@ -20,7 +20,7 @@ import json
 import logging
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Dict, Any, List, Optional, Callable
+from typing import Dict, Any, List, Optional, Callable, Tuple
 from dataclasses import dataclass, asdict
 import os
 
@@ -111,7 +111,7 @@ class StateValidator:
     
     @staticmethod
     def validate_transition(from_state: SROIState, to_state: SROIState, 
-                          metrics: StateMetrics) -> tuple[bool, str]:
+                          metrics: StateMetrics) -> Tuple[bool, str]:
         """
         Validate if a state transition is allowed
         
@@ -141,7 +141,7 @@ class StateValidator:
         return True, "Transition validated successfully"
     
     @staticmethod
-    def validate_state_consistency(state: SROIState, metrics: StateMetrics) -> tuple[bool, str]:
+    def validate_state_consistency(state: SROIState, metrics: StateMetrics) -> Tuple[bool, str]:
         """
         Validate state consistency with current metrics
         
