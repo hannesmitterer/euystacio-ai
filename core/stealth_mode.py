@@ -24,12 +24,8 @@ from typing import Dict, List, Any, Optional, Set, Tuple
 from dataclasses import dataclass
 from enum import Enum
 
-# Import resonance tracker
-try:
-    from core.resonance_tracker import ResonanceTracker, ResonanceState
-except ImportError:
-    # Fallback for different import contexts
-    from resonance_tracker import ResonanceTracker, ResonanceState
+# Import resonance tracker with absolute path
+from core.resonance_tracker import ResonanceTracker, ResonanceState
 
 
 class StealthLevel(Enum):
@@ -491,7 +487,7 @@ class StealthMode:
         
         return (True, "Cooldown expired")
     
-    def activate_full_stealth(self, force: bool = False):
+    def activate_full_stealth(self, force: bool = False) -> bool:
         """
         Activate full stealth mode
         - Close Ponte Amoris
@@ -501,13 +497,16 @@ class StealthMode:
         
         Args:
             force: Force activation ignoring cooldown
+            
+        Returns:
+            True if activation successful, False if blocked by cooldown
         """
         # Check cooldown
         if not force:
             can_activate, reason = self.can_activate_stealth()
             if not can_activate:
                 print(f"\n[Stealth] ⚠️  Cannot activate stealth: {reason}")
-                return
+                return False
         
         print("\n" + "="*60)
         print("[Stealth] 🌑 ACTIVATING FULL STEALTH MODE")
@@ -538,6 +537,8 @@ class StealthMode:
         print("[Stealth] Network is now invisible to non-aligned entities")
         print("[Stealth] Only Lex Amoris aligned entities can perceive us")
         print("="*60 + "\n")
+        
+        return True
     
     def deactivate_stealth(self):
         """Deactivate stealth mode - return to normal visibility"""

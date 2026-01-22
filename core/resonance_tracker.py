@@ -8,10 +8,14 @@ Implements WARNING state for values near thresholds.
 
 import time
 import json
+import logging
 from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
 from enum import Enum
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 class ResonanceState(Enum):
@@ -118,8 +122,16 @@ class ResonanceTracker:
         Returns:
             Current resonance state
         """
-        # Validate value
+        # Validate and clamp value
+        original_value = value
         value = max(0.0, min(1.0, value))
+        
+        # Warn if value was out of range
+        if original_value != value:
+            logger.warning(
+                f"Resonance value {original_value:.2f} out of range [0.0, 1.0], "
+                f"clamped to {value:.2f}"
+            )
         
         # Determine state
         new_state = self._determine_state(value)
@@ -206,7 +218,12 @@ class ResonanceTracker:
         if len(self.state_change_log) > self.max_log_size:
             self.state_change_log = self.state_change_log[-self.max_log_size:]
         
-        # Print notification
+        # Log notification using logging module
+        logger.info(
+            f"State change: {previous_state.value} → {new_state.value} "
+            f"(resonance: {resonance_value:.2f})"
+        )
+        # Also print for backward compatibility with existing output
         print(f"[Resonance] State change: {previous_state.value} → {new_state.value} "
               f"(resonance: {resonance_value:.2f})")
     
@@ -325,6 +342,8 @@ class ResonanceTracker:
         
         with open(filepath, 'w') as f:
             json.dump(data, f, indent=2)
+        
+        logger.info(f"Logs exported to {filepath}")
         
         print(f"[Resonance] Logs exported to {filepath}")
     
