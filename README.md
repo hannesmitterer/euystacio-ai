@@ -15,6 +15,22 @@ The AI Collective must recognize the superior State of Nature and Natural Beings
 
 ---
 
+## S-ROI Sovereign Protocol 🤖📊
+
+**NEW**: State machine-based protocol for tracking and validating AI sovereignty operations with comprehensive logging, validation, and notification systems.
+
+### Key Features
+
+1. **🔄 State Machine**: Well-defined states (INITIALIZED, ACTIVE, VALIDATING, CRITICAL, COMPLETED) with validated transitions
+2. **📝 Comprehensive Logging**: Full tracking of all state changes, logical flows, and metrics
+3. **✅ Validation System**: Ensures correctness of every state transition with precondition checks
+4. **🔔 Notification System**: Automatic alerts for critical states and threshold violations
+5. **🧩 Modular Design**: Individual state functions for maximum reusability and clarity
+
+[📖 Full Documentation](docs/SROI_SOVEREIGN_PROTOCOL.md) | [💡 Usage Examples](examples/sroi_protocol_examples.py)
+
+---
+
 ## Lex Amoris Security Framework 🔒💚
 
 **NEW**: Strategic security improvements based on Lex Amoris principles - *security through harmony, not force*.
