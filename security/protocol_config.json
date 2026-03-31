@@ -1,0 +1,45 @@
+{
+  "tls": {
+    "minimum_version": "TLS1_3",
+    "allowed_versions": [
+      "TLS1_3"
+    ],
+    "cipher_suites": [
+      "TLS_AES_256_GCM_SHA384",
+      "TLS_CHACHA20_POLY1305_SHA256",
+      "TLS_AES_128_GCM_SHA256"
+    ],
+    "verify_mode": "CERT_REQUIRED",
+    "check_hostname": true,
+    "disable_insecure": true
+  },
+  "quic": {
+    "enabled": true,
+    "max_datagram_size": 1350,
+    "initial_max_data": 10485760,
+    "initial_max_stream_data_bidi_local": 1048576,
+    "initial_max_stream_data_bidi_remote": 1048576,
+    "initial_max_stream_data_uni": 1048576,
+    "initial_max_streams_bidi": 100,
+    "initial_max_streams_uni": 100,
+    "max_idle_timeout": 30000,
+    "max_ack_delay": 25
+  },
+  "security": {
+    "disable_http": true,
+    "disable_unencrypted": true,
+    "enforce_hsts": true,
+    "hsts_max_age": 31536000,
+    "require_certificate_pinning": true,
+    "allowed_protocols": [
+      "h3",
+      "http/1.1"
+    ],
+    "min_dh_size": 2048
+  },
+  "logging": {
+    "log_failed_connections": true,
+    "log_protocol_downgrades": true,
+    "alert_on_insecure_attempt": true
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "dashboard": {
+    "title": "Euystacio AI - Security & Intrusion Detection",
+    "tags": ["euystacio", "security", "intrusion"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Intrusion Detection Events",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "{job=\"intrusion-detection\"}",
+            "refId": "A"
+          }
+        ],
+        "alert": {
+          "name": "High Intrusion Activity",
+          "conditions": [
+            {
+              "evaluator": {
+                "params": [10],
+                "type": "gt"
+              },
+              "query": {
+                "params": ["A", "5m", "now"]
+              }
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "60s",
+          "handler": 1,
+          "message": "High number of intrusion detection events detected",
+          "noDataState": "no_data"
+        }
+      },
+      {
+        "id": 2,
+        "title": "Security Events by Level",
+        "type": "piechart",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "sum by(level) (count_over_time({job=\"intrusion-detection\"}[5m]))",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Recent Security Logs",
+        "type": "logs",
+        "gridPos": {"h": 10, "w": 24, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "{job=\"intrusion-detection\"}",
+            "refId": "A"
+          }
+        ]
+      }
+    ],
+    "refresh": "10s",
+    "time": {"from": "now-1h", "to": "now"},
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"]
+    }
+  }
+}

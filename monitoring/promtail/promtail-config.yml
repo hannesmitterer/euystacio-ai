@@ -1,0 +1,65 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: info
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Euystacio AI system logs
+  - job_name: euystacio-system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: euystacio-system
+          __path__: /home/runner/work/euystacio-ai/euystacio-ai/logs/*.log
+  
+  # Intrusion detection logs
+  - job_name: intrusion-detection
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: intrusion-detection
+          __path__: /home/runner/work/euystacio-ai/euystacio-ai/security/intrusion_detection.log
+    pipeline_stages:
+      - match:
+          selector: '{job="intrusion-detection"}'
+          stages:
+            - regex:
+                expression: '(?P<timestamp>\S+)\s+(?P<level>\S+)\s+(?P<event>\S+)\s+(?P<details>.*)'
+            - labels:
+                level:
+                event:
+  
+  # Node status logs
+  - job_name: node-status
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: node-status
+          __path__: /home/runner/work/euystacio-ai/euystacio-ai/logs/node_status.log
+  
+  # Backup system logs
+  - job_name: backup-system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: backup-system
+          __path__: /home/runner/work/euystacio-ai/euystacio-ai/logs/backup_system.log
+  
+  # Firmware update logs
+  - job_name: firmware-updates
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: firmware-updates
+          __path__: /home/runner/work/euystacio-ai/euystacio-ai/logs/firmware_updates.log

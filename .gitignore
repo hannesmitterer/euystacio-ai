@@ -45,3 +45,20 @@ temp/
 
 # Generated reports (regenerated at runtime)
 reports/
+
+# Security and backup files
+*.gpg
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+security/gpg_keyring/
+security/*_private.key
+security/protocol_security.log
+backups/encrypted/*.gpg
+firmware_updates/manifests/*.sig
+
+# Monitoring data
+monitoring/grafana-data/
+monitoring/loki-data/
