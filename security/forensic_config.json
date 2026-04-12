@@ -1,0 +1,41 @@
+{
+  "alert_threshold": 5,
+  "response_mode": "tor",
+  "tor_enabled": true,
+  "vpn_enabled": true,
+  "monitoring_paths": [
+    "/home/runner/work/euystacio-ai/euystacio-ai/logs/*.log",
+    "/var/log/auth.log",
+    "/var/log/syslog"
+  ],
+  "response_actions": {
+    "tor": {
+      "enabled": true,
+      "command": "systemctl start tor",
+      "verify_command": "systemctl is-active tor"
+    },
+    "vpn": {
+      "enabled": true,
+      "command": "systemctl start openvpn",
+      "verify_command": "systemctl is-active openvpn"
+    }
+  },
+  "notification_webhook": null,
+  "auto_response_enabled": true,
+  "cooldown_period": 300,
+  "intrusion_patterns": [
+    "failed login attempt",
+    "unauthorized access",
+    "brute force",
+    "sql injection",
+    "xss attack",
+    "ddos",
+    "port scan",
+    "malware detected",
+    "suspicious activity",
+    "authentication failure",
+    "permission denied",
+    "invalid token",
+    "rate limit exceeded"
+  ]
+}

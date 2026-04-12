@@ -1,0 +1,50 @@
+{
+  "dashboard": {
+    "title": "Euystacio AI - Node Status & Performance",
+    "tags": ["euystacio", "nodes", "performance"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Node Status",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "{job=\"node-status\"}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Node Latency",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "{job=\"node-status\"} |~ \"latency\"",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "System Logs",
+        "type": "logs",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "{job=\"euystacio-system\"}",
+            "refId": "A"
+          }
+        ]
+      }
+    ],
+    "refresh": "5s",
+    "time": {"from": "now-1h", "to": "now"},
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"]
+    }
+  }
+}
