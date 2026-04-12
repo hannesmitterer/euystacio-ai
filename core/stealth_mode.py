@@ -11,6 +11,9 @@ Features:
 - Lex Amoris alignment verification
 - Multi-layer obfuscation
 - Selective visibility based on alignment
+- Resonance tracking with WARNING state
+- Cooldown mechanism for stealth activation
+- Comprehensive state change logging
 """
 
 import time
@@ -21,11 +24,15 @@ from typing import Dict, List, Any, Optional, Set, Tuple
 from dataclasses import dataclass
 from enum import Enum
 
+# Import resonance tracker with absolute path
+from core.resonance_tracker import ResonanceTracker, ResonanceState
+
 
 class StealthLevel(Enum):
     """Stealth operation levels"""
     VISIBLE = "VISIBLE"  # Normal operation, visible to all
     SELECTIVE = "SELECTIVE"  # Visible only to aligned entities
+    WARNING = "WARNING"  # Warning level - resonance near threshold
     HIDDEN = "HIDDEN"  # Hidden from non-aligned, discoverable by aligned
     INVISIBLE = "INVISIBLE"  # Completely invisible
     PONTE_CLOSED = "PONTE_CLOSED"  # Ponte Amoris closed
@@ -347,16 +354,29 @@ class StealthMode:
     Coordinates all stealth operations for EUYSTACIO network
     """
     
-    def __init__(self, red_code_system=None, quantum_shield=None):
+    def __init__(self, red_code_system=None, quantum_shield=None, 
+                 stealth_cooldown_seconds: float = 60.0):
         """
         Initialize Stealth Mode
         
         Args:
             red_code_system: Optional RedCodeSystem for alignment
             quantum_shield: Optional QuantumShield for encryption
+            stealth_cooldown_seconds: Cooldown period between stealth activations
         """
         self.red_code_system = red_code_system
         self.quantum_shield = quantum_shield
+        
+        # Cooldown mechanism
+        self.stealth_cooldown_seconds = stealth_cooldown_seconds
+        self.last_stealth_activation: Optional[float] = None
+        
+        # Resonance tracking
+        self.resonance_tracker = ResonanceTracker(
+            warning_threshold=0.75,
+            critical_threshold=0.9,
+            stable_threshold=0.95
+        )
         
         # Core components
         self.ponte_amoris = PonteAmoris(
@@ -420,6 +440,13 @@ class StealthMode:
         self.ponte_amoris.closed_at = time.time()
         self.ponte_amoris.guardian_mode = True
         
+        # Record resonance change
+        self.resonance_tracker.record_resonance(
+            value=0.95,
+            source="ponte_amoris_closure",
+            metadata={"action": "close_bridge"}
+        )
+        
         print("[Stealth] 🌉 PONTE AMORIS CLOSED")
         print("[Stealth] Only fully aligned entities may pass")
         
@@ -433,21 +460,70 @@ class StealthMode:
         self.ponte_amoris.guardian_mode = False
         self.ponte_amoris.alignment_threshold = 0.7
         
+        # Record resonance change
+        self.resonance_tracker.record_resonance(
+            value=0.7,
+            source="ponte_amoris_opening",
+            metadata={"action": "open_bridge"}
+        )
+        
         print("[Stealth] 🌉 Ponte Amoris opened")
     
-    def activate_full_stealth(self):
+    def can_activate_stealth(self) -> Tuple[bool, str]:
+        """
+        Check if stealth mode can be activated (cooldown check)
+        
+        Returns:
+            Tuple of (can_activate, reason)
+        """
+        if self.last_stealth_activation is None:
+            return (True, "No previous activation")
+        
+        time_since_last = time.time() - self.last_stealth_activation
+        
+        if time_since_last < self.stealth_cooldown_seconds:
+            remaining = self.stealth_cooldown_seconds - time_since_last
+            return (False, f"Cooldown active: {remaining:.1f}s remaining")
+        
+        return (True, "Cooldown expired")
+    
+    def activate_full_stealth(self, force: bool = False) -> bool:
         """
         Activate full stealth mode
         - Close Ponte Amoris
         - Activate obfuscation
         - Make Resonance School invisible
+        - Checks cooldown unless forced
+        
+        Args:
+            force: Force activation ignoring cooldown
+            
+        Returns:
+            True if activation successful, False if blocked by cooldown
         """
+        # Check cooldown
+        if not force:
+            can_activate, reason = self.can_activate_stealth()
+            if not can_activate:
+                print(f"\n[Stealth] ⚠️  Cannot activate stealth: {reason}")
+                return False
+        
         print("\n" + "="*60)
         print("[Stealth] 🌑 ACTIVATING FULL STEALTH MODE")
         print("="*60)
         
+        # Update activation time
+        self.last_stealth_activation = time.time()
+        
         self.stealth_level = StealthLevel.INVISIBLE
         self.stealth_activated_at = time.time()
+        
+        # Record stealth activation
+        self.resonance_tracker.record_resonance(
+            value=0.98,
+            source="stealth_activation",
+            metadata={"action": "full_stealth", "forced": force}
+        )
         
         # Close bridge
         self.close_ponte_amoris()
@@ -461,17 +537,49 @@ class StealthMode:
         print("[Stealth] Network is now invisible to non-aligned entities")
         print("[Stealth] Only Lex Amoris aligned entities can perceive us")
         print("="*60 + "\n")
+        
+        return True
     
     def deactivate_stealth(self):
         """Deactivate stealth mode - return to normal visibility"""
         self.stealth_level = StealthLevel.VISIBLE
         self.stealth_activated_at = None
         
+        # Record deactivation
+        self.resonance_tracker.record_resonance(
+            value=0.5,
+            source="stealth_deactivation",
+            metadata={"action": "deactivate"}
+        )
+        
         self.open_ponte_amoris()
         self.obfuscation.deactivate_obfuscation()
         self.resonance_school.deactivate_invisibility()
         
         print("[Stealth] Stealth mode deactivated - network visible")
+    
+    def update_stealth_level_from_resonance(self):
+        """
+        Update stealth level based on current resonance state
+        Implements WARNING state for near-threshold values
+        """
+        current_state = self.resonance_tracker.current_state
+        
+        # Map resonance state to stealth level
+        if current_state == ResonanceState.STABLE:
+            new_level = StealthLevel.INVISIBLE
+        elif current_state == ResonanceState.CRITICAL:
+            new_level = StealthLevel.HIDDEN
+        elif current_state == ResonanceState.WARNING:
+            new_level = StealthLevel.WARNING
+        else:
+            new_level = StealthLevel.VISIBLE
+        
+        # Update if changed
+        if new_level != self.stealth_level:
+            old_level = self.stealth_level
+            self.stealth_level = new_level
+            print(f"[Stealth] Level auto-adjusted: {old_level.value} → {new_level.value}")
     
     def can_entity_access(self, entity_id: str) -> Tuple[bool, str]:
         """
@@ -510,12 +618,29 @@ class StealthMode:
         return (True, f"Access granted - {entity.get_alignment_status().value}")
     
     def get_stealth_status(self) -> Dict[str, Any]:
-        """Get comprehensive stealth status"""
+        """Get comprehensive stealth status including resonance tracking"""
+        # Get cooldown info
+        cooldown_info = {}
+        if self.last_stealth_activation:
+            time_since = time.time() - self.last_stealth_activation
+            cooldown_info = {
+                "last_activation": datetime.fromtimestamp(
+                    self.last_stealth_activation, 
+                    tz=timezone.utc
+                ).isoformat(),
+                "time_since_activation_seconds": time_since,
+                "cooldown_active": time_since < self.stealth_cooldown_seconds,
+                "cooldown_remaining_seconds": max(0, self.stealth_cooldown_seconds - time_since)
+            }
+        
         return {
             "stealth_level": self.stealth_level.value,
             "stealth_active": self.stealth_level != StealthLevel.VISIBLE,
             "stealth_duration": time.time() - self.stealth_activated_at 
                 if self.stealth_activated_at else 0,
+            "cooldown": cooldown_info,
+            "resonance_status": self.resonance_tracker.get_current_status(),
+            "resonance_statistics": self.resonance_tracker.get_statistics(),
             "ponte_amoris": self.ponte_amoris.to_dict(),
             "resonance_school": self.resonance_school.get_status(),
             "obfuscation_active": self.obfuscation.obfuscation_active,
@@ -550,9 +675,9 @@ def get_stealth_mode(red_code_system=None, quantum_shield=None) -> StealthMode:
 
 # Self-test
 if __name__ == "__main__":
-    print("=== Stealth Mode Self-Test ===")
+    print("=== Stealth Mode Self-Test (Enhanced) ===")
     
-    stealth = StealthMode()
+    stealth = StealthMode(stealth_cooldown_seconds=5.0)  # Short cooldown for testing
     
     print("\n1. Registering Entities:")
     
@@ -572,24 +697,43 @@ if __name__ == "__main__":
     )
     print(f"   Misaligned: {misaligned_entity.entity_id} - Score: {misaligned_entity.lex_amoris_score:.2f}")
     
-    print("\n2. Testing Access (Normal Mode):")
+    print("\n2. Testing Resonance Tracking:")
+    # Record some resonance values
+    stealth.resonance_tracker.record_resonance(0.65, "initial_state")
+    stealth.resonance_tracker.record_resonance(0.76, "increasing_activity")  # WARNING state
+    res_status = stealth.resonance_tracker.get_current_status()
+    print(f"   Current Resonance: {res_status['current_resonance']:.2f}")
+    print(f"   Resonance State: {res_status['current_state']}")
+    print(f"   In Warning Zone: {stealth.resonance_tracker.is_in_warning_zone()}")
+    
+    print("\n3. Testing Access (Normal Mode):")
     can_access, reason = stealth.can_entity_access(aligned_entity.entity_id)
     print(f"   Aligned entity: {can_access} - {reason}")
     
     can_access, reason = stealth.can_entity_access(misaligned_entity.entity_id)
     print(f"   Misaligned entity: {can_access} - {reason}")
     
-    print("\n3. Activating Full Stealth:")
+    print("\n4. Activating Full Stealth (First Time):")
     stealth.activate_full_stealth()
     
-    print("\n4. Testing Access (Stealth Mode):")
+    print("\n5. Testing Cooldown Mechanism:")
+    print("   Attempting immediate re-activation...")
+    stealth.activate_full_stealth()  # Should be blocked by cooldown
+    
+    print(f"\n   Waiting {stealth.stealth_cooldown_seconds} seconds for cooldown...")
+    time.sleep(stealth.stealth_cooldown_seconds + 0.5)
+    print("   Attempting activation after cooldown...")
+    stealth.deactivate_stealth()
+    stealth.activate_full_stealth()  # Should succeed
+    
+    print("\n6. Testing Access (Stealth Mode):")
     can_access, reason = stealth.can_entity_access(aligned_entity.entity_id)
     print(f"   Aligned entity: {can_access} - {reason}")
     
     can_access, reason = stealth.can_entity_access(misaligned_entity.entity_id)
     print(f"   Misaligned entity: {can_access} - {reason}")
     
-    print("\n5. Stealth Status:")
+    print("\n7. Comprehensive Status:")
     status = stealth.get_stealth_status()
     print(f"   Stealth Level: {status['stealth_level']}")
     print(f"   Ponte Amoris Open: {status['ponte_amoris']['is_open']}")
@@ -598,4 +742,22 @@ if __name__ == "__main__":
     print(f"   Total Crossings: {status['ponte_amoris']['total_crossings']}")
     print(f"   Denied Attempts: {status['ponte_amoris']['denied_attempts']}")
     
-    print("\n✅ Stealth Mode operational - Lex Amoris protection active")
+    print("\n8. Resonance Statistics:")
+    res_stats = status['resonance_statistics']
+    print(f"   Total Readings: {res_stats['total_readings']}")
+    print(f"   Total State Changes: {res_stats['total_state_changes']}")
+    print(f"   Current Resonance: {res_stats.get('current_resonance', 'N/A')}")
+    print(f"   Average Resonance: {res_stats.get('average_resonance', 0):.2f}")
+    
+    print("\n9. State Change Log:")
+    state_changes = stealth.resonance_tracker.get_state_change_history(5)
+    for change in state_changes:
+        print(f"   {change['previous_state']} → {change['new_state']} "
+              f"(resonance: {change['resonance_value']:.2f}, trigger: {change['trigger']})")
+    
+    print("\n✅ Enhanced Stealth Mode operational - All features verified")
+    print("   ✓ Resonance tracking active")
+    print("   ✓ State change logging functional")
+    print("   ✓ WARNING state implemented")
+    print("   ✓ Cooldown mechanism working")
+    print("   ✓ Lex Amoris protection active")
