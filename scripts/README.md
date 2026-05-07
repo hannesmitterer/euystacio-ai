@@ -59,6 +59,56 @@ The script outputs a JSON object containing:
 
 Install with: `npm install`
 
+### `verify_memory_integrity.js`
+
+Verifies memory integrity according to NRE-002 (New Ethical Rule 002: Memory).
+
+**Purpose**: Ensures the integrity of the memory system by checking hash chains, critical file presence, and compliance with memory tier policies.
+
+**Usage**:
+
+```bash
+node scripts/verify_memory_integrity.js
+# or
+npm run verify-memory
+```
+
+**Checks Performed**:
+
+1. **Tier 0 (Immutable) Memory Check**:
+   - Verifies presence of genesis documents
+   - Checks statement_of_origin.md
+   - Validates LIVING-COVENANT.md
+   - Confirms red_code.json integrity
+   - Calculates SHA-256 hashes for verification
+
+2. **NRE-002 Document Check**:
+   - Confirms NRE-002_Memoria.md exists
+   - Validates nre_002_memoria.json data file
+   - Verifies version and status information
+
+3. **Red Code Integration Check**:
+   - Loads and validates red_code.json
+   - Confirms core truth statement
+   - Checks symbiosis level
+
+**Output**:
+
+The script provides color-coded terminal output:
+- ✓ Green: Check passed
+- ✗ Red: Check failed
+- Blue: Section headers and info
+
+All verification results are logged to `docs/data/memory_verification_log.json` with timestamps.
+
+**Exit Codes**:
+- `0`: All checks passed
+- `1`: One or more checks failed
+
+**Dependencies**:
+
+- Node.js >= 14.x (crypto, fs, path modules)
+
 ## Development
 
 ### Adding New Scripts
